@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/oslokommune/ok/compare/v1.2.0...v1.3.0) (2023-11-15)
+
+
+### Features
+
+* Trigger a release ([8d73cc7](https://github.com/oslokommune/ok/commit/8d73cc79633edd8fe4ec7f2f94ff1266cd65cd9f))
+
 ## [1.2.0](https://github.com/oslokommune/ok/compare/v1.1.0...v1.2.0) (2023-11-15)
 
 

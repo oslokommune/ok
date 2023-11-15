@@ -23,3 +23,7 @@ brews:
     folder: Formula
     install: |
       bin.install "ok"
+
+    download_strategy: GitHubPrivateRepositoryReleaseDownloadStrategy
+
+    custom_require: "../homebrew_private_strategy"

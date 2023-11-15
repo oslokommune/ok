@@ -12,7 +12,7 @@ import (
 //go:embed ok.sh port-forward.sh
 var scripts embed.FS
 
-// Loads a script from the embedded filesystem, writes it to a temp file, and returns the path to the temp file.
+// Loads a script from the embedded filesystem, writes it to a temp file, and returns the path to the temp file...
 func createTempScriptFile(scriptName string) (string, error) {
 	scriptContent, err := scripts.ReadFile(scriptName)
 	if err != nil {

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/oslokommune/ok/charming"
 	"github.com/oslokommune/ok/scriptrunner"
 	"github.com/oslokommune/ok/toggle"
 	"github.com/spf13/cobra"
@@ -19,7 +20,8 @@ func NewRootCommand() *cobra.Command {
 		newGetTemplateCommand(),
 		newForwardCommand(),
 		newVersionCommand(),
-		newAssumeCommand())
+		newAssumeCommand(),
+		newCharmingCommand())
 
 	return rootCmd
 }
@@ -106,6 +108,17 @@ func newAssumeCommand() *cobra.Command {
 		Short: "Toggle assume_cd_role in app stack",
 		Run: func(cmd *cobra.Command, args []string) {
 			toggle.Assume()
+		},
+	}
+}
+
+// The whole function for charming
+func newCharmingCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:   "charming",
+		Short: "Run charming",
+		Run: func(cmd *cobra.Command, args []string) {
+			charming.Hehe()
 		},
 	}
 }

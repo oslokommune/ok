@@ -26,4 +26,4 @@ brews:
 
     download_strategy: GitHubPrivateRepositoryReleaseDownloadStrategy
 
-    custom_require: "lib/homebrew_private_strategy"
+    custom_require: "lib/private_strategy"

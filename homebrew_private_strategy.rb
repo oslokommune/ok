@@ -42,20 +42,6 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   require "utils/formatter"
   require "utils/github"
 
-  # fix issue: https://github.com/Homebrew/brew/issues/15169
-  # bypass a HEAD request that does NOT contains token, which will fail
-  def resolve_url_basename_time_file_size(url, timeout: nil)
-    url = download_url
-    super
-  end
-
-  # [2023-10-14] brew relies on this output to rename the downloaded file
-  # See: https://github.com/Homebrew/brew/blob/fbe50bf280bff033b968d439d5441d338afec98f/Library/Homebrew/download_strategy.rb#L305
-  # Not setting this will break formulas during install stage, symtoms: Errno::ENOENT: No such file or directory - path/to/file
-  def resolved_basename
-    @filename
-  end
-
   def initialize(url, name, version, **meta)
     super
     parse_url_pattern
@@ -76,7 +62,7 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
 
   private
 
-  def _fetch(url:, resolved_url:)
+  def _fetch(url:, resolved_url:, timeout:)
     curl_download download_url, to: temporary_path
   end
 
@@ -128,7 +114,7 @@ class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDo
 
   private
 
-  def _fetch(url:, resolved_url:)
+  def _fetch(url:, resolved_url:, timeout:)
     # HTTP request header `Accept: application/octet-stream` is required.
     # Without this, the GitHub API will respond with metadata, not binary.
     curl_download download_url, "--header", "Accept: application/octet-stream", to: temporary_path
@@ -147,7 +133,7 @@ class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDo
   end
 
   def fetch_release_metadata
-    release_url = "https://api.github.com/repos/#{@owner}/#{@repo}/releases/tags/#{@tag}"
-    GitHub.open_api(release_url)
+    GitHub.get_release(@owner, @repo, @tag)
   end
 end
+

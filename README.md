@@ -15,7 +15,7 @@ Make sure you are logged in to GitHub with `gh`.
 
 ```sh
 export HOMEBREW_GITHUB_API_TOKEN=$(gh config get -h github.com oauth_token)
-brew tap oslokommune/ok https://github.com/oslokommune/ok
+brew tap oslokommune/ok git@github.com:oslokommune/ok.git
 brew install ok
 ```
 

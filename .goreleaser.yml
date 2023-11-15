@@ -1,0 +1,19 @@
+# The changelog is managed by release-please
+changelog:
+  skip: true
+
+builds:
+  - binary: ok
+
+brews:
+  - name: ok
+    description: A CLI called ok
+    homepage: https://github.com/oslokommune/ok
+    goarm: 6
+    goamd64: v3
+    tap:
+      owner: oslokommune
+      name: ok
+    folder: Formula
+    install: |
+      bin.install "ok"

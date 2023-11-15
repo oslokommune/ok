@@ -4,44 +4,59 @@ import (
 	"embed"
 	"fmt"
 	"os"
-	"os/exec"
+
+	"github.com/magefile/mage/sh"
 )
 
 //go:embed ok.sh port-forward.sh
 var scripts embed.FS
 
-func RunScript(scriptName string, args []string) {
+// Loads a script from the embedded filesystem, writes it to a temp file, and returns the path to the temp file.
+func createTempScriptFile(scriptName string) (string, error) {
 	scriptContent, err := scripts.ReadFile(scriptName)
 	if err != nil {
-		fmt.Println("Error reading script:", err)
-		return
+		return "", fmt.Errorf("error reading script: %w", err)
 	}
 
-	// Using fmt.Sprintf for string formatting
 	tmpFileName := fmt.Sprintf("*-%s", scriptName)
 	tmpFile, err := os.CreateTemp("", tmpFileName)
 	if err != nil {
-		fmt.Println("Error creating temp file:", err)
-		return
+		return "", fmt.Errorf("error creating temp file: %w", err)
 	}
-	defer os.Remove(tmpFile.Name())
 
 	if _, err := tmpFile.Write(scriptContent); err != nil {
-		fmt.Println("Error writing to temp file:", err)
-		return
+		return "", fmt.Errorf("error writing to temp file: %w", err)
 	}
 	if err := tmpFile.Close(); err != nil {
-		fmt.Println("Error closing temp file:", err)
+		return "", fmt.Errorf("error closing temp file: %w", err)
+	}
+
+	return tmpFile.Name(), nil
+}
+
+// Executes a script with the given arguments, and returns the output.
+func executeScript(scriptFile string, args []string) (string, error) {
+	combinedArgs := append([]string{scriptFile}, args...)
+	output, err := sh.Output("/bin/bash", combinedArgs...)
+	if err != nil {
+		return "", fmt.Errorf("error executing script: %v", err)
+	}
+
+	return output, nil
+}
+
+func RunScript(scriptName string, args []string) {
+	scriptFile, err := createTempScriptFile(scriptName)
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
+	defer os.Remove(scriptFile)
 
-	cmdArgs := append([]string{"/bin/bash", tmpFile.Name()}, args...)
-	cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		fmt.Println("Error running script:", err)
+	output, err := executeScript(scriptFile, args)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
+	fmt.Println(output)
 }

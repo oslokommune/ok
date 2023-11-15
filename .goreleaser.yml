@@ -4,6 +4,12 @@ changelog:
 
 builds:
   - binary: ok
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
 
 brews:
   - name: ok
@@ -11,7 +17,7 @@ brews:
     homepage: https://github.com/oslokommune/ok
     goarm: 6
     goamd64: v3
-    tap:
+    repository:
       owner: oslokommune
       name: ok
     folder: Formula

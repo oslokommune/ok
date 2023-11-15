@@ -5,12 +5,12 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "1.0.0"
+  version "1.1.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/oslokommune/ok/releases/download/v1.0.0/ok_1.0.0_darwin_arm64.tar.gz"
-      sha256 "2969766da9bdc41261b29c039276e8e44c48862d707b119a436b027474ba1ff1"
+      url "https://github.com/oslokommune/ok/releases/download/v1.1.0/ok_1.1.0_darwin_arm64.tar.gz"
+      sha256 "0de85d92f72b0c031644ed2823776d06a7d2b8e015ddb5f24ad02cdfe4d0e1f9"
 
       def install
         bin.install "ok"
@@ -20,8 +20,8 @@ class Ok < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/oslokommune/ok/releases/download/v1.0.0/ok_1.0.0_linux_arm64.tar.gz"
-      sha256 "b42cec1d1b17321a3a0950c0cf67e39647e23e699e531d740a51d43c89f4c5be"
+      url "https://github.com/oslokommune/ok/releases/download/v1.1.0/ok_1.1.0_linux_arm64.tar.gz"
+      sha256 "5889e1cc1c9efdecfa969ce78d1ec4533c2ba0afc553361daefc57feea4b40b4"
 
       def install
         bin.install "ok"

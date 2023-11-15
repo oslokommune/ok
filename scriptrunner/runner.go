@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/magefile/mage/sh"
 )
@@ -37,7 +38,13 @@ func createTempScriptFile(scriptName string) (string, error) {
 // Executes a script with the given arguments, and returns the output.
 func executeScript(scriptFile string, args []string) (string, error) {
 	combinedArgs := append([]string{scriptFile}, args...)
-	output, err := sh.Output("/bin/bash", combinedArgs...)
+
+	bashPath, err := exec.LookPath("bash")
+	if err != nil {
+		return "", fmt.Errorf("failed to find bash: %v", err)
+	}
+
+	output, err := sh.Output(bashPath, combinedArgs...)
 	if err != nil {
 		return "", fmt.Errorf("error executing script: %v", err)
 	}

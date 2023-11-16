@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0](https://github.com/oslokommune/ok/compare/v1.3.0...v1.4.0) (2023-11-16)
+
+
+### Features
+
+* Add command descriptions ([6998ff7](https://github.com/oslokommune/ok/commit/6998ff702bb82a43174a5a30017ccd50e5735131))
+* Output output when error occurs ([ba2862e](https://github.com/oslokommune/ok/commit/ba2862e9d4d89d89b6c97bbd3c181bb4fd8e2e1f))
+
 ## [1.3.0](https://github.com/oslokommune/ok/compare/v1.2.0...v1.3.0) (2023-11-15)
 
 

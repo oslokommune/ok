@@ -2,7 +2,7 @@
 
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 ![Homebrew](https://img.shields.io/badge/Homebrew-blue)
-![Static Badge](https://img.shields.io/badge/Go-teal)
+![Go](https://img.shields.io/badge/Go-teal)
 
 
 <p align="center">
@@ -24,6 +24,7 @@ brew install ok
 If you watch the project (Watch → Custom → Releases) you can easily upgrade to the latest version when notified:
 
 ```sh
+brew update
 brew upgrade ok
 ```
 

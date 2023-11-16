@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
+	"strings"
 
 	"github.com/magefile/mage/sh"
 )
@@ -44,7 +46,9 @@ func executeScript(scriptFile string, args []string) (string, error) {
 		return "", fmt.Errorf("failed to find bash: %v", err)
 	}
 
-	output, err := sh.Output(bashPath, combinedArgs...)
+	env, err := toMap(os.Getenv("PATH"))
+
+	output, err := sh.OutputWith(env, bashPath, combinedArgs...)
 	if err != nil {
 		return "", fmt.Errorf("error executing script: %v: %s", err, output)
 	}
@@ -52,6 +56,27 @@ func executeScript(scriptFile string, args []string) (string, error) {
 	return output, nil
 }
 
+func toMap(input string) map[string]string {
+	// Define the separator (assuming ':' as a common path separator)
+	var separator string
+	if runtime.GOOS == "windows" {
+		separator = ";"
+	} else {
+		separator = ":"
+	}
+
+	// Split the input string based on the separator
+	items := strings.Split(input, separator)
+
+	// Create a map to store each item with a unique key
+	result := make(map[string]string)
+	for i, item := range items {
+		key := fmt.Sprintf("item%d", i)
+		result[key] = item
+	}
+
+	return result
+}
 func RunScript(scriptName string, args []string) {
 	scriptFile, err := createTempScriptFile(scriptName)
 	if err != nil {

@@ -57,9 +57,8 @@ func executeScript(scriptFile string, args []string) (string, error) {
 }
 
 func toMap(input string) map[string]string {
-	// Define the separator (assuming ':' as a common path separator)
 	var separator string
-	if runtime.GOOS == "windows" {
+	if strings.Contains(runtime.GOOS, "windows") {
 		separator = ";"
 	} else {
 		separator = ":"

@@ -46,7 +46,7 @@ func executeScript(scriptFile string, args []string) (string, error) {
 
 	output, err := sh.Output(bashPath, combinedArgs...)
 	if err != nil {
-		return "", fmt.Errorf("error executing script: %v", err)
+		return "", fmt.Errorf("error executing script: %v: %s", err, output)
 	}
 
 	return output, nil

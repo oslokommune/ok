@@ -5,12 +5,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newCharmingCommand() *cobra.Command {
-	return &cobra.Command{
-		Use:   "charming",
-		Short: "Run charming",
-		Run: func(cmd *cobra.Command, args []string) {
-			charming.Hehe()
-		},
-	}
+func init() {
+	rootCmd.AddCommand(charmingCommand)
+}
+
+var charmingCommand = &cobra.Command{
+	Use:   "charming",
+	Short: "Run charming",
+	Run: func(cmd *cobra.Command, args []string) {
+		charming.Hehe()
+	},
 }

@@ -1,25 +1,21 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
-func NewRootCommand() *cobra.Command {
-	var rootCmd = &cobra.Command{
-		Use:   "ok",
-		Short: "The ok tool.",
-		Long:  "The ok tool.",
+var rootCmd = &cobra.Command{
+	Use:   "ok",
+	Short: "The ok tool.",
+	Long:  "The ok tool.",
+}
+
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
-
-	rootCmd.AddCommand(newBootstrapCommand(),
-		newScaffoldCommand(),
-		newEnvCommand(),
-		newEnvarsCommand(),
-		newGetTemplateCommand(),
-		newForwardCommand(),
-		newVersionCommand(),
-		newAssumeCommand(),
-		newCharmingCommand())
-
-	return rootCmd
 }

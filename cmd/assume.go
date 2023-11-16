@@ -5,12 +5,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newAssumeCommand() *cobra.Command {
-	return &cobra.Command{
-		Use:   "assume",
-		Short: "Toggle assume_cd_role in app stack",
-		Run: func(cmd *cobra.Command, args []string) {
-			toggle.Assume()
-		},
-	}
+func init() {
+	rootCmd.AddCommand(assumeCommand)
+}
+
+var assumeCommand = &cobra.Command{
+	Use:   "assume",
+	Short: "Toggle assume_cd_role in app stack",
+	Run: func(cmd *cobra.Command, args []string) {
+		toggle.Assume()
+	},
 }

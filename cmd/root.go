@@ -7,7 +7,8 @@ import (
 func NewRootCommand() *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use:   "ok",
-		Short: "Command Runner is a simple tool to run a script with subcommands",
+		Short: "The ok tool.",
+		Long:  "The ok tool.",
 	}
 
 	rootCmd.AddCommand(newBootstrapCommand(),

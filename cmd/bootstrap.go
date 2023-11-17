@@ -15,6 +15,6 @@ var bootstrapCommand = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		//fullArgs := append([]string{"bootstrap"}, args...)
 		//scriptrunner.RunScript("ok.sh", fullArgs)
-		bootstrap.ReadHCLFile()
+		bootstrap.Entry()
 	},
 }

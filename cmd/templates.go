@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/oslokommune/ok/scriptrunner"
+	"github.com/oslokommune/ok/internal/scriptrunner"
 	"github.com/spf13/cobra"
 )
 

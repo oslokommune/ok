@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/oslokommune/ok/toggle"
+	"github.com/oslokommune/ok/pkg/toggle"
 	"github.com/spf13/cobra"
 )
 

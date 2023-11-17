@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/oslokommune/ok/compare/v1.4.0...v1.4.1) (2023-11-17)
+
+
+### Bug Fixes
+
+* Use bootstrap as arg ([#10](https://github.com/oslokommune/ok/issues/10)) ([e925b29](https://github.com/oslokommune/ok/commit/e925b29016667577a04c38f0fda2cb5baf7d81d4))
+
 ## [1.4.0](https://github.com/oslokommune/ok/compare/v1.3.0...v1.4.0) (2023-11-16)
 
 

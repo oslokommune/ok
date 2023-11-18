@@ -12,7 +12,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// OriginalConfig represents the structure of the YAML configuration file (think of `env.yml`)“.
+// OriginalConfig represents the structure of the YAML configuration file (think of `env.yml`).
 type OriginalConfig struct {
 	APIVersion string `yaml:"apiVersion"`
 	Kind       string `yaml:"kind"`

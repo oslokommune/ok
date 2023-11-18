@@ -1,12 +1,16 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/oslokommune/ok/internal/charming"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	rootCmd.AddCommand(charmingCommand)
+	if os.Getenv("OK_ENABLE_EXPERIMENTAL") == "true" {
+		rootCmd.AddCommand(charmingCommand)
+	}
 }
 
 var charmingCommand = &cobra.Command{

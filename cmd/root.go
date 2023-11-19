@@ -22,15 +22,6 @@ var (
 	defaultConfigPath string
 )
 
-// init initializes the root command, setting up the configuration file path and flags.
-func init() {
-	home, err := os.UserHomeDir()
-	cobra.CheckErr(err)
-	defaultConfigPath = path.Join(home, ".config", "ok", "config.yml")
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", defaultConfigPath))
-	cobra.OnInitialize(initializeConfiguration)
-}
-
 // setDefaultConfigPath configures viper with the default configuration path.
 func setDefaultConfigPath() {
 	viper.AddConfigPath(path.Dir(defaultConfigPath))
@@ -50,6 +41,8 @@ func setConfigFile() {
 // initializeConfiguration is the function that initializes configuration using viper. It is called at the start of the application.
 func initializeConfiguration() {
 	setConfigFile()
+	viper.SetDefault("enable_experimental", true)
+	viper.SetEnvPrefix("ok")
 	viper.AutomaticEnv()
 	loadConfiguration()
 }
@@ -66,5 +59,17 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
+	}
+}
+
+// init initializes the root command, setting up the configuration file path and flags.
+func init() {
+	home, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+	defaultConfigPath = path.Join(home, ".config", "ok", "config.yml")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", defaultConfigPath))
+	initializeConfiguration()
+	if viper.GetBool("enable_experimental") {
+		rootCmd.AddCommand(charmingCommand)
 	}
 }

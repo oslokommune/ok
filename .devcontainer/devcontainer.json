@@ -3,6 +3,9 @@
   "features": {
     "ghcr.io/devcontainers/features/go:1": {}
   },
+  "remoteEnv": {
+    "OK_ENABLE_EXPERIMENTAL": "true"
+  },
   "customizations": {
     "vscode": {
       "extensions": [

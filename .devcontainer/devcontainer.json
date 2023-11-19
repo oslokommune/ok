@@ -2,5 +2,15 @@
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "features": {
     "ghcr.io/devcontainers/features/go:1": {}
-  }
+},
+"customizations": {
+	"vscode": {
+		"extensions": [
+			"golang.go",
+			"DavidAnson.vscode-markdownlint",
+			"GitHub.copilot",
+			"GitHub.copilot-chat"
+		]
+	}
+}
 }

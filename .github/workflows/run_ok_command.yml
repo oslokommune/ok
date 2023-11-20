@@ -75,6 +75,8 @@ jobs:
         env:
           HOMEBREW_GITHUB_API_TOKEN: "${{ github.token }}"
         run: |
+          base64_token=$(echo -n "x-access-token:${{ github.token }}" | base64 | tr -d "\n")
+          git config --global "http.${GITHUB_SERVER_URL}/.extraheader" "Authorization: basic ${base64_token}"
           brew tap oslokommune/ok https://github.com/oslokommune/ok
           brew install ok
           ok "${{ inputs.subcommand }}"

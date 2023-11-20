@@ -65,8 +65,8 @@ func TranslateToJSONConfig(orig *OriginalConfig) *JSONConfig {
 // load reads and unmarshals a YAML file into an OriginalConfig object.
 // Returns the unmarshalled OriginalConfig.
 // Exits the program if reading or unmarshalling fails.
-func load() OriginalConfig {
-	data, err := os.ReadFile("env.yml")
+func load(filename string) OriginalConfig {
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatalf("error reading file: %v", err)
 	}
@@ -102,7 +102,7 @@ func readHCLFile(filename string) (*hclwrite.File, error) {
 // It orchestrates the loading, translating, and writing of configuration files.
 func Entry() {
 
-	origConfig := load()
+	origConfig := load("env.yaml")
 	jsonConfig := TranslateToJSONConfig(&origConfig)
 
 	err := jsonConfig.ToJSONFile("_config.auto.tfvars.json")

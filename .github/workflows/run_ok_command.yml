@@ -75,7 +75,7 @@ jobs:
 
       - name: Setup mocks
         run: |
-          ./.github/scripts/setup_mocks.sh
+          source .github/scripts/setup_mocks.sh
 
      
       - name: Run ok

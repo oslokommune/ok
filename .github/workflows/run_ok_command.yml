@@ -72,35 +72,11 @@ jobs:
           go-version-file: "go.mod"
           cache-dependency-path: "go.sum"
 
+
       - name: Setup mocks
         run: |
-          function setupMocks() {
-              if ! command -v terraform &> /dev/null; then
-                  function terraform() {
-                      printf "mock terraform with args: %s\n" "${ARRAY_VAR[@]}"
-                  }
-                  export -f terraform
-              else
-                  _ORIGINAL_TERRAFORM=$(which terraform)
-              fi
+          ./setup-mocks.sh
 
-              if ! command -v fzf &> /dev/null; then
-                  function fzf() {
-                      printf "mock fzf with args: %s\n" "${ARRAY_VAR[@]}"
-                  }
-                  export -f fzf
-              else
-                  _ORIGINAL_FZF=$(which fzf)
-              fi 
-
-              if ! command -v gh &> /dev/null; then
-                  function gh() {
-                      printf "mock gh with args: %s\n" "${ARRAY_VAR[@]}"
-                  }
-                  export -f gh
-              else
-                  _ORIGINAL_GH=$(which gh)
-              fi
      
       - name: Run ok
         run: |

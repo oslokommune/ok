@@ -1,4 +1,5 @@
 - [x] Test reading HCL to a struct, modify it, write it to a new file
+- [ ] Lage høynivå tester? (Se feks https://github.com/oslokommune/aws-delete-stacks/blob/main/cmd/util_test_runner_test.go#L64)
 - [ ] Create dir `remote-state`
 - [ ] Write files needed by bootstrap
   - [x] `_config.auto.tfvars.json`

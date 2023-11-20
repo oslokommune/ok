@@ -6,12 +6,12 @@ require_relative "lib/private_strategy"
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "1.4.1"
+  version "1.5.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/oslokommune/ok/releases/download/v1.4.1/ok_1.4.1_darwin_arm64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "01ddfca24eb3ad21e4cdc1293305df692b5731d6cc425dbcf38c0eca45eb4891"
+      url "https://github.com/oslokommune/ok/releases/download/v1.5.0/ok_1.5.0_darwin_arm64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
+      sha256 "6638b834283f47b10203cd707f5fe0141b045aa5c74e487a401c90fc9518a4ab"
 
       def install
         bin.install "ok"
@@ -21,8 +21,8 @@ class Ok < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/oslokommune/ok/releases/download/v1.4.1/ok_1.4.1_linux_arm64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "a6e097f0752f7c174193f1882d39cddf901a761e88eb5abcfe4b44e42106fec1"
+      url "https://github.com/oslokommune/ok/releases/download/v1.5.0/ok_1.5.0_linux_arm64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
+      sha256 "ac2ca89acf9fd4f98d989bedf8f83f4ce5019fc5fd19bd9661a8273f6b5ed8c9"
 
       def install
         bin.install "ok"

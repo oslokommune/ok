@@ -62,21 +62,16 @@ jobs:
 
     steps:
 
-      - if: runner.os == 'linux'
-        name: Add Homebrew to PATH
-        run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
-
-
-      - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+        with:
+          token: "${{ github.token }}"
 
 
       - name: Install ok
         env:
           HOMEBREW_GITHUB_API_TOKEN: "${{ github.token }}"
         run: |
-          base64_token=$(echo -n "x-access-token:${{ github.token }}" | base64 | tr -d "\n")
-          git config --global "http.${GITHUB_SERVER_URL}/.extraheader" "Authorization: basic ${base64_token}"
           brew tap oslokommune/ok https://github.com/oslokommune/ok
           brew install ok
           ok "${{ inputs.subcommand }}"

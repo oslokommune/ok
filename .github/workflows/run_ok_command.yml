@@ -75,7 +75,7 @@ jobs:
 
       - name: Setup mocks
         run: |
-          ./setup-mocks.sh
+          ./setup_mocks.sh
 
      
       - name: Run ok

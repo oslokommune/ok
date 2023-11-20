@@ -54,7 +54,7 @@ jobs:
 
     name: "Run ok subcommand ${{ inputs.subcommand }}"
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     defaults:
       run:

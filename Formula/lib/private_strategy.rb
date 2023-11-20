@@ -99,6 +99,10 @@ class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDo
     super
   end
 
+  def resolve_url_basename_time_file_size(url, timeout: nil)
+    [download_url, "", Time.now, 0, false]
+  end
+
   def parse_url_pattern
     url_pattern = %r{https://github.com/([^/]+)/([^/]+)/releases/download/([^/]+)/(\S+)}
     unless @url =~ url_pattern

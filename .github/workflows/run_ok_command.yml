@@ -73,5 +73,6 @@ jobs:
           HOMEBREW_GITHUB_API_TOKEN: "${{ github.token }}"
         run: |
           brew tap oslokommune/ok https://github.com/oslokommune/ok
+          brew update
           brew install ok
           ok "${{ inputs.subcommand }}"

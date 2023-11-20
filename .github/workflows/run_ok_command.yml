@@ -73,12 +73,8 @@ jobs:
           cache-dependency-path: "go.sum"
 
 
-      - name: Setup mocks
-        run: |
-          source .github/scripts/setup_mocks.sh
-
-     
       - name: Run ok
         run: |
+          source .github/scripts/setup_mocks.sh
           setupMocks
           go run main.go "${{ inputs.subcommand }}"

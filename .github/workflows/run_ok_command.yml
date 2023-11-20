@@ -1,0 +1,70 @@
+name: Run a ok command
+
+on:
+
+  workflow_dispatch:
+
+    inputs:
+
+      subcommand:
+        type: choice
+        description: 'The ok command to run'
+        options:
+          - 'env'
+          - 'bootstrap'
+          - 'scaffold'
+
+      working_directory:
+        description: >
+          The working directory to run ok from.
+        required: true
+        type: string
+
+      create_pr:
+        type: boolean
+        description: 'Create a PR with the changes'
+        default: false
+
+  workflow_call:
+
+    secrets:
+
+      GPG_PRIVATE_KEY:
+        description: "The GPG private key to use for signing commits"
+        required: true
+      GPG_PASSPHRASE:
+        description: "The passphrase for the GPG private key"
+        required: true
+
+    inputs:
+
+      subcommand:
+        type: string
+        description: 'The ok command to run'
+        required: true
+
+      create_pr:
+        type: boolean
+        description: 'Create a PR with the changes'
+        default: false
+
+jobs:
+
+  mage:
+
+    name: "Run ok subcommand ${{ inputs.subcommand }}"
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+
+      - name: Install ok
+        run: |
+          export HOMEBREW_GITHUB_API_TOKEN=$(gh config get -h github.com oauth_token)
+          brew tap oslokommune/ok git@github.com:oslokommune/ok.git
+          brew install ok
+          ok "${{ inputs.subcommand }}"

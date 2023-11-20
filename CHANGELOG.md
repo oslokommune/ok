@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/oslokommune/ok/compare/v1.4.1...v1.5.0) (2023-11-20)
+
+
+### Features
+
+* Add toggle for experimental features ([d3d271a](https://github.com/oslokommune/ok/commit/d3d271a69d59ccaf8aabda7522da6db530542191))
+* Use Viper for enabling experimental features ([96af6ed](https://github.com/oslokommune/ok/commit/96af6edc00486d9a425e5d2ce73e385aa2863cee))
+
 ## [1.4.1](https://github.com/oslokommune/ok/compare/v1.4.0...v1.4.1) (2023-11-17)
 
 

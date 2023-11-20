@@ -72,7 +72,7 @@ jobs:
           go-version-file: "go.mod"
           cache-dependency-path: "go.sum"
 
-      - Setup mocks
+      - name: Setup mocks
         run: |
           function setupMocks() {
               if ! command -v terraform &> /dev/null; then

@@ -1,0 +1,15 @@
+- [x] Test reading HCL to a struct, modify it, write it to a new file
+- [ ] Create dir `remote-state`
+- [ ] Write files needed by bootstrap
+  - [x] `_config.auto.tfvars.json`
+  - [ ] `_variables.tf`
+  - [ ] `_config.tf`
+  - [ ] `_versions_bootstrap.tf`
+- [ ] Run `terraform init` and `terraform apply`
+- [ ] Do something so we get `versions.tf` with correct contents (same as `ok scaffold`), for instance
+  - [ ] Delete `_versions_bootstrap.tf`
+  - [ ] Create `versions.tf`
+- [ ] Run `terraform init -upgrade -force-copy`
+- [ ] Consider: Run `terraform plan` and verify 0 changes
+- [ ] Run `rm terraform.tfstate`
+ 

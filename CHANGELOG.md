@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/oslokommune/ok/compare/v1.6.0...v1.7.0) (2023-11-21)
+
+
+### Features
+
+* Trigger release ([7d841c9](https://github.com/oslokommune/ok/commit/7d841c99ce6a60d45846ea1de7052f6bc126ff43))
+
 ## [1.6.0](https://github.com/oslokommune/ok/compare/v1.5.0...v1.6.0) (2023-11-21)
 
 

@@ -6,20 +6,20 @@ require_relative "lib/private_strategy"
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "1.6.0"
+  version "1.7.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/oslokommune/ok/releases/download/v1.6.0/ok_1.6.0_darwin_arm64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "5a377cf58519f266af890da31301e070b550870df9830bdb29e16de88be32764"
+      url "https://github.com/oslokommune/ok/releases/download/v1.7.0/ok_1.7.0_darwin_arm64.tar.gz", using: GitHubPrivateRepositoryDownloadStrategy
+      sha256 "512f28e96dd14dc5d01eadd96f6526a4b90936485cd09b4406e3054704fc81b1"
 
       def install
         bin.install "ok"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v1.6.0/ok_1.6.0_darwin_amd64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "3261265d45d12de78c62c92439a0bdd76d654dff829f61e17511790f86bcecef"
+      url "https://github.com/oslokommune/ok/releases/download/v1.7.0/ok_1.7.0_darwin_amd64.tar.gz", using: GitHubPrivateRepositoryDownloadStrategy
+      sha256 "1df5b67eb5c479b09d21c725f8f9beeb2afe10a91af2ee16d20466b384aed434"
 
       def install
         bin.install "ok"
@@ -28,17 +28,17 @@ class Ok < Formula
   end
 
   on_linux do
-    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/oslokommune/ok/releases/download/v1.6.0/ok_1.6.0_linux_arm64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "ed2042b32bf5bfb2f6fed22277602b03c423df9bd7c270d5f0eb2246d04ba17e"
+    if Hardware::CPU.intel?
+      url "https://github.com/oslokommune/ok/releases/download/v1.7.0/ok_1.7.0_linux_amd64.tar.gz", using: GitHubPrivateRepositoryDownloadStrategy
+      sha256 "9057ba9c9353bc7a54a596f6d1b79deaf86802b6507726899aae8035a45035f1"
 
       def install
         bin.install "ok"
       end
     end
-    if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v1.6.0/ok_1.6.0_linux_amd64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "b9a327fd93e1da9b79ad3dc0db9e32fa6550992882c6c31ed71bf11213597800"
+    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
+      url "https://github.com/oslokommune/ok/releases/download/v1.7.0/ok_1.7.0_linux_arm64.tar.gz", using: GitHubPrivateRepositoryDownloadStrategy
+      sha256 "fbbc606cd905f7e923d4e6accd7b907d38cce65aef2ea29303524b41aaea0698"
 
       def install
         bin.install "ok"

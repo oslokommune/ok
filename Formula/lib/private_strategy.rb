@@ -45,15 +45,7 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   # fix issue: https://github.com/Homebrew/brew/issues/15169
   # bypass a HEAD request that does NOT contains token, which will fail
   def resolve_url_basename_time_file_size(url, timeout: nil)
-    url = download_url
-    super
-  end
-
-  # [2023-10-14] brew relies on this output to rename the downloaded file
-  # See: https://github.com/Homebrew/brew/blob/fbe50bf280bff033b968d439d5441d338afec98f/Library/Homebrew/download_strategy.rb#L305
-  # Not setting this will break formulas during install stage, symtoms: Errno::ENOENT: No such file or directory - path/to/file
-  def resolved_basename
-    @filename
+    [download_url, "", Time.now, 0, false]
   end
 
   def initialize(url, name, version, **meta)

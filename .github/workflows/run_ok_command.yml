@@ -62,22 +62,20 @@ jobs:
 
     steps:
 
-      - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-
-
-      - name: Set up Go
-        uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # v4.1.0
+      - name: Setup Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
         with:
-          go-version-file: "go.mod"
-          cache-dependency-path: "go.sum"
+          token: "${{ github.token }}"
 
 
-      - name: Run ok
+      - name: Install ok
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: "${{ github.token }}"
         run: |
-          source .github/scripts/setup_mocks.sh
-          setupMocks
-          go run main.go "${{ inputs.subcommand }}"
+          brew tap oslokommune/ok https://github.com/oslokommune/ok
+          brew update
+          brew install ok
+          ok "${{ inputs.subcommand }}"
 
 
       - name: Run ls and git status

@@ -42,12 +42,6 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   require "utils/formatter"
   require "utils/github"
 
-  # fix issue: https://github.com/Homebrew/brew/issues/15169
-  # bypass a HEAD request that does NOT contains token, which will fail
-  def resolve_url_basename_time_file_size(url, timeout: nil)
-    [download_url, "", Time.now, 0, false]
-  end
-
   def initialize(url, name, version, **meta)
     super
     parse_url_pattern
@@ -142,4 +136,3 @@ class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDo
     GitHub.get_release(@owner, @repo, @tag)
   end
 end
-

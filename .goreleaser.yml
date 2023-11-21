@@ -24,6 +24,6 @@ brews:
     install: |
       bin.install "ok"
 
-    download_strategy: GitHubPrivateRepositoryDownloadStrategy
+    download_strategy: GitHubPrivateRepositoryReleaseDownloadStrategy
 
     custom_require: "lib/private_strategy"

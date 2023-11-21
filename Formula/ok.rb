@@ -6,12 +6,20 @@ require_relative "lib/private_strategy"
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "1.5.0"
+  version "1.6.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/oslokommune/ok/releases/download/v1.5.0/ok_1.5.0_darwin_arm64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "6638b834283f47b10203cd707f5fe0141b045aa5c74e487a401c90fc9518a4ab"
+      url "https://github.com/oslokommune/ok/releases/download/v1.6.0/ok_1.6.0_darwin_arm64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
+      sha256 "5a377cf58519f266af890da31301e070b550870df9830bdb29e16de88be32764"
+
+      def install
+        bin.install "ok"
+      end
+    end
+    if Hardware::CPU.intel?
+      url "https://github.com/oslokommune/ok/releases/download/v1.6.0/ok_1.6.0_darwin_amd64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
+      sha256 "3261265d45d12de78c62c92439a0bdd76d654dff829f61e17511790f86bcecef"
 
       def install
         bin.install "ok"
@@ -21,8 +29,16 @@ class Ok < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/oslokommune/ok/releases/download/v1.5.0/ok_1.5.0_linux_arm64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
-      sha256 "ac2ca89acf9fd4f98d989bedf8f83f4ce5019fc5fd19bd9661a8273f6b5ed8c9"
+      url "https://github.com/oslokommune/ok/releases/download/v1.6.0/ok_1.6.0_linux_arm64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
+      sha256 "ed2042b32bf5bfb2f6fed22277602b03c423df9bd7c270d5f0eb2246d04ba17e"
+
+      def install
+        bin.install "ok"
+      end
+    end
+    if Hardware::CPU.intel?
+      url "https://github.com/oslokommune/ok/releases/download/v1.6.0/ok_1.6.0_linux_amd64.tar.gz", using: GitHubPrivateRepositoryReleaseDownloadStrategy
+      sha256 "b9a327fd93e1da9b79ad3dc0db9e32fa6550992882c6c31ed71bf11213597800"
 
       def install
         bin.install "ok"

@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	// rootCmd represents the base command when called without any subcommands.
+	// rootCmd represents the base command when called without any subcommands...
 	rootCmd = &cobra.Command{
 		Use:   "ok",
 		Short: "The ok tool.",

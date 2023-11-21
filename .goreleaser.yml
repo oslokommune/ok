@@ -16,7 +16,7 @@ brews:
     description: A CLI called ok
     homepage: https://github.com/oslokommune/ok
     goarm: 6
-    goamd64: v3
+    goamd64: v1
     repository:
       owner: oslokommune
       name: ok

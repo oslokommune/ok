@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/oslokommune/ok/compare/v1.5.0...v1.6.0) (2023-11-21)
+
+
+### Features
+
+* Trigger build ([267deba](https://github.com/oslokommune/ok/commit/267deba429887980b1e73332a4f995b9b8e81dc5))
+
 ## [1.5.0](https://github.com/oslokommune/ok/compare/v1.4.1...v1.5.0) (2023-11-20)
 
 

@@ -78,3 +78,9 @@ jobs:
           source .github/scripts/setup_mocks.sh
           setupMocks
           go run main.go "${{ inputs.subcommand }}"
+
+
+      - name: Run ls and git status
+        run: |
+          ls -la
+          git status

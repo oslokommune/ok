@@ -69,12 +69,13 @@ jobs:
       - name: Setup Homebrew
         uses: Homebrew/actions/setup-homebrew@master
         with:
-          token: "${{ github.token }}"
+          token: "${{ secrets.GITHUB_TOKEN }}"
 
 
       - name: Install ok
         env:
-          HOMEBREW_GITHUB_API_TOKEN: "${{ github.token }}"
+          HOMEBREW_GITHUB_API_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
           brew tap oslokommune/ok https://github.com/oslokommune/ok
           brew update

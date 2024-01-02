@@ -8,8 +8,16 @@ updates:
       interval: "daily"
     reviewers:
       - "oslokommune/kjoremiljo"
+    groups:
+      all:
+        patterns:
+          - "*"
 
   - package-ecosystem: gomod
     directory: "/"
     schedule:
       interval: daily
+    groups:
+      all:
+        patterns:
+          - "*"

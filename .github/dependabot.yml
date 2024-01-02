@@ -9,7 +9,7 @@ updates:
     reviewers:
       - "oslokommune/kjoremiljo"
     groups:
-      all:
+      github-actions-all:
         patterns:
           - "*"
 
@@ -18,6 +18,6 @@ updates:
     schedule:
       interval: daily
     groups:
-      all:
+      gomod-all:
         patterns:
           - "*"

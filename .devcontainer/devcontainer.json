@@ -6,6 +6,7 @@
   "remoteEnv": {
     "OK_ENABLE_EXPERIMENTAL": "true"
   },
+  "postCreateCommand": "go install github.com/magefile/mage@latest",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -25,7 +26,10 @@
         "go.testEnvVars": {
           "CGO_ENABLED": "1"
         },
-        "go.testFlags": ["-v", "-race"],
+        "go.testFlags": [
+          "-v",
+          "-race"
+        ],
         "go.testTimeout": "10s",
         "go.coverOnSingleTest": true,
         "go.coverOnSingleTestFile": true,

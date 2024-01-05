@@ -1,7 +1,7 @@
 {
   "release-search-depth": 50,
   "commit-search-depth": 100,
-  "release-type": "simple",
+  "release-type": "go",
   "separate-pull-requests": false,
   "packages": {
     ".": {

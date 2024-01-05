@@ -12,6 +12,8 @@ updates:
       github-actions-all:
         patterns:
           - "*"
+    commit-message:
+      prefix: ci(deps)
 
   - package-ecosystem: gomod
     directory: "/"
@@ -21,3 +23,5 @@ updates:
       gomod-all:
         patterns:
           - "*"
+    commit-message:
+      prefix: deps

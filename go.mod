@@ -4,7 +4,7 @@ go 1.21.4
 
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.26.3
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.36.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.37.0
 	github.com/charmbracelet/bubbles v0.17.1
 	github.com/charmbracelet/bubbletea v0.25.0
 	github.com/charmbracelet/lipgloss v0.9.1

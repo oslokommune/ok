@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/oslokommune/ok/compare/v1.7.0...v1.8.0) (2024-01-19)
+
+
+### Features
+
+* Remove private repo settings ([12ec49d](https://github.com/oslokommune/ok/commit/12ec49ddcc86f3623764083d44ac98f2f9aaa672))
+
 ## [1.7.0](https://github.com/oslokommune/ok/compare/v1.6.0...v1.7.0) (2023-11-21)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/oslokommune/ok/compare/v1.8.0...v1.8.1) (2024-01-19)
+
+
+### Dependency Updates
+
+* Bump the gomod-all group with 2 updates ([#56](https://github.com/oslokommune/ok/issues/56)) ([435b889](https://github.com/oslokommune/ok/commit/435b889ef847e4355625b2779f3d85a6262a284d))
+
 ## [1.8.0](https://github.com/oslokommune/ok/compare/v1.7.0...v1.8.0) (2024-01-19)
 
 

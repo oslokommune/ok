@@ -19,8 +19,6 @@ jobs:
     steps:
 
       - name: Install ok
-        env:
-          HOMEBREW_GITHUB_API_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
           brew tap oslokommune/ok https://github.com/oslokommune/ok
           brew install ok

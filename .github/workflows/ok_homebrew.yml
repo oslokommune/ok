@@ -18,15 +18,9 @@ jobs:
 
     steps:
 
-      - name: Load SSH deploy key
-        uses: webfactory/ssh-agent@d4b9b8ff72958532804b70bbe600ad43b36d5f2e # v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.OK_PRIVATE_DEPLOY_KEY }}
-
-
       - name: Install ok
         env:
           HOMEBREW_GITHUB_API_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
-          brew tap oslokommune/ok git@github.com:oslokommune/ok.git
+          brew tap oslokommune/ok https://github.com/oslokommune/ok
           brew install ok

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="v2.3.0" # x-release-please-version
+VERSION="v2.3.1" # x-release-please-version
 ENV_FILE=env.yaml
 GOLDEN_PATH_IAC_REPO="oslokommune/golden-path-iac"
 REUSABLE_WORKFLOWS_REPO="oslokommune/reusable-workflows"
@@ -631,7 +631,7 @@ elif [[ $1 == "get-template" ]]; then
       echo "No template selected, exiting."
       exit
     fi
-  elif [[ "$TEMPLATE_NAME" != *".tf" ]]; then
+  elif [[ ! "$TEMPLATE_NAME" =~ \. ]]; then
     TEMPLATE_NAME="$TEMPLATE_NAME.tf"
   fi
 

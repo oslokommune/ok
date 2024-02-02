@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2034
-VERSION="v2.3.0" # x-release-please-version
+VERSION="v2.3.1" # x-release-please-version
 
 configFile="$HOME/.ok-port-forward.conf"
 
@@ -166,15 +166,25 @@ while true; do
         printMessage "Task status check timed out. Please run the program again." red
         exit 1
     fi
+
+    # Overall task information
     taskDescription=$(aws ecs describe-tasks --cluster "$clusterName" --tasks "$taskId" --output json)
     taskStatus=$(echo "$taskDescription" | jq -r '.tasks[0].lastStatus')
-    containerStatus=$(echo "$taskDescription" | jq -r '.tasks[0].containers[0].lastStatus')
-    agentLastStatus=$(echo "$taskDescription" | jq -r '.tasks[0].containers[0].managedAgents[0].lastStatus')
-    
+
+    # The portforward task
+    # Do a separate `describe-tasks` here and not parse out from the json in $taskDescription above
+    # to make the code easier to read and follow: jq can query for someting that "startswith", but
+    # the complexity of the query makes it less readable.
+    # We have to query for a explicit container that starts with "ssm-portfwd-" because GuardDuty
+    # injects a separate container in the task list
+    portfwdTaskDescription=$(aws ecs describe-tasks --cluster "$clusterName" --tasks "$taskId" --query "tasks[0].containers[?starts_with(name,'ssm-portfwd-')]" --output json)
+    containerStatus=$(echo "$portfwdTaskDescription" | jq -r ".[0].lastStatus")
+    agentLastStatus=$(echo "$portfwdTaskDescription" | jq -r ".[0].managedAgents[0].lastStatus")
+
     if [ "$taskStatus" == "RUNNING" ]; then
         if [ "$containerStatus" == "RUNNING" ]; then
             if [ "$agentLastStatus" == "RUNNING" ]; then
-                echo "Ready"
+                echo
                 break
             else
                 if [ "$_saidAgentText" = false ]; then
@@ -183,7 +193,6 @@ while true; do
                     _saidAgentText=true
                 fi
             fi
-            break
         else
             if [ "$_saidContainerText" = false ]; then
                 echo
@@ -191,7 +200,6 @@ while true; do
                 _saidContainerText=true
             fi
         fi
-        break
     else
         if [ "$_saidTaskText" = false ]; then
             printMessage "Waiting for task to start " yellow
@@ -204,7 +212,7 @@ done
 
 printMessage "Task started successfully. Retrieving runtimeId ..."
 
-runtimeId=$(aws ecs describe-tasks --cluster "$clusterName" --tasks "$taskId" --query 'tasks[0].containers[0].runtimeId' --output text)
+runtimeId=$(aws ecs describe-tasks --cluster "$clusterName" --tasks "$taskId" --query "tasks[0].containers[?starts_with(name,'ssm-portfwd-')].runtimeId" --output text)
 
 if [[ ! $runtimeId =~ ^[a-z0-9-]+$ ]]; then
     printMessage "Failed to retrieve runtimeId. This is probably a bug." red
@@ -253,7 +261,6 @@ if [ -z "$LOCAL_PORT" ] || [ -z "$REMOTE_PORT" ] || [ -z "$RDS_ENDPOINT" ]; then
             printMessage "Port must be a number. Try again." red
         fi
     done
-
 
     while true; do
         read -rp "$(echo -e "Enter remote port or press enter to use:" "$colorGreen$remotePortDefault$colorReset")" REMOTE_PORT

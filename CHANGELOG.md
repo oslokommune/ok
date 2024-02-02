@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/oslokommune/ok/compare/v1.8.3...v1.9.0) (2024-02-02)
+
+
+### Features
+
+* Update shell files to newest version ([8d9b44b](https://github.com/oslokommune/ok/commit/8d9b44ba03c9722ae323b1c258c59111ed21f830))
+
 ## [1.8.3](https://github.com/oslokommune/ok/compare/v1.8.2...v1.8.3) (2024-01-25)
 
 

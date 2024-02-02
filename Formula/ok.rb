@@ -5,20 +5,20 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "1.8.3"
+  version "1.9.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/oslokommune/ok/releases/download/v1.8.3/ok_1.8.3_darwin_arm64.tar.gz"
-      sha256 "35abdb656c692071b64843c5a5739f3cbd3207020919a336e08dab749ea85f74"
+      url "https://github.com/oslokommune/ok/releases/download/v1.9.0/ok_1.9.0_darwin_arm64.tar.gz"
+      sha256 "6691efa374406c6d76eb6acb12cbb7e3ef4f23de2f579f3ada60eed30f5f2755"
 
       def install
         bin.install "ok"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v1.8.3/ok_1.8.3_darwin_amd64.tar.gz"
-      sha256 "f4300dd333ff431b92f598af33a994e6334490989db4ed8a17cc377bb6ad8587"
+      url "https://github.com/oslokommune/ok/releases/download/v1.9.0/ok_1.9.0_darwin_amd64.tar.gz"
+      sha256 "8ef773ae26dd3ee55fc05235233802bc1dd345c0fda85e43bfdfc9f0f0e2d6dd"
 
       def install
         bin.install "ok"
@@ -28,16 +28,16 @@ class Ok < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/oslokommune/ok/releases/download/v1.8.3/ok_1.8.3_linux_arm64.tar.gz"
-      sha256 "10270b602804452d513c860700e24dfed53817ad6d736d06d417e0f0ffe0063a"
+      url "https://github.com/oslokommune/ok/releases/download/v1.9.0/ok_1.9.0_linux_arm64.tar.gz"
+      sha256 "c6620d1128945b173624e5de9c0c828858ec8a5c308138611d33b50bc7fe60f0"
 
       def install
         bin.install "ok"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v1.8.3/ok_1.8.3_linux_amd64.tar.gz"
-      sha256 "2eadf25a56515f85cdd4cb53d7994313788fd4af7c43ec32fb2b99ec24838c55"
+      url "https://github.com/oslokommune/ok/releases/download/v1.9.0/ok_1.9.0_linux_amd64.tar.gz"
+      sha256 "9dedc6af5151b9fd2c72b4a495b7a9dc2bcca00659d9bef9df512e5ca48d72ba"
 
       def install
         bin.install "ok"

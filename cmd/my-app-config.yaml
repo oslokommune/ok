@@ -1,0 +1,2 @@
+appName: "Demo App"
+dockerImage: "nginx:latest"

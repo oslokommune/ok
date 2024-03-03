@@ -24,54 +24,53 @@ type Package struct {
 	Tag  string `json:"tag"`
 }
 
-func Get() {
-
+func Get() error {
 	manifest, err := readPackageManifest("ok.json")
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to read package manifest: %w", err)
 	}
 
-	fs := createFileStore()
+	fs, err := createFileStore()
+	if err != nil {
+		return fmt.Errorf("failed to create file store: %w", err)
+	}
 	defer fs.Close()
 
-	authClient := createAuthClient()
+	authClient, err := createAuthClient()
+	if err != nil {
+		return fmt.Errorf("failed to create auth client: %w", err)
+	}
 
 	ctx := context.Background()
 	for _, pkg := range manifest.Packages {
-		repo, err := remote.NewRepository(pkg.Repo)
+		err := processPackage(ctx, pkg, authClient, fs)
 		if err != nil {
-			panic(err)
+			return fmt.Errorf("failed to process package: %w", err)
 		}
-		repo.Client = authClient
-
-		manifestDescriptor, err := oras.Copy(ctx, repo, pkg.Tag, fs, pkg.Name, oras.DefaultCopyOptions)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("manifest descriptor:", manifestDescriptor)
 	}
 
+	return nil
 }
 
-func createFileStore() *file.Store {
+func createFileStore() (*file.Store, error) {
 	dir, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to get working directory: %w", err)
 	}
 
 	fs, err := file.New(dir)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to create new file: %w", err)
 	}
 
-	return fs
+	return fs, nil
 }
 
-func createAuthClient() *auth.Client {
+func createAuthClient() (*auth.Client, error) {
 	storeOpts := credentials.StoreOptions{}
 	credStore, err := credentials.NewStoreFromDocker(storeOpts)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to create new store from docker: %w", err)
 	}
 
 	authClient := &auth.Client{
@@ -80,7 +79,7 @@ func createAuthClient() *auth.Client {
 		Credential: credentials.Credential(credStore),
 	}
 
-	return authClient
+	return authClient, nil
 }
 
 func readPackageManifest(filePath string) (*PackageManifest, error) {
@@ -95,4 +94,19 @@ func readPackageManifest(filePath string) (*PackageManifest, error) {
 	}
 
 	return &manifest, nil
+}
+
+func processPackage(ctx context.Context, pkg Package, authClient *auth.Client, fs *file.Store) error {
+	repo, err := remote.NewRepository(pkg.Repo)
+	if err != nil {
+		return fmt.Errorf("failed to create new repository: %w", err)
+	}
+	repo.Client = authClient
+
+	_, err = oras.Copy(ctx, repo, pkg.Tag, fs, pkg.Name, oras.DefaultCopyOptions)
+	if err != nil {
+		return fmt.Errorf("failed to copy package: %w", err)
+	}
+
+	return nil
 }

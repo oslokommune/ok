@@ -19,9 +19,10 @@ type PackageManifest struct {
 }
 
 type Package struct {
-	Name string `json:"name"`
-	Repo string `json:"repo"`
-	Tag  string `json:"tag"`
+	Name   string `json:"name"`
+	Image  string `json:"image"`
+	Tag    string `json:"tag"`
+	Digest string `json:"digest"`
 }
 
 func Get() error {
@@ -97,7 +98,7 @@ func readPackageManifest(filePath string) (*PackageManifest, error) {
 }
 
 func processPackage(ctx context.Context, pkg Package, authClient *auth.Client, fs *file.Store) error {
-	repo, err := remote.NewRepository(pkg.Repo)
+	repo, err := remote.NewRepository(pkg.Image)
 	if err != nil {
 		return fmt.Errorf("failed to create new repository: %w", err)
 	}

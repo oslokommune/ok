@@ -2,8 +2,9 @@
   "packages": [
     {
       "name": "rules",
-      "repo": "ghcr.io/oslokommune/golden-path-semgrep-rules/rules",
-      "tag": "latest"
+      "image": "ghcr.io/oslokommune/golden-path-semgrep-rules/rules",
+      "tag": "latest",
+      "digest": null
     }
   ]
 }

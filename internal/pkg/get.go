@@ -31,27 +31,10 @@ func Get() {
 		panic(err)
 	}
 
-	dir, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-
-	fs, err := file.New(dir)
-	if err != nil {
-		panic(err)
-	}
+	fs := createFileStore()
 	defer fs.Close()
 
-	storeOpts := credentials.StoreOptions{}
-	credStore, err := credentials.NewStoreFromDocker(storeOpts)
-	if err != nil {
-		panic(err)
-	}
-	authClient := &auth.Client{
-		Client:     retry.DefaultClient,
-		Cache:      auth.NewCache(),
-		Credential: credentials.Credential(credStore),
-	}
+	authClient := createAuthClient()
 
 	ctx := context.Background()
 	for _, pkg := range manifest.Packages {
@@ -68,6 +51,36 @@ func Get() {
 		fmt.Println("manifest descriptor:", manifestDescriptor)
 	}
 
+}
+
+func createFileStore() *file.Store {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	fs, err := file.New(dir)
+	if err != nil {
+		panic(err)
+	}
+
+	return fs
+}
+
+func createAuthClient() *auth.Client {
+	storeOpts := credentials.StoreOptions{}
+	credStore, err := credentials.NewStoreFromDocker(storeOpts)
+	if err != nil {
+		panic(err)
+	}
+
+	authClient := &auth.Client{
+		Client:     retry.DefaultClient,
+		Cache:      auth.NewCache(),
+		Credential: credentials.Credential(credStore),
+	}
+
+	return authClient
 }
 
 func readPackageManifest(filePath string) (*PackageManifest, error) {

@@ -2,7 +2,9 @@ package pkg
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"oras.land/oras-go/v2"
 	"oras.land/oras-go/v2/content/file"
@@ -12,11 +14,22 @@ import (
 	"oras.land/oras-go/v2/registry/remote/retry"
 )
 
-const (
-	rulesRepo = "ghcr.io/oslokommune/golden-path-semgrep-rules/rules"
-)
+type PackageManifest struct {
+	Packages []Package `json:"packages"`
+}
+
+type Package struct {
+	Name string `json:"name"`
+	Repo string `json:"repo"`
+	Tag  string `json:"tag"`
+}
 
 func Get() {
+
+	manifest, err := readPackageManifest("ok.json")
+	if err != nil {
+		panic(err)
+	}
 
 	fs, err := file.New("/tmp/")
 	if err != nil {
@@ -24,29 +37,44 @@ func Get() {
 	}
 	defer fs.Close()
 
-	repo, err := remote.NewRepository(rulesRepo)
-	if err != nil {
-		panic(err)
-	}
-
 	storeOpts := credentials.StoreOptions{}
 	credStore, err := credentials.NewStoreFromDocker(storeOpts)
 	if err != nil {
 		panic(err)
 	}
-	repo.Client = &auth.Client{
+	authClient := &auth.Client{
 		Client:     retry.DefaultClient,
 		Cache:      auth.NewCache(),
 		Credential: credentials.Credential(credStore),
 	}
 
 	ctx := context.Background()
+	for _, pkg := range manifest.Packages {
+		repo, err := remote.NewRepository(pkg.Repo)
+		if err != nil {
+			panic(err)
+		}
+		repo.Client = authClient
 
-	tag := "latest"
-	manifestDescriptor, err := oras.Copy(ctx, repo, tag, fs, tag, oras.DefaultCopyOptions)
-	if err != nil {
-		panic(err)
+		manifestDescriptor, err := oras.Copy(ctx, repo, pkg.Tag, fs, pkg.Name, oras.DefaultCopyOptions)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("manifest descriptor:", manifestDescriptor)
 	}
-	fmt.Println("manifest descriptor:", manifestDescriptor)
 
+}
+
+func readPackageManifest(filePath string) (*PackageManifest, error) {
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open file: %w", err)
+	}
+
+	var manifest PackageManifest
+	if err := json.Unmarshal(data, &manifest); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal json: %w", err)
+	}
+
+	return &manifest, nil
 }

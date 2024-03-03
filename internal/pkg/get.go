@@ -31,7 +31,12 @@ func Get() {
 		panic(err)
 	}
 
-	fs, err := file.New("/tmp/")
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	fs, err := file.New(dir)
 	if err != nil {
 		panic(err)
 	}

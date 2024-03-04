@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/oslokommune/ok/compare/v1.10.0...v1.11.0) (2024-03-04)
+
+
+### Features
+
+* Return errors in pkg command ([a40a9f2](https://github.com/oslokommune/ok/commit/a40a9f250db6f142ce24707deac0fbae4f83654c))
+
 ## [1.10.0](https://github.com/oslokommune/ok/compare/v1.9.0...v1.10.0) (2024-03-04)
 
 

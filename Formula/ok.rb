@@ -5,20 +5,20 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "1.10.0"
+  version "1.11.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/oslokommune/ok/releases/download/v1.10.0/ok_1.10.0_darwin_arm64.tar.gz"
-      sha256 "f5b3b07e649a99912a492a574b86ce3223c7a92b7f18a2e1a04c7a912393f085"
+      url "https://github.com/oslokommune/ok/releases/download/v1.11.0/ok_1.11.0_darwin_arm64.tar.gz"
+      sha256 "ce483ac153233286ea2ba621ddb058a502dd7388a1f992f146ba9aaea7847e80"
 
       def install
         bin.install "ok"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v1.10.0/ok_1.10.0_darwin_amd64.tar.gz"
-      sha256 "bad606687ea33203b44e9f8e681db5bd70aca60971a7200c00a8770af717247c"
+      url "https://github.com/oslokommune/ok/releases/download/v1.11.0/ok_1.11.0_darwin_amd64.tar.gz"
+      sha256 "ce650dccf7ab3b246408d6e42efbf4bc6a5a0b3143797c0815780b1abbb4b77e"
 
       def install
         bin.install "ok"
@@ -28,16 +28,16 @@ class Ok < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/oslokommune/ok/releases/download/v1.10.0/ok_1.10.0_linux_arm64.tar.gz"
-      sha256 "7d4060537686549d119f0ef9a266d768afe7e35826f9195119d8a2bd5658058e"
+      url "https://github.com/oslokommune/ok/releases/download/v1.11.0/ok_1.11.0_linux_arm64.tar.gz"
+      sha256 "d1ec45cba8f04b63dc56e89c1ac991e85fe0457d02896efd5dce5ef0eda0b2c8"
 
       def install
         bin.install "ok"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v1.10.0/ok_1.10.0_linux_amd64.tar.gz"
-      sha256 "a866c90c4d09915132cc273d0e963d4a4f0de7f3494673b781d33172d5e84f67"
+      url "https://github.com/oslokommune/ok/releases/download/v1.11.0/ok_1.11.0_linux_amd64.tar.gz"
+      sha256 "bc00613b86e1c0ab01e65844788d8797a3005650677bee742d33f6c3722b6981"
 
       def install
         bin.install "ok"

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/oslokommune/ok/compare/v1.11.0...v1.12.0) (2024-03-04)
+
+
+### Features
+
+* Make scriptrunner show all output ([902a205](https://github.com/oslokommune/ok/commit/902a20587edfa477c266a67fb3e22670a8bebeee))
+
 ## [1.11.0](https://github.com/oslokommune/ok/compare/v1.10.0...v1.11.0) (2024-03-04)
 
 

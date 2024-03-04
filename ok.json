@@ -1,0 +1,10 @@
+{
+  "packages": [
+    {
+      "name": "rules",
+      "image": "ghcr.io/oslokommune/golden-path-semgrep-rules/rules",
+      "tag": "latest",
+      "digest": null
+    }
+  ]
+}

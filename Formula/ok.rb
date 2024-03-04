@@ -5,20 +5,20 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "1.9.0"
+  version "1.10.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/oslokommune/ok/releases/download/v1.9.0/ok_1.9.0_darwin_arm64.tar.gz"
-      sha256 "6691efa374406c6d76eb6acb12cbb7e3ef4f23de2f579f3ada60eed30f5f2755"
+      url "https://github.com/oslokommune/ok/releases/download/v1.10.0/ok_1.10.0_darwin_arm64.tar.gz"
+      sha256 "f5b3b07e649a99912a492a574b86ce3223c7a92b7f18a2e1a04c7a912393f085"
 
       def install
         bin.install "ok"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v1.9.0/ok_1.9.0_darwin_amd64.tar.gz"
-      sha256 "8ef773ae26dd3ee55fc05235233802bc1dd345c0fda85e43bfdfc9f0f0e2d6dd"
+      url "https://github.com/oslokommune/ok/releases/download/v1.10.0/ok_1.10.0_darwin_amd64.tar.gz"
+      sha256 "bad606687ea33203b44e9f8e681db5bd70aca60971a7200c00a8770af717247c"
 
       def install
         bin.install "ok"
@@ -28,16 +28,16 @@ class Ok < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/oslokommune/ok/releases/download/v1.9.0/ok_1.9.0_linux_arm64.tar.gz"
-      sha256 "c6620d1128945b173624e5de9c0c828858ec8a5c308138611d33b50bc7fe60f0"
+      url "https://github.com/oslokommune/ok/releases/download/v1.10.0/ok_1.10.0_linux_arm64.tar.gz"
+      sha256 "7d4060537686549d119f0ef9a266d768afe7e35826f9195119d8a2bd5658058e"
 
       def install
         bin.install "ok"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v1.9.0/ok_1.9.0_linux_amd64.tar.gz"
-      sha256 "9dedc6af5151b9fd2c72b4a495b7a9dc2bcca00659d9bef9df512e5ca48d72ba"
+      url "https://github.com/oslokommune/ok/releases/download/v1.10.0/ok_1.10.0_linux_amd64.tar.gz"
+      sha256 "a866c90c4d09915132cc273d0e963d4a4f0de7f3494673b781d33172d5e84f67"
 
       def install
         bin.install "ok"

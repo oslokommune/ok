@@ -36,20 +36,21 @@ func createTempScriptFile(scriptName string) (string, error) {
 }
 
 // Executes a script with the given arguments, and returns the output.
-func executeScript(scriptFile string, args []string) (string, error) {
-	combinedArgs := append([]string{scriptFile}, args...)
+func executeScript(scriptFile string, args []string) error {
 
 	bashPath, err := exec.LookPath("bash")
 	if err != nil {
-		return "", fmt.Errorf("failed to find bash: %v", err)
+		return fmt.Errorf("failed to find bash: %v", err)
 	}
 
-	output, err := sh.Output(bashPath, combinedArgs...)
+	combinedArgs := append([]string{scriptFile}, args...)
+
+	err = sh.RunV(bashPath, combinedArgs...)
 	if err != nil {
-		return "", fmt.Errorf("error executing script: %v: %s", err, output)
+		return fmt.Errorf("error executing script: %v", err)
 	}
 
-	return output, nil
+	return nil
 }
 
 func RunScript(scriptName string, args []string) {
@@ -60,10 +61,9 @@ func RunScript(scriptName string, args []string) {
 	}
 	defer os.Remove(scriptFile)
 
-	output, err := executeScript(scriptFile, args)
+	err = executeScript(scriptFile, args)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(output)
 }

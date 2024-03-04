@@ -6,9 +6,15 @@ import (
 )
 
 var pkgCommand = &cobra.Command{
-	Use:   "pkg",
-	Short: "Run pkg",
-	Run: func(cmd *cobra.Command, args []string) {
+	Use:           "pkg",
+	Short:         "Run pkg",
+	SilenceErrors: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
 		pkg.Get()
+		err := pkg.Get()
+		if err != nil {
+			return err
+		}
+		return nil
 	},
 }

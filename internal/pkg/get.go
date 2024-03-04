@@ -44,7 +44,7 @@ func Get() error {
 
 	ctx := context.Background()
 	for _, pkg := range manifest.Packages {
-		err := processPackage(ctx, pkg, authClient, fs)
+		err := copyPackage(ctx, pkg, authClient, fs)
 		if err != nil {
 			return fmt.Errorf("failed to process package: %w", err)
 		}
@@ -97,7 +97,7 @@ func readPackageManifest(filePath string) (*PackageManifest, error) {
 	return &manifest, nil
 }
 
-func processPackage(ctx context.Context, pkg Package, authClient *auth.Client, fs *file.Store) error {
+func copyPackage(ctx context.Context, pkg Package, authClient *auth.Client, fs *file.Store) error {
 	repo, err := remote.NewRepository(pkg.Image)
 	if err != nil {
 		return fmt.Errorf("failed to create new repository: %w", err)

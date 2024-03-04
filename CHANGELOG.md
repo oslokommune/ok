@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.0](https://github.com/oslokommune/ok/compare/v1.9.0...v1.10.0) (2024-03-04)
+
+
+### Features
+
+* Add pkg command for downloading OCI artifacts ([#77](https://github.com/oslokommune/ok/issues/77)) ([1c185d7](https://github.com/oslokommune/ok/commit/1c185d7caa4859046ce023e96ca52b52a7446022))
+
+
+### Dependency Updates
+
+* Bump the gomod-all group with 2 updates ([#66](https://github.com/oslokommune/ok/issues/66)) ([54cfd1b](https://github.com/oslokommune/ok/commit/54cfd1b313929b39ade84de2518ce45e2f9cbde6))
+
 ## [1.9.0](https://github.com/oslokommune/ok/compare/v1.8.3...v1.9.0) (2024-02-02)
 
 

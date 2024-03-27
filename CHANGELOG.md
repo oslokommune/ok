@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.13.0](https://github.com/oslokommune/ok/compare/v1.12.0...v1.13.0) (2024-03-27)
+
+
+### Features
+
+* Add get command for Boilerplate templates ([#90](https://github.com/oslokommune/ok/issues/90)) ([6d1af15](https://github.com/oslokommune/ok/commit/6d1af152417551ccd0a8e041abc87d440bc285f9))
+
+
+### Dependency Updates
+
+* Bump the gomod-all group with 3 updates ([#88](https://github.com/oslokommune/ok/issues/88)) ([d6e1d2b](https://github.com/oslokommune/ok/commit/d6e1d2becb6ab3a5386fa23a5aaf8f97663cef3c))
+
 ## [1.12.0](https://github.com/oslokommune/ok/compare/v1.11.0...v1.12.0) (2024-03-04)
 
 

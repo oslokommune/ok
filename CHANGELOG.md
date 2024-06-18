@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.13.1](https://github.com/oslokommune/ok/compare/v1.13.0...v1.13.1) (2024-06-18)
+
+
+### Dependency Updates
+
+* Bump the gomod-all group across 1 directory with 4 updates ([#112](https://github.com/oslokommune/ok/issues/112)) ([b9f9ed1](https://github.com/oslokommune/ok/commit/b9f9ed10bd031f9d2632d8d03aa04785e6acbe7c))
+* Bump the gomod-all group across 1 directory with 5 updates ([#123](https://github.com/oslokommune/ok/issues/123)) ([ce74a66](https://github.com/oslokommune/ok/commit/ce74a660b2fd5e8fcbe5e32856033f41c2bcc09a))
+* Bump the gomod-all group with 3 updates ([#94](https://github.com/oslokommune/ok/issues/94)) ([54ee1ff](https://github.com/oslokommune/ok/commit/54ee1ff6cf9cc2835c8214153da232d28c33587a))
+
 ## [1.13.0](https://github.com/oslokommune/ok/compare/v1.12.0...v1.13.0) (2024-03-27)
 
 

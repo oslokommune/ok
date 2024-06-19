@@ -13,25 +13,33 @@ import (
 	"testing"
 )
 
-const baseUrl = "someBaseUrl"
-
 func TestInstall(t *testing.T) {
 	testCases := []struct {
-		testName                 string
-		inputFile                string
-		expectBoilerplateCommand *exec.Cmd
+		testName                  string
+		packageManifestFilename   string
+		expectBoilerplateCommands []*exec.Cmd
 	}{
 		{
-			testName:  "Should work",
-			inputFile: "package.yml",
-			expectBoilerplateCommand: exec.Command(
-				"boilerplate",
-				"--template-url", "%s/app/ref=v1.0.2",
-				"--var-file", "common-config.yml",
-				"--template-url", "app-hello.yml",
-				"--output-folder", "app-hello",
-				"--non-interactive",
-			),
+			testName:                "Should run correct boilerplate commands from package manifest",
+			packageManifestFilename: "packages.yml",
+			expectBoilerplateCommands: []*exec.Cmd{
+				exec.Command(
+					"boilerplate",
+					"--template-url", BaseUrl+"/app?ref=app-v6.1.1",
+					"--output-folder", "out/app-hello",
+					"--non-interactive",
+					"--var-file", "config/common-config.yml",
+					"--var-file", "config/app-hello.yml",
+				),
+				exec.Command(
+					"boilerplate",
+					"--template-url", BaseUrl+"/networking?ref=main",
+					"--output-folder", "out/networking",
+					"--non-interactive",
+					"--var-file", "config/common-config.yml",
+					"--var-file", "config/networking.yml",
+				),
+			},
 		},
 	}
 
@@ -44,18 +52,22 @@ func TestInstall(t *testing.T) {
 			}
 
 			// Construct the absolute path to testdata/packages.yml
-			inputFile := filepath.Join(cwd, "testdata", "packages.yml")
+			inputFile := filepath.Join(cwd, "testdata", tc.packageManifestFilename)
 
 			// When
-			cmd, err := CreateBoilerplateCommand(inputFile)
+			cmds, err := CreateBoilerplateCommands(inputFile)
 
 			// Then
 			assert.NilError(t, err)
 
-			assert.Equal(t, cmd.Path, tc.expectBoilerplateCommand.Path)
-			assert.Equal(t,
-				strings.Join(cmd.Args, ","),
-				strings.Join(tc.expectBoilerplateCommand.Args, ","))
+			for i, cmd := range cmds {
+				assert.Equal(t, cmd.Path, tc.expectBoilerplateCommands[i].Path)
+				assert.Equal(t,
+					strings.Join(cmd.Args, ","),
+					strings.Join(tc.expectBoilerplateCommands[i].Args, ","))
+			}
+
+			assert.Equal(t, len(cmds), len(tc.expectBoilerplateCommands))
 		})
 	}
 }

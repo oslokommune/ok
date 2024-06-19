@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/oslokommune/ok/compare/v1.14.0...v1.15.0) (2024-06-19)
+
+
+### Features
+
+* Trigger release ([08dcad6](https://github.com/oslokommune/ok/commit/08dcad654dd05cfc64ef5e430039413de0285e9a))
+
 ## [1.14.0](https://github.com/oslokommune/ok/compare/v1.13.1...v1.14.0) (2024-06-19)
 
 

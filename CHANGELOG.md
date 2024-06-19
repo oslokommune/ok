@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.14.0](https://github.com/oslokommune/ok/compare/v1.13.1...v1.14.0) (2024-06-19)
+
+
+### Features
+
+* Create ok pkg install ([35ac6ce](https://github.com/oslokommune/ok/commit/35ac6ce8553fe3b92a98d5b5402e01637e830442))
+* Get templates based on package manifest ([3aab589](https://github.com/oslokommune/ok/commit/3aab58923b12761f4f5b4c7adb89766b64b25727))
+
+
+### Dependency Updates
+
+* Bump the gomod-all group with 2 updates ([#125](https://github.com/oslokommune/ok/issues/125)) ([4f02377](https://github.com/oslokommune/ok/commit/4f02377f2b419223859a3d09870cddb7cf310678))
+
 ## [1.13.1](https://github.com/oslokommune/ok/compare/v1.13.0...v1.13.1) (2024-06-18)
 
 

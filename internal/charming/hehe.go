@@ -84,7 +84,7 @@ func listClusters() ([]string, error) {
 
 	result, err := ecsSvc.ListClusters(context.TODO(), &ecs.ListClustersInput{})
 	if err != nil {
-		return nil, fmt.Errorf("error listing clusters: %w", err)
+		return nil, fmt.Errorf("listing clusters: %w", err)
 	}
 
 	var clusters []string

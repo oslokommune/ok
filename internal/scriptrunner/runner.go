@@ -16,20 +16,20 @@ var scripts embed.FS
 func createTempScriptFile(scriptName string) (string, error) {
 	scriptContent, err := scripts.ReadFile(scriptName)
 	if err != nil {
-		return "", fmt.Errorf("error reading script: %w", err)
+		return "", fmt.Errorf("reading script: %w", err)
 	}
 
 	tmpFileName := fmt.Sprintf("*-%s", scriptName)
 	tmpFile, err := os.CreateTemp("", tmpFileName)
 	if err != nil {
-		return "", fmt.Errorf("error creating temp file: %w", err)
+		return "", fmt.Errorf("creating temp file: %w", err)
 	}
 
 	if _, err := tmpFile.Write(scriptContent); err != nil {
-		return "", fmt.Errorf("error writing to temp file: %w", err)
+		return "", fmt.Errorf("writing to temp file: %w", err)
 	}
 	if err := tmpFile.Close(); err != nil {
-		return "", fmt.Errorf("error closing temp file: %w", err)
+		return "", fmt.Errorf("closing temp file: %w", err)
 	}
 
 	return tmpFile.Name(), nil
@@ -47,7 +47,7 @@ func executeScript(scriptFile string, args []string) error {
 
 	err = sh.RunV(bashPath, combinedArgs...)
 	if err != nil {
-		return fmt.Errorf("error executing script: %v", err)
+		return fmt.Errorf("executing script: %v", err)
 	}
 
 	return nil

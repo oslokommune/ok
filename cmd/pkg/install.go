@@ -8,7 +8,7 @@ import (
 var InstallCommand = &cobra.Command{
 	Use:           "install",
 	Short:         "Run install",
-	SilenceErrors: true, // TODO true
+	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		err := install.Run()
 		if err != nil {

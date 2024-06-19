@@ -1,6 +1,6 @@
 # The changelog is managed by release-please
 changelog:
-  skip: true
+  disable: true
 
 builds:
   - binary: ok
@@ -20,6 +20,6 @@ brews:
     repository:
       owner: oslokommune
       name: ok
-    folder: Formula
+    directory: Formula
     install: |
       bin.install "ok"

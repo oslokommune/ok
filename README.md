@@ -11,7 +11,7 @@
 
 ## Homebrew
 
-A Homebrew formula is included at [`./Formula/ok.rb`](Formula/ok.rb).
+[A Homebrew formula is included at `./Formula/ok.rb`](Formula/ok.rb).
 
 ```sh
 brew tap oslokommune/ok https://github.com/oslokommune/ok

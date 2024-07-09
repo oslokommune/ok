@@ -41,10 +41,7 @@ func Run() error {
 }
 
 func CreateBoilerplateCommands(filePath string) ([]*exec.Cmd, error) {
-	var BaseUrl = os.Getenv("BASE_URL")
-	if BaseUrl == "" {
-		BaseUrl = DefaultBaseUrl	
-	}
+	var EnvBaseUrl = os.Getenv("BASE_URL")
 
 	fmt.Println("Installing packages...")
 
@@ -62,7 +59,12 @@ func CreateBoilerplateCommands(filePath string) ([]*exec.Cmd, error) {
 
 	var cmds []*exec.Cmd
 	for _, pkg := range manifest.Packages {
-		templateURL := fmt.Sprintf("%s/%s?ref=%s", BaseUrl, pkg.Template, pkg.Ref)
+		var templateURL string
+		if EnvBaseUrl == "" {
+			templateURL = fmt.Sprintf("%s/%s?ref=%s", DefaultBaseUrl, pkg.Template, pkg.Ref)
+		} else {
+			templateURL = fmt.Sprintf("%s/%s", EnvBaseUrl, pkg.Template)
+		}
 
 		cmdArgs := []string{
 			"--template-url", templateURL,

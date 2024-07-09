@@ -1,0 +1,42 @@
+name: Approve and merge release PRs
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+jobs:
+
+  auto-approve:
+
+    runs-on: ubuntu-latest
+
+    if: github.actor == 'okctl-bot'
+
+    name: Approve and merge release PRs
+
+    permissions:
+      pull-requests: write
+
+    steps:
+
+      - name: Approve the PR with okctl-bot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY_TEXT=$(cat <<- EOM
+            _Beep boop_ :robot:
+
+            I've automatically approved this PR.
+
+            [I was summoned by workflow run `${{ github.run_id }}` (click to see run)](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+          EOM
+          )
+          gh pr review --approve "${{github.event.pull_request.html_url}}" --body "$BODY_TEXT"
+
+
+      # This has to be done because release-please does not support signing commits
+      # https://github.com/googleapis/release-please/issues/1314
+      - name: Squash and merge the PR
+        env:
+          GH_TOKEN: ${{ secrets.OKCTL_FINE_GRAINED_TOKEN }}
+        run: gh pr merge --squash --admin "${{github.event.pull_request.html_url}}"

@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const BaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate/terraform"
+const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate/terraform"
 
 func Run() error {
 	cmds, err := CreateBoilerplateCommands("packages.yml")
@@ -41,6 +41,11 @@ func Run() error {
 }
 
 func CreateBoilerplateCommands(filePath string) ([]*exec.Cmd, error) {
+	var BaseUrl = os.Getenv("BASE_URL")
+	if BaseUrl == "" {
+		BaseUrl = DefaultBaseUrl	
+	}
+
 	fmt.Println("Installing packages...")
 
 	fileContents, err := os.ReadFile(filePath)

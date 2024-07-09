@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.16.0](https://github.com/oslokommune/ok/compare/v1.15.1...v1.16.0) (2024-07-09)
+
+
+### Features
+
+* Add support for overriding template BASE_URL with environment variable ([e9f8f88](https://github.com/oslokommune/ok/commit/e9f8f8872754e7321ab05fbb5e5bab8620abf5fc))
+
+
+### Bug Fixes
+
+* Added override for ref ([9407173](https://github.com/oslokommune/ok/commit/940717351d5e6b1d8ac423eb00ac1af59fe732f2))
+
 ## [1.15.1](https://github.com/oslokommune/ok/compare/v1.15.0...v1.15.1) (2024-06-29)
 
 

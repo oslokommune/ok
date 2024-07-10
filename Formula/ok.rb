@@ -5,20 +5,20 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "1.16.1"
+  version "1.16.2"
 
   on_macos do
     on_intel do
-      url "https://github.com/oslokommune/ok/releases/download/v1.16.1/ok_1.16.1_darwin_amd64.tar.gz"
-      sha256 "9b14413e263ce7170a553c695c8045a3d17e5986534213d0eddf5a1833902253"
+      url "https://github.com/oslokommune/ok/releases/download/v1.16.2/ok_1.16.2_darwin_amd64.tar.gz"
+      sha256 "5d008f1f8b305d629b18151ba6b4ad2126e01e722abeb8fb3ec8471c5f2bd107"
 
       def install
         bin.install "ok"
       end
     end
     on_arm do
-      url "https://github.com/oslokommune/ok/releases/download/v1.16.1/ok_1.16.1_darwin_arm64.tar.gz"
-      sha256 "27c5a6483cac88d1b127b4e6b5a0178b3cddb2de8e5c6b7369f9f6a21529b3c4"
+      url "https://github.com/oslokommune/ok/releases/download/v1.16.2/ok_1.16.2_darwin_arm64.tar.gz"
+      sha256 "075a8b2d15bdc86de0d2e88ce09812e65cad3bbcd2888bcd5256a76d4f03ef1f"
 
       def install
         bin.install "ok"
@@ -29,8 +29,8 @@ class Ok < Formula
   on_linux do
     on_intel do
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v1.16.1/ok_1.16.1_linux_amd64.tar.gz"
-        sha256 "3bf759fec91f3068407949e862a62ba666b36fb3d1f008e463ebf4fd4bf973e6"
+        url "https://github.com/oslokommune/ok/releases/download/v1.16.2/ok_1.16.2_linux_amd64.tar.gz"
+        sha256 "77f8b4c3f8194b786208b7421fa68813fb2388c343ee6fbaca639c0a3aa2fa6e"
 
         def install
           bin.install "ok"
@@ -39,8 +39,8 @@ class Ok < Formula
     end
     on_arm do
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v1.16.1/ok_1.16.1_linux_arm64.tar.gz"
-        sha256 "d62a0bdafca793e7aa1b8950d44f1a2d1bb3dbb29cf904b7eaf9130f6d3494cc"
+        url "https://github.com/oslokommune/ok/releases/download/v1.16.2/ok_1.16.2_linux_arm64.tar.gz"
+        sha256 "3fdd8694fe0e76a7fb16083572670e636c4458249af4e61d8d7a3aed642296dd"
 
         def install
           bin.install "ok"

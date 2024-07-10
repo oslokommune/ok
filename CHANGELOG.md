@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.1](https://github.com/oslokommune/ok/compare/v1.16.0...v1.16.1) (2024-07-10)
+
+
+### Bug Fixes
+
+* Test release ([70d03b9](https://github.com/oslokommune/ok/commit/70d03b9f861f2ffd398a24f4c3c4722e3afffef9))
+
 ## [1.16.0](https://github.com/oslokommune/ok/compare/v1.15.1...v1.16.0) (2024-07-09)
 
 

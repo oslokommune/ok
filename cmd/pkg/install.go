@@ -6,11 +6,11 @@ import (
 )
 
 var InstallCommand = &cobra.Command{
-	Use:           "install",
-	Short:         "Run install",
+	Use:           "install [stackName1, stackName2, ...]",
+	Short:         "Install or update Boilerplate packages",
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := install.Run()
+		err := install.Run(args)
 		if err != nil {
 			return err
 		}

@@ -11,8 +11,8 @@ import (
 
 const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate/terraform"
 
-func Run() error {
-	cmds, err := CreateBoilerplateCommands("packages.yml")
+func Run(args [] string) error {
+	cmds, err := CreateBoilerplateCommands("packages.yml", args)
 	if err != nil {
 		return fmt.Errorf("creating boilerplate command: %w", err)
 	}
@@ -25,6 +25,7 @@ func Run() error {
 	log.Debug().Msgf("Current working directory: %s", curDir)
 
 	for _, cmd := range cmds {
+		fmt.Println("Running boilerplate command %s", cmd.Args)
 		args := strings.Join(cmd.Args[1:], " ")
 		log.Debug().Msgf("Running boilerplate command: %s %s", cmd.Path, args)
 
@@ -40,7 +41,7 @@ func Run() error {
 	return nil
 }
 
-func CreateBoilerplateCommands(filePath string) ([]*exec.Cmd, error) {
+func CreateBoilerplateCommands(filePath string, stacks [] string) ([]*exec.Cmd, error) {
 	var EnvBaseUrl = os.Getenv("BASE_URL")
 
 	fmt.Println("Installing packages...")
@@ -59,6 +60,19 @@ func CreateBoilerplateCommands(filePath string) ([]*exec.Cmd, error) {
 
 	var cmds []*exec.Cmd
 	for _, pkg := range manifest.Packages {
+		if len(stacks) > 0 {
+			var found bool
+			for _, stack := range stacks {
+				if stack == pkg.OutputFolder {
+					found = true
+					break
+				}
+			}
+			if !found {
+				continue
+			}
+		}
+
 		var templateURL string
 		if EnvBaseUrl == "" {
 			templateURL = fmt.Sprintf("%s/%s?ref=%s", DefaultBaseUrl, pkg.Template, pkg.Ref)

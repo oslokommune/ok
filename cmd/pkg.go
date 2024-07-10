@@ -6,5 +6,5 @@ import (
 
 var pkgCommand = &cobra.Command{
 	Use: "pkg",
+	Short: "Manage Boilerplate packages",
 }
-

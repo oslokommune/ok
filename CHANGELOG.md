@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.0](https://github.com/oslokommune/ok/compare/v1.16.2...v1.17.0) (2024-07-10)
+
+
+### Features
+
+* Add support for picking stacks with 'ok pkg install [stack1, stack2...]' ([eb82a70](https://github.com/oslokommune/ok/commit/eb82a70c2c577518dbdfba2b54a831b611cdd82e))
+
 ## [1.16.2](https://github.com/oslokommune/ok/compare/v1.16.1...v1.16.2) (2024-07-10)
 
 

@@ -5,27 +5,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  AppArmor:
-    runs-on: ubuntu-latest
-    steps:
-      - name: apparmor
-        run: |
-          set -x
-          sudo apt-get remove mysql-server --purge
-          sudo apt-get install apparmor-profiles
-          sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
-
   Test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Set up Go
         uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
         with:
           go-version-file: "go.mod"
           cache-dependency-path: "go.sum"
-
-      - name: Checkout code
-        uses: actions/checkout@v3
 
       - name: Run Mage
         uses: magefile/mage-action@6a5dcb5fe61f43d7c08a98bc3cf9bc63c308c08e # v3.0.0

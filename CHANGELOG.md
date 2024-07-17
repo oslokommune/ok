@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.0](https://github.com/oslokommune/ok/compare/v1.18.0...v1.19.0) (2024-07-17)
+
+
+### Features
+
+* Use version from Goreleaser ([#148](https://github.com/oslokommune/ok/issues/148)) ([31fde97](https://github.com/oslokommune/ok/commit/31fde976fb0c1f273e1897f9cea1cacf12c4f577))
+
 ## [1.18.0](https://github.com/oslokommune/ok/compare/v1.17.3...v1.18.0) (2024-07-17)
 
 

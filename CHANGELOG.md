@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.2](https://github.com/oslokommune/ok/compare/v1.17.1...v1.17.2) (2024-07-17)
+
+
+### Bug Fixes
+
+* Use Example ([89330e1](https://github.com/oslokommune/ok/commit/89330e1f423ba34b8438cc9a709c94c492fae5d0))
+
 ## [1.17.1](https://github.com/oslokommune/ok/compare/v1.17.0...v1.17.1) (2024-07-12)
 
 

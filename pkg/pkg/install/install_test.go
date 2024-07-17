@@ -25,7 +25,7 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", BaseUrl+"/app?ref=app-v6.1.1",
+					"--template-url", DefaultBaseUrl+"/app?ref=app-v6.1.1",
 					"--output-folder", "out/app-hello",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -33,7 +33,7 @@ func TestInstall(t *testing.T) {
 				),
 				exec.Command(
 					"boilerplate",
-					"--template-url", BaseUrl+"/networking?ref=main",
+					"--template-url", DefaultBaseUrl+"/networking?ref=main",
 					"--output-folder", "out/networking",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -55,7 +55,7 @@ func TestInstall(t *testing.T) {
 			inputFile := filepath.Join(cwd, "testdata", tc.packageManifestFilename)
 
 			// When
-			cmds, err := CreateBoilerplateCommands(inputFile)
+			cmds, err := CreateBoilerplateCommands(inputFile, []string{})
 
 			// Then
 			assert.NilError(t, err)

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.17.3](https://github.com/oslokommune/ok/compare/v1.17.2...v1.17.3) (2024-07-17)
+
+
+### Bug Fixes
+
+* Fix failing tests ([#149](https://github.com/oslokommune/ok/issues/149)) ([b0d7fb0](https://github.com/oslokommune/ok/commit/b0d7fb07e8158e8d282e7d9ec007b4779cc50779))
+
 ## [1.17.2](https://github.com/oslokommune/ok/compare/v1.17.1...v1.17.2) (2024-07-17)
 
 

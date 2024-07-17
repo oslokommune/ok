@@ -7,7 +7,7 @@ import (
 
 var InstallCommand = &cobra.Command{
 	Use:   "install [outputFolder ...]",
-	Short: "Install or update Boilerplate packages",
+	Short: "Install or update Boilerplate packages.",
 	Long: `Install or update Boilerplate packages.
 
 If no arguments are used, the command installs all the packages specified in the package manifest file.

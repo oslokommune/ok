@@ -2,6 +2,7 @@ package install
 
 import (
 	"fmt"
+	"github.com/logrusorgru/aurora/v3"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -25,8 +26,7 @@ func Run(args []string) error {
 	log.Debug().Msgf("Current working directory: %s", curDir)
 
 	for _, cmd := range cmds {
-		args := strings.Join(cmd.Args[1:], " ")
-		fmt.Printf("Running boilerplate command: %s %s", cmd.Path, args)
+		printPrettyCmd(cmd)
 
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -38,6 +38,31 @@ func Run(args []string) error {
 	}
 
 	return nil
+}
+
+func printPrettyCmd(cmd *exec.Cmd) {
+	cmdString := createPrettyCmdString(cmd)
+
+	fmt.Println("------------------------------------------------------------------------------------------")
+	fmt.Println("Running boilerplate command:")
+	fmt.Println(aurora.Green(cmdString))
+	fmt.Println("------------------------------------------------------------------------------------------")
+}
+
+func createPrettyCmdString(cmd *exec.Cmd) string {
+	var argsStr string
+
+	for _, arg := range cmd.Args[1:] {
+		if strings.HasPrefix(arg, "--") {
+			argsStr += "\n  " + arg
+		} else {
+			argsStr += " " + arg
+		}
+	}
+
+	cmdString := fmt.Sprintf("%s%s", cmd.Path, argsStr)
+
+	return cmdString
 }
 
 func CreateBoilerplateCommands(filePath string, stacks []string) ([]*exec.Cmd, error) {

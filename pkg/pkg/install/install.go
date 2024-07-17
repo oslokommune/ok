@@ -11,7 +11,7 @@ import (
 
 const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate/terraform"
 
-func Run(args [] string) error {
+func Run(args []string) error {
 	cmds, err := CreateBoilerplateCommands("packages.yml", args)
 	if err != nil {
 		return fmt.Errorf("creating boilerplate command: %w", err)
@@ -25,9 +25,8 @@ func Run(args [] string) error {
 	log.Debug().Msgf("Current working directory: %s", curDir)
 
 	for _, cmd := range cmds {
-		fmt.Println("Running boilerplate command %s", cmd.Args)
 		args := strings.Join(cmd.Args[1:], " ")
-		log.Debug().Msgf("Running boilerplate command: %s %s", cmd.Path, args)
+		fmt.Printf("Running boilerplate command: %s %s", cmd.Path, args)
 
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -41,7 +40,7 @@ func Run(args [] string) error {
 	return nil
 }
 
-func CreateBoilerplateCommands(filePath string, stacks [] string) ([]*exec.Cmd, error) {
+func CreateBoilerplateCommands(filePath string, stacks []string) ([]*exec.Cmd, error) {
 	var EnvBaseUrl = os.Getenv("BASE_URL")
 
 	fmt.Println("Installing packages...")

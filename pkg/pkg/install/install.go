@@ -2,7 +2,7 @@ package install
 
 import (
 	"fmt"
-	"github.com/logrusorgru/aurora/v3"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -42,10 +42,11 @@ func Run(args []string) error {
 
 func printPrettyCmd(cmd *exec.Cmd) {
 	cmdString := createPrettyCmdString(cmd)
+	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 
 	fmt.Println("------------------------------------------------------------------------------------------")
 	fmt.Println("Running boilerplate command:")
-	fmt.Println(aurora.Green(cmdString))
+	fmt.Println(green.Render(cmdString))
 	fmt.Println("------------------------------------------------------------------------------------------")
 }
 

@@ -14,8 +14,8 @@ var getCommand = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		baseURL := "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate"
 		ref := "main"
-		if version != "" {
-			ref = version
+		if okGetVersion != "" {
+			ref = okGetVersion
 		}
 		if outputFolder == "" {
 			outputFolder = templateName
@@ -46,12 +46,12 @@ var getCommand = &cobra.Command{
 
 var templateName string
 var outputFolder string
-var version string
+var okGetVersion string
 
 func init() {
 	getCommand.Flags().StringVarP(&templateName, "template", "t", "", "Template name (required)")
 	getCommand.MarkFlagRequired("template")
 	getCommand.Flags().StringVarP(&outputFolder, "output-folder", "o", "", "Output folder (optional)")
-	getCommand.Flags().StringVarP(&version, "version", "v", "", "Version (optional)")
+	getCommand.Flags().StringVarP(&okGetVersion, "version", "v", "", "Version (optional)")
 	rootCmd.AddCommand(getCommand)
 }

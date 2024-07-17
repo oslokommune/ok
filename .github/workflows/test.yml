@@ -17,6 +17,9 @@ jobs:
           go-version-file: "go.mod"
           cache-dependency-path: "go.sum"
 
+      - name: List files in the current directory
+        run: ls -lrta
+
       - name: Run Mage
         uses: magefile/mage-action@6a5dcb5fe61f43d7c08a98bc3cf9bc63c308c08e # v3.0.0
         with:

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/oslokommune/ok/compare/v1.17.3...v1.18.0) (2024-07-17)
+
+
+### Features
+
+* Print pretty boilerplate commands ([#151](https://github.com/oslokommune/ok/issues/151)) ([18254c0](https://github.com/oslokommune/ok/commit/18254c067b4655094725c644333b1c50ba9d4584))
+
 ## [1.17.3](https://github.com/oslokommune/ok/compare/v1.17.2...v1.17.3) (2024-07-17)
 
 

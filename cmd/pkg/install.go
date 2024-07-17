@@ -12,8 +12,7 @@ var InstallCommand = &cobra.Command{
 
 If no arguments are used, the command installs all the packages specified in the package manifest file.
 
-If one or more output folders are specified, the command installs only the packages from the package manifest that has
-OutputFolder that matches one of the specified output folders.
+If one or more output folders are specified, the command installs only the packages whose OutputFolder matches the specified folders. (OutputFolder is a field in the package manifest file.)
 `,
 	Examples: `ok install networking
 ok install networking my-app

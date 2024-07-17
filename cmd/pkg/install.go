@@ -15,7 +15,7 @@ If no arguments are used, the command installs all the packages specified in the
 If one or more output folders are specified, the command installs only the packages from the package manifest that has
 OutputFolder that matches one of the specified output folders.
 `,
-	Example: `ok install networking
+	Examples: `ok install networking
 ok install networking my-app
 `,
 	SilenceErrors: true,

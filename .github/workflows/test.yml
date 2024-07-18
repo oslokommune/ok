@@ -8,8 +8,10 @@ jobs:
   Test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
 
       - name: Set up Go
         uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
@@ -17,8 +19,6 @@ jobs:
           go-version-file: "go.mod"
           cache-dependency-path: "go.sum"
 
-      - name: List files in the current directory
-        run: ls -lrta
 
       - name: Run tests
         uses: magefile/mage-action@6a5dcb5fe61f43d7c08a98bc3cf9bc63c308c08e # v3.0.0

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.1](https://github.com/oslokommune/ok/compare/v1.19.0...v1.19.1) (2024-07-18)
+
+
+### Dependency Updates
+
+* bump github.com/charmbracelet/lipgloss in the gomod-all group ([#145](https://github.com/oslokommune/ok/issues/145)) ([6a6a2ea](https://github.com/oslokommune/ok/commit/6a6a2ea0f6e9b081360b9ecc0a27b6836187b5d4))
+
 ## [1.19.0](https://github.com/oslokommune/ok/compare/v1.18.0...v1.19.0) (2024-07-17)
 
 

@@ -1,7 +1,7 @@
 package pkg
 
 import (
-	"github.com/oslokommune/ok/pkg/pkg/update"
+	"github.com/oslokommune/ok/pkg/pkg/update/select_pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +11,7 @@ var UpdateCommand = &cobra.Command{
 	Example:       `ok pkg update`,
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := update.Run(PackagesManifestFilename)
+		_, err := select_pkg.Run()
 		if err != nil {
 			return err
 		}

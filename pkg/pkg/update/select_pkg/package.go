@@ -2,9 +2,10 @@ package select_pkg
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"gopkg.in/yaml.v3"
-	"os"
 )
 
 func listPackages() ([]string, error) {

@@ -2,11 +2,12 @@ package select_pkg
 
 import (
 	"fmt"
+	"io"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"io"
-	"strings"
 )
 
 type itemDelegate struct{}
@@ -43,7 +44,10 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 }
 
 func Run() ([]string, error) {
-	ssoFolders, _ := listPackages()
+	ssoFolders, err := listPackages()
+	if err != nil {
+		return []string{}, fmt.Errorf("listing packages: %w", err)
+	}
 
 	var items []list.Item
 
@@ -55,8 +59,7 @@ func Run() ([]string, error) {
 		list: list.New(items, itemDelegate{}, 0, 0),
 	}
 
-	m.list.Title = "Clusters"
-	//m.list.SetFilteringEnabled(true)
+	m.list.Title = "Packages"
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
 

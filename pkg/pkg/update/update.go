@@ -2,6 +2,7 @@ package update
 
 import (
 	"fmt"
+
 	"github.com/oslokommune/ok/pkg/pkg/common"
 
 	"gopkg.in/yaml.v3"

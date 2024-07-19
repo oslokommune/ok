@@ -18,8 +18,8 @@ If one or more output folders are specified, the command installs only the packa
 ok install networking my-app
 `,
 	SilenceErrors: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		err := install.Run(args)
+	RunE: func(cmd *cobra.Command, stacks []string) error {
+		err := install.Run(PackagesManifestFilename, stacks)
 		if err != nil {
 			return err
 		}

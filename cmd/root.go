@@ -47,6 +47,7 @@ func init() {
 
 	rootCmd.AddCommand(pkgCommand)
 	pkgCommand.AddCommand(pkg.InstallCommand)
+	pkgCommand.AddCommand(pkg.UpdateCommand)
 
 	if viper.GetBool("enable_experimental") {
 		rootCmd.AddCommand(charmingCommand)

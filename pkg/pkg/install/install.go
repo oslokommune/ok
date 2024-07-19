@@ -3,6 +3,7 @@ package install
 import (
 	"fmt"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -12,8 +13,8 @@ import (
 
 const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate/terraform"
 
-func Run(args []string) error {
-	cmds, err := CreateBoilerplateCommands("packages.yml", args)
+func Run(pkgManifestFilename string, stacks []string) error {
+	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, stacks)
 	if err != nil {
 		return fmt.Errorf("creating boilerplate command: %w", err)
 	}
@@ -76,7 +77,7 @@ func CreateBoilerplateCommands(filePath string, stacks []string) ([]*exec.Cmd, e
 		return nil, fmt.Errorf("opening file: %w", err)
 	}
 
-	var manifest PackageManifest
+	var manifest common.PackageManifest
 
 	err = yaml.Unmarshal(fileContents, &manifest)
 	if err != nil {

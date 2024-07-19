@@ -1,4 +1,4 @@
-package install
+package common
 
 type PackageManifest struct {
 	Packages []Package `yaml:"Packages"`

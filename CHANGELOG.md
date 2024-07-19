@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.0](https://github.com/oslokommune/ok/compare/v1.19.2...v1.20.0) (2024-07-19)
+
+
+### Features
+
+* Add ok pkg update ([#160](https://github.com/oslokommune/ok/issues/160)) ([dba323f](https://github.com/oslokommune/ok/commit/dba323f32a5ee889ad953c313cc64fd540176c48))
+
 ## [1.19.2](https://github.com/oslokommune/ok/compare/v1.19.1...v1.19.2) (2024-07-19)
 
 

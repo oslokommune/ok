@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.2](https://github.com/oslokommune/ok/compare/v1.19.1...v1.19.2) (2024-07-19)
+
+
+### Dependency Updates
+
+* bump github.com/aws/aws-sdk-go-v2/config in the gomod-all group ([#157](https://github.com/oslokommune/ok/issues/157)) ([9ed79fc](https://github.com/oslokommune/ok/commit/9ed79fc35657be0f695a431ae2ee5f41381b020b))
+
 ## [1.19.1](https://github.com/oslokommune/ok/compare/v1.19.0...v1.19.1) (2024-07-18)
 
 

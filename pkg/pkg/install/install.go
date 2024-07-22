@@ -68,8 +68,6 @@ func createPrettyCmdString(cmd *exec.Cmd) string {
 }
 
 func CreateBoilerplateCommands(pkgManifestFilename string, stacks []string) ([]*exec.Cmd, error) {
-	var EnvBaseUrl = os.Getenv("BASE_URL")
-
 	fmt.Println("Installing packages...")
 
 	manifestFileContents, err := os.ReadFile(pkgManifestFilename)
@@ -99,6 +97,7 @@ func CreateBoilerplateCommands(pkgManifestFilename string, stacks []string) ([]*
 			}
 		}
 
+		var EnvBaseUrl = os.Getenv("BASE_URL")
 		var templateURL string
 		if EnvBaseUrl == "" {
 			templateURL = fmt.Sprintf("%s/%s?ref=%s", DefaultBaseUrl, pkg.Template, pkg.Ref)

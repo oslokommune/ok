@@ -67,19 +67,19 @@ func createPrettyCmdString(cmd *exec.Cmd) string {
 	return cmdString
 }
 
-func CreateBoilerplateCommands(filePath string, stacks []string) ([]*exec.Cmd, error) {
+func CreateBoilerplateCommands(pkgManifestFilename string, stacks []string) ([]*exec.Cmd, error) {
 	var EnvBaseUrl = os.Getenv("BASE_URL")
 
 	fmt.Println("Installing packages...")
 
-	fileContents, err := os.ReadFile(filePath)
+	manifestFileContents, err := os.ReadFile(pkgManifestFilename)
 	if err != nil {
 		return nil, fmt.Errorf("opening file: %w", err)
 	}
 
 	var manifest common.PackageManifest
 
-	err = yaml.Unmarshal(fileContents, &manifest)
+	err = yaml.Unmarshal(manifestFileContents, &manifest)
 	if err != nil {
 		return nil, fmt.Errorf("unmarshalling YAML: %w", err)
 	}

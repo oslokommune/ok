@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.22.0](https://github.com/oslokommune/ok/compare/v1.21.0...v1.22.0) (2024-07-23)
+
+
+### Features
+
+* Load GitHub token from keyring ([#164](https://github.com/oslokommune/ok/issues/164)) ([fa80473](https://github.com/oslokommune/ok/commit/fa80473354ec58c0aa5693b2831f15b4d97ed670))
+
 ## [1.21.0](https://github.com/oslokommune/ok/compare/v1.20.0...v1.21.0) (2024-07-23)
 
 

@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/oslokommune/ok/cmd/pkg"
 	"os"
 	"path"
+
+	"github.com/oslokommune/ok/cmd/pkg"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -48,6 +49,7 @@ func init() {
 	rootCmd.AddCommand(pkgCommand)
 	pkgCommand.AddCommand(pkg.InstallCommand)
 	pkgCommand.AddCommand(pkg.UpdateCommand)
+	pkgCommand.AddCommand(pkg.ListCommand)
 
 	if viper.GetBool("enable_experimental") {
 		rootCmd.AddCommand(charmingCommand)

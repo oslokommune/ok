@@ -2,6 +2,7 @@ package update
 
 import (
 	"fmt"
+
 	"github.com/oslokommune/ok/pkg/pkg/common"
 
 	"gopkg.in/yaml.v3"
@@ -15,7 +16,7 @@ type Release struct {
 }
 
 func Run(pkgManifestFilename string) error {
-	manifest, err := loadPackageManifest(pkgManifestFilename)
+	manifest, err := LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
 		return fmt.Errorf("loading package manifest: %w", err)
 	}
@@ -38,7 +39,7 @@ func Run(pkgManifestFilename string) error {
 	return nil
 }
 
-func loadPackageManifest(filePath string) (common.PackageManifest, error) {
+func LoadPackageManifest(filePath string) (common.PackageManifest, error) {
 	fileContents, err := os.ReadFile(filePath)
 	if err != nil {
 		return common.PackageManifest{}, fmt.Errorf("opening file: %w", err)

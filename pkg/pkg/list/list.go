@@ -5,13 +5,11 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/common"
 )
 
-func Run(pkgManifestFilename string) error {
+func Run(pkgManifestFilename string) ([]common.Package, error) {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
-		return fmt.Errorf("loading package manifest: %w", err)
+		return nil, fmt.Errorf("loading package manifest: %w", err)
 	}
 
-	fmt.Println(manifest)
-
-	return nil
+	return manifest.Packages, nil
 }

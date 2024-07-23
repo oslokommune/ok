@@ -3,6 +3,7 @@ package update
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/Masterminds/semver"
@@ -11,10 +12,12 @@ import (
 )
 
 func getLatestReleases() (map[string]string, error) {
-	authToken, err := keyring.Get("gh:github.com", "")
+
+	authToken, err := getGitHubToken()
 	if err != nil {
-		return nil, fmt.Errorf("getting github token: %w", err)
+		return nil, fmt.Errorf("getting GitHub token: %w", err)
 	}
+
 	client := github.NewClient(nil).WithAuthToken(authToken)
 
 	githubReleases, err := listReleases(client)
@@ -29,6 +32,23 @@ func getLatestReleases() (map[string]string, error) {
 		return nil, fmt.Errorf("getting latest releases: %w", err)
 	}
 	return latestReleases, nil
+}
+
+func getGitHubToken() (string, error) {
+	if token := os.Getenv("GH_TOKEN"); token != "" {
+		return token, nil
+	}
+
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		return token, nil
+	}
+
+	token, err := keyring.Get("gh:github.com", "")
+	if err != nil {
+		return "", fmt.Errorf("getting GitHub token from keyring: %w", err)
+	}
+
+	return token, nil
 }
 
 func listReleases(client *github.Client) ([]*github.RepositoryRelease, error) {

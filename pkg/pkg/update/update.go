@@ -15,7 +15,7 @@ type Release struct {
 }
 
 func Run(pkgManifestFilename string) error {
-	manifest, err := loadPackageManifest(pkgManifestFilename)
+	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
 		return fmt.Errorf("loading package manifest: %w", err)
 	}
@@ -36,22 +36,6 @@ func Run(pkgManifestFilename string) error {
 	}
 
 	return nil
-}
-
-func loadPackageManifest(filePath string) (common.PackageManifest, error) {
-	fileContents, err := os.ReadFile(filePath)
-	if err != nil {
-		return common.PackageManifest{}, fmt.Errorf("opening file: %w", err)
-	}
-
-	var manifest common.PackageManifest
-
-	err = yaml.Unmarshal(fileContents, &manifest)
-	if err != nil {
-		return common.PackageManifest{}, fmt.Errorf("unmarshalling YAML: %w", err)
-	}
-
-	return manifest, nil
 }
 
 func writePackageManifest(pkgManifestFilename string, manifest common.PackageManifest) error {

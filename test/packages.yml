@@ -1,13 +1,97 @@
 Packages:
-  - Template: "app"
-    Ref: "app-v6.1.1"
-    OutputFolder: "out/app-hello"
-    VarFiles:
-      - "config/common-config.yml"
-      - "config/app-hello.yml"
-  - Template: "networking"
+  - OutputFolder: "remote-state"
+    Template: "remote-state"
     Ref: "main"
-    OutputFolder: "out/networking"
     VarFiles:
-      - "config/common-config.yml"
-      - "config/networking.yml"
+      - _config/common-config.yml
+      - _config/remote-state.yml
+  - OutputFolder: "dns"
+    Template: "dns"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/dns.yml
+  - OutputFolder: "networking"
+    Template: "networking"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/networking.yml
+  - OutputFolder: "databases"
+    Template: "databases"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/databases.yml
+  - OutputFolder: "certificates"
+    Template: "scaffold"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/certificates.yml
+  - OutputFolder: "load-balancing-alb-main"
+    Template: "load-balancing-alb"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/load-balancing-alb-main.yml
+  - OutputFolder: "iam"
+    Template: "iam"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/iam.yml
+  - OutputFolder: "app-common"
+    Template: "app-common"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/app-common.yml
+  - OutputFolder: "app-grafana"
+    Template: "app"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/app-grafana.yml
+  - OutputFolder: "app-hello"
+    Template: "app"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/app-hello.yml
+  - OutputFolder: "app-km"
+    Template: "app"
+    Ref: "enable_quick_switch_assume_cd_role"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/app-km.yml
+  - OutputFolder: "app-too-tikki"
+    Template: "app"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/app-too-tikki.yml
+  - OutputFolder: "rds-bastion"
+    Template: "rds-bastion"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/rds-bastion.yml
+  - OutputFolder: "backup"
+    Template: "backup"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/backup.yml
+  - OutputFolder: "observability"
+    Template: "observability"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/observability.yml
+  - OutputFolder: "observability-grafana-settings"
+    Template: "observability-grafana-settings"
+    Ref: "main"
+    VarFiles:
+      - _config/common-config.yml
+      - _config/observability-grafana-settings.yml

@@ -1,9 +1,17 @@
 package pkg
 
 import (
+	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/install"
+	"github.com/oslokommune/ok/pkg/pkg/install/select_pkg"
 	"github.com/spf13/cobra"
 )
+
+var installSelectFlag bool
+
+func init() {
+	InstallCommand.Flags().BoolVarP(&installSelectFlag, "interactive", "i", false, "Select package interactively")
+}
 
 var InstallCommand = &cobra.Command{
 	Use:   "install [outputFolder ...]",
@@ -22,6 +30,20 @@ BASE_URL=../boilerplate/terraform ok install networking my-app
 `,
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, stacks []string) error {
+		if installSelectFlag {
+			answer, err := select_pkg.Run(PackagesManifestFilename)
+			if err != nil {
+				return fmt.Errorf("selecting package: %w", err)
+			}
+
+			if answer.Aborted {
+				fmt.Println("Aborted")
+				return nil
+			}
+
+			stacks = []string{answer.Choice}
+		}
+
 		err := install.Run(PackagesManifestFilename, stacks)
 		if err != nil {
 			return err

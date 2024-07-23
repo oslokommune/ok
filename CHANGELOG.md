@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.23.0](https://github.com/oslokommune/ok/compare/v1.22.0...v1.23.0) (2024-07-23)
+
+
+### Features
+
+* **auth:** Add support for GitHub token environment variables ([f9a12b5](https://github.com/oslokommune/ok/commit/f9a12b57170a42db150909ac0358af2a56234ef2))
+
 ## [1.22.0](https://github.com/oslokommune/ok/compare/v1.21.0...v1.22.0) (2024-07-23)
 
 

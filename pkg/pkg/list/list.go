@@ -12,9 +12,7 @@ type Release struct {
 }
 
 func Run(pkgManifestFilename string) error {
-
 	manifest, err := update.LoadPackageManifest(pkgManifestFilename)
-
 	if err != nil {
 		return fmt.Errorf("loading package manifest: %w", err)
 	}
@@ -22,5 +20,4 @@ func Run(pkgManifestFilename string) error {
 	fmt.Println(manifest)
 
 	return nil
-
 }

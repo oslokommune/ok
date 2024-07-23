@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.0](https://github.com/oslokommune/ok/compare/v1.20.0...v1.21.0) (2024-07-23)
+
+
+### Features
+
+* Add help text for BASE_URL ([#162](https://github.com/oslokommune/ok/issues/162)) ([20db749](https://github.com/oslokommune/ok/commit/20db7498f40f707acbab55d62441ab3a00b64050))
+
 ## [1.20.0](https://github.com/oslokommune/ok/compare/v1.19.2...v1.20.0) (2024-07-19)
 
 

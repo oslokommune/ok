@@ -3,14 +3,18 @@ package update
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/Masterminds/semver"
 	"github.com/google/go-github/v63/github"
-	"os"
-	"strings"
+	"github.com/zalando/go-keyring"
 )
 
 func getLatestReleases() (map[string]string, error) {
-	authToken := os.Getenv("GH_TOKEN")
+	authToken, err := keyring.Get("gh:github.com", "")
+	if err != nil {
+		return nil, fmt.Errorf("getting github token: %w", err)
+	}
 	client := github.NewClient(nil).WithAuthToken(authToken)
 
 	githubReleases, err := listReleases(client)

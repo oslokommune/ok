@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/oslokommune/ok/pkg/pkg/common"
-	"github.com/rs/zerolog/log"
 	"os"
 	"os/exec"
 	"strings"
@@ -17,13 +16,6 @@ func Run(pkgManifestFilename string, outputFolders []string) error {
 	if err != nil {
 		return fmt.Errorf("creating boilerplate command: %w", err)
 	}
-
-	curDir, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("getting current directory: %w", err)
-	}
-
-	log.Debug().Msgf("Current working directory: %s", curDir)
 
 	for _, cmd := range cmds {
 		printPrettyCmd(cmd)

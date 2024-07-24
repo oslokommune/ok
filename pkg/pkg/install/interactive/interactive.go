@@ -1,66 +1,40 @@
 package interactive
 
 import (
+	"errors"
 	"fmt"
-	"github.com/charmbracelet/bubbles/list"
-	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/huh"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 )
 
-type Result struct {
-	Choice  string
-	Aborted bool
-}
-
-func Run(pkgManifestFilename string) (Result, error) {
-	listItems, err := getListItems(pkgManifestFilename)
-	if err != nil {
-		return Result{}, fmt.Errorf("getting items: %w", err)
-	}
-
-	m := model{
-		list: list.New(listItems, itemDelegate{}, 0, 0),
-	}
-
-	m.list.Title = "Select package to install:"
-
-	return run(m)
-}
-
-func getListItems(pkgManifestFilename string) ([]list.Item, error) {
+func SelectPackagesToInstall(pkgManifestFilename string) ([]string, error) {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
-		return nil, fmt.Errorf("loading package manifest: %w", err)
+		return []string{}, fmt.Errorf("loading package manifest: %w", err)
 	}
 
-	var items []list.Item
+	options := make([]huh.Option[string], 0)
 
 	for _, p := range manifest.Packages {
-		items = append(items, item{
-			outputFolder: p.OutputFolder,
-			ref:          p.Ref,
-		})
+		options = append(options, huh.NewOption(p.OutputFolder, p.OutputFolder))
 	}
-	return items, nil
-}
 
-func run(m model) (Result, error) {
-	p := tea.NewProgram(m, tea.WithAltScreen())
+	var packages []string
 
-	genericModel, err := p.Run()
+	s := huh.NewMultiSelect[string]().
+		Options(options...).
+		Title("Select package(s) to install").
+		Limit(4).
+		Value(&packages)
+
+	err = huh.NewForm(huh.NewGroup(s)).Run()
 	if err != nil {
-		return Result{}, fmt.Errorf("running program: %w", err)
+		if errors.Is(err, huh.ErrUserAborted) {
+			return []string{}, nil
+		} else {
+			return []string{}, fmt.Errorf("running multi select form: %w", err)
+		}
 	}
 
-	resultModel, ok := genericModel.(model)
-	if !ok {
-		return Result{}, fmt.Errorf("unable to cast resultModel to model")
-	}
-
-	result := Result{
-		Choice:  resultModel.choice,
-		Aborted: resultModel.aborted,
-	}
-
-	return result, nil
+	return packages, nil
 }

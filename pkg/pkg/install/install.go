@@ -12,8 +12,8 @@ import (
 
 const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate/terraform"
 
-func Run(pkgManifestFilename string, stacks []string) error {
-	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, stacks)
+func Run(pkgManifestFilename string, outputFolders []string) error {
+	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, outputFolders)
 	if err != nil {
 		return fmt.Errorf("creating boilerplate command: %w", err)
 	}
@@ -66,7 +66,7 @@ func createPrettyCmdString(cmd *exec.Cmd) string {
 	return cmdString
 }
 
-func CreateBoilerplateCommands(pkgManifestFilename string, stacks []string) ([]*exec.Cmd, error) {
+func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []string) ([]*exec.Cmd, error) {
 	fmt.Println("Installing packages...")
 
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
@@ -76,15 +76,15 @@ func CreateBoilerplateCommands(pkgManifestFilename string, stacks []string) ([]*
 
 	var cmds []*exec.Cmd
 	for _, pkg := range manifest.Packages {
-		if len(stacks) > 0 {
-			var found bool
-			for _, stack := range stacks {
-				if stack == pkg.OutputFolder {
-					found = true
+		if len(outputFolders) > 0 {
+			var installPackage bool
+			for _, p := range outputFolders {
+				if p == pkg.OutputFolder {
+					installPackage = true
 					break
 				}
 			}
-			if !found {
+			if !installPackage {
 				continue
 			}
 		}

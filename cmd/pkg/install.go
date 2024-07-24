@@ -3,6 +3,7 @@ package pkg
 import (
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/install"
+	"github.com/oslokommune/ok/pkg/pkg/install/interactive"
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +31,7 @@ BASE_URL=../boilerplate/terraform ok install networking my-app
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, stacks []string) error {
 		if installSelectFlag {
-			answer, err := _select.Run(PackagesManifestFilename)
+			answer, err := interactive.Run(PackagesManifestFilename)
 			if err != nil {
 				return fmt.Errorf("selecting package: %w", err)
 			}

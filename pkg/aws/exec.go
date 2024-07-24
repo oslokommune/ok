@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
+	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/charmbracelet/huh"
 )
 
@@ -63,10 +65,60 @@ func listTasks(clusterArn, serviceArn string) ([]string, error) {
 	return tasks, nil
 }
 
+func getTaskDetails(clusterName, taskId string) (*types.Task, error) {
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("error loading configuration: %w", err)
+	}
+
+	ecsSvc := ecs.NewFromConfig(cfg)
+
+	input := &ecs.DescribeTasksInput{
+		Cluster: &clusterName,
+		Tasks:   []string{taskId},
+	}
+
+	result, err := ecsSvc.DescribeTasks(context.TODO(), input)
+	if err != nil {
+		return nil, fmt.Errorf("error describing task: %w", err)
+	}
+
+	if len(result.Tasks) == 0 {
+		return nil, fmt.Errorf("no task found")
+	}
+
+	return &result.Tasks[0], nil
+}
+
+func executeCommand(clusterName, taskId, containerName string) error {
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		return fmt.Errorf("error loading configuration: %w", err)
+	}
+
+	ecsSvc := ecs.NewFromConfig(cfg)
+
+	input := &ecs.ExecuteCommandInput{
+		Cluster:     &clusterName,
+		Task:        &taskId,
+		Container:   &containerName,
+		Interactive: true,
+		Command:     aws.String("/bin/sh"),
+	}
+
+	_, err = ecsSvc.ExecuteCommand(context.TODO(), input)
+	if err != nil {
+		return fmt.Errorf("error executing command: %w", err)
+	}
+
+	return nil
+}
+
 func Exec() (string, error) {
 	var cluster string
 	var service string
 	var task string
+	var container string
 
 	clusters, err := listClusters()
 	if err != nil {
@@ -140,5 +192,35 @@ func Exec() (string, error) {
 		}
 	}
 
-	return fmt.Sprintf("Cluster: %s, Service: %s, Task: %s", cluster, service, task), nil
+	taskDetail, err := getTaskDetails(cluster, task)
+	if err != nil {
+		return "", fmt.Errorf("getting task details: %w", err)
+	}
+
+	containerOptions := make([]huh.Option[string], 0)
+	for _, c := range taskDetail.Containers {
+		containerOptions = append(containerOptions, huh.NewOption(*c.Name, *c.Name))
+	}
+
+	containerSelect := huh.NewSelect[string]().
+		Options(containerOptions...).
+		Title("Select container").
+		Value(&container)
+
+	err = huh.NewForm(huh.NewGroup(containerSelect)).Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return "", nil
+		} else {
+			return "", fmt.Errorf("running container select form: %w", err)
+		}
+	}
+
+	fmt.Println("Executing command. Press Ctrl+C to exit.")
+	err = executeCommand(cluster, task, container)
+	if err != nil {
+		return "", fmt.Errorf("executing command: %w", err)
+	}
+
+	return fmt.Sprintf("Command executed on Cluster: %s, Task: %s, Container: %s", cluster, task, container), nil
 }

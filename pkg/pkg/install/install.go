@@ -5,7 +5,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v3"
 	"os"
 	"os/exec"
 	"strings"
@@ -70,16 +69,9 @@ func createPrettyCmdString(cmd *exec.Cmd) string {
 func CreateBoilerplateCommands(pkgManifestFilename string, stacks []string) ([]*exec.Cmd, error) {
 	fmt.Println("Installing packages...")
 
-	manifestFileContents, err := os.ReadFile(pkgManifestFilename)
+	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
-		return nil, fmt.Errorf("opening file: %w", err)
-	}
-
-	var manifest common.PackageManifest
-
-	err = yaml.Unmarshal(manifestFileContents, &manifest)
-	if err != nil {
-		return nil, fmt.Errorf("unmarshalling YAML: %w", err)
+		return nil, fmt.Errorf("loading package manifest: %w", err)
 	}
 
 	var cmds []*exec.Cmd

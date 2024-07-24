@@ -44,9 +44,29 @@ func listServices(clusterArn string) ([]string, error) {
 	return services, nil
 }
 
+func listTasks(clusterArn, serviceArn string) ([]string, error) {
+	cfg, err := config.LoadDefaultConfig(context.Background())
+	if err != nil {
+		fmt.Printf("error loading configuration: %v\n", err)
+		return nil, err
+	}
+	ecsSvc := ecs.NewFromConfig(cfg)
+	result, err := ecsSvc.ListTasks(context.TODO(), &ecs.ListTasksInput{
+		Cluster:     &clusterArn,
+		ServiceName: &serviceArn,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("listing tasks: %w", err)
+	}
+	var tasks []string
+	tasks = append(tasks, result.TaskArns...)
+	return tasks, nil
+}
+
 func Exec() (string, error) {
 	var cluster string
 	var service string
+	var task string
 
 	clusters, err := listClusters()
 	if err != nil {
@@ -96,5 +116,29 @@ func Exec() (string, error) {
 		}
 	}
 
-	return fmt.Sprintf("Cluster: %s, Service: %s", cluster, service), nil
+	tasks, err := listTasks(cluster, service)
+	if err != nil {
+		return "", fmt.Errorf("listing tasks: %w", err)
+	}
+
+	taskOptions := make([]huh.Option[string], 0)
+	for _, t := range tasks {
+		taskOptions = append(taskOptions, huh.NewOption(t, t))
+	}
+
+	taskSelect := huh.NewSelect[string]().
+		Options(taskOptions...).
+		Title("Select running task").
+		Value(&task)
+
+	err = huh.NewForm(huh.NewGroup(taskSelect)).Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return "", nil
+		} else {
+			return "", fmt.Errorf("running task select form: %w", err)
+		}
+	}
+
+	return fmt.Sprintf("Cluster: %s, Service: %s, Task: %s", cluster, service, task), nil
 }

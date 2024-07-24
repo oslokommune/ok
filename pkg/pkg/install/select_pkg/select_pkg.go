@@ -7,6 +7,11 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/common"
 )
 
+type Result struct {
+	Choice  string
+	Aborted bool
+}
+
 func Run(pkgManifestFilename string) (Result, error) {
 	listItems, err := getListItems(pkgManifestFilename)
 	if err != nil {
@@ -58,9 +63,4 @@ func run(m model) (Result, error) {
 	}
 
 	return result, nil
-}
-
-type Result struct {
-	Choice  string
-	Aborted bool
 }

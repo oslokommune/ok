@@ -13,6 +13,12 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+// TODO: Create `ok aws` command
+// TODO: Create `ok aws ecs-exec` command
+// TODO: Make `ok do ecs-exec` list clusters
+// TODO: Make `ok do ecs-exec` list clusters and select one to execute
+// TODO:
+
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 var quitTextStyle = lipgloss.NewStyle().Margin(1, 0, 2, 4)
 

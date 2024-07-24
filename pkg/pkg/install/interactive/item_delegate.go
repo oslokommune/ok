@@ -1,4 +1,4 @@
-package select_pkg
+package interactive
 
 import (
 	"fmt"

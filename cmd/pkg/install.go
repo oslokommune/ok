@@ -7,10 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var installSelectFlag bool
+var flagInstallInteractive bool
 
 func init() {
-	InstallCommand.Flags().BoolVarP(&installSelectFlag, "interactive", "i", false, "Select package interactively")
+	InstallCommand.Flags().BoolVarP(&flagInstallInteractive, "interactive", "i", false, "Select package interactively")
 }
 
 var InstallCommand = &cobra.Command{
@@ -30,7 +30,7 @@ BASE_URL=../boilerplate/terraform ok install networking my-app
 `,
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, stacks []string) error {
-		if installSelectFlag {
+		if flagInstallInteractive {
 			answer, err := interactive.Run(PackagesManifestFilename)
 			if err != nil {
 				return fmt.Errorf("selecting package: %w", err)

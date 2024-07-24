@@ -66,20 +66,41 @@ func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []strin
 		return nil, fmt.Errorf("loading package manifest: %w", err)
 	}
 
-	var cmds []*exec.Cmd
-	for _, pkg := range manifest.Packages {
-		if len(outputFolders) > 0 {
-			var installPackage bool
-			for _, p := range outputFolders {
-				if p == pkg.OutputFolder {
-					installPackage = true
-					break
-				}
+	// Filter packages based on output folders
+	packagesToInstall := make([]common.Package, 0)
+	if len(outputFolders) == 0 {
+		packagesToInstall = manifest.Packages
+	} else {
+		packagesToInstall = filterPackages(manifest.Packages, outputFolders)
+	}
+	manifest.Packages = packagesToInstall
+
+	// Install packages
+	cmds := createBoilerPlateCommands(packagesToInstall)
+
+	return cmds, nil
+}
+
+func filterPackages(packages []common.Package, outputFolders []string) []common.Package {
+	result := make([]common.Package, 0)
+
+	for _, pkg := range packages {
+		for _, outputFolder := range outputFolders {
+
+			if pkg.OutputFolder == outputFolder {
+				result = append(result, pkg)
+				break
 			}
-			if !installPackage {
-				continue
-			}
+
 		}
+	}
+
+	return result
+}
+
+func createBoilerPlateCommands(packagesToInstall []common.Package) []*exec.Cmd {
+	var cmds []*exec.Cmd
+	for _, pkg := range packagesToInstall {
 
 		var EnvBaseUrl = os.Getenv("BASE_URL")
 		var templateURL string
@@ -102,6 +123,5 @@ func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []strin
 		cmd := exec.Command("boilerplate", cmdArgs...)
 		cmds = append(cmds, cmd)
 	}
-
-	return cmds, nil
+	return cmds
 }

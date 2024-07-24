@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.24.0](https://github.com/oslokommune/ok/compare/v1.23.0...v1.24.0) (2024-07-24)
+
+
+### Features
+
+* Add ok pkg install --interactive ([#168](https://github.com/oslokommune/ok/issues/168)) ([258808a](https://github.com/oslokommune/ok/commit/258808ab711b63993635448f1346809f1d1f9697))
+
 ## [1.23.0](https://github.com/oslokommune/ok/compare/v1.22.0...v1.23.0) (2024-07-23)
 
 

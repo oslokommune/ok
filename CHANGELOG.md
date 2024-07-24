@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.0](https://github.com/oslokommune/ok/compare/v1.24.0...v1.25.0) (2024-07-24)
+
+
+### Features
+
+* Add multi select ([#170](https://github.com/oslokommune/ok/issues/170)) ([c837250](https://github.com/oslokommune/ok/commit/c83725007e194c1b339506cd4a2087eab9ba3b26))
+
 ## [1.24.0](https://github.com/oslokommune/ok/compare/v1.23.0...v1.24.0) (2024-07-24)
 
 

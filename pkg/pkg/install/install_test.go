@@ -1,6 +1,7 @@
 package install
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/require"
 	"os"
 	"os/exec"
@@ -18,9 +19,10 @@ func TestInstall(t *testing.T) {
 		testName                  string
 		packageManifestFilename   string
 		expectBoilerplateCommands []*exec.Cmd
+		outputFolders             []string
 	}{
 		{
-			testName:                "Should run correct boilerplate commands from package manifest",
+			testName:                "Should install all packages from packages.yml",
 			packageManifestFilename: "packages.yml",
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
@@ -41,21 +43,33 @@ func TestInstall(t *testing.T) {
 				),
 			},
 		},
+		{
+			testName:                "Should install package with specified output folder",
+			packageManifestFilename: "packages.yml",
+			outputFolders:           []string{"out/app-hello"},
+			expectBoilerplateCommands: []*exec.Cmd{
+				exec.Command(
+					"boilerplate",
+					"--template-url", DefaultBaseUrl+"/app?ref=app-v6.1.1",
+					"--output-folder", "out/app-hello",
+					"--non-interactive",
+					"--var-file", "config/common-config.yml",
+					"--var-file", "config/app-hello.yml",
+				),
+			},
+		},
 	}
 
 	for _, tc := range testCases {
 		tc := tc
-		t.Run(tc.testName, func(t *testing.T) {
-			cwd, err := os.Getwd()
-			if err != nil {
-				require.Nil(t, err)
-			}
 
-			// Construct the absolute path to testdata/packages.yml
-			inputFile := filepath.Join(cwd, "testdata", tc.packageManifestFilename)
+		t.Run(tc.testName, func(t *testing.T) {
+			// Given
+			inputFile, err := getTestdataFilepath(tc.packageManifestFilename)
+			require.Nil(t, err)
 
 			// When
-			cmds, err := CreateBoilerplateCommands(inputFile, []string{})
+			cmds, err := CreateBoilerplateCommands(inputFile, tc.outputFolders)
 
 			// Then
 			assert.NilError(t, err)
@@ -70,4 +84,13 @@ func TestInstall(t *testing.T) {
 			assert.Equal(t, len(cmds), len(tc.expectBoilerplateCommands))
 		})
 	}
+}
+
+func getTestdataFilepath(testDataFilename string) (string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("getting current directory: %w", err)
+	}
+
+	return filepath.Join(cwd, "testdata", testDataFilename), nil
 }

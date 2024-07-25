@@ -54,10 +54,6 @@ func init() {
 	rootCmd.AddCommand(awsCommand)
 	awsCommand.AddCommand(aws.EcsExecCommand)
 
-	if viper.GetBool("enable_experimental") {
-		rootCmd.AddCommand(charmingCommand)
-	}
-
 	initializeConfiguration()
 }
 

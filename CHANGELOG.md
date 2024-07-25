@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.26.0](https://github.com/oslokommune/ok/compare/v1.25.0...v1.26.0) (2024-07-25)
+
+
+### Features
+
+* **aws:** Implement ECS Exec for interactive shell access ([#173](https://github.com/oslokommune/ok/issues/173)) ([32e3138](https://github.com/oslokommune/ok/commit/32e3138a67051de9786a98ecf687a46f328ca804))
+
 ## [1.25.0](https://github.com/oslokommune/ok/compare/v1.24.0...v1.25.0) (2024-07-24)
 
 

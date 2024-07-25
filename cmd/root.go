@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/oslokommune/ok/cmd/pkg"
 	"os"
 	"path"
+
+	"github.com/oslokommune/ok/cmd/aws"
+	"github.com/oslokommune/ok/cmd/pkg"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -49,9 +51,8 @@ func init() {
 	pkgCommand.AddCommand(pkg.InstallCommand)
 	pkgCommand.AddCommand(pkg.UpdateCommand)
 
-	if viper.GetBool("enable_experimental") {
-		rootCmd.AddCommand(charmingCommand)
-	}
+	rootCmd.AddCommand(awsCommand)
+	awsCommand.AddCommand(aws.EcsExecCommand)
 
 	initializeConfiguration()
 }

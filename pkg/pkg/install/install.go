@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate/terraform"
+const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git"
 
 func Run(pkgManifestFilename string, outputFolders []string) error {
 	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, outputFolders)
@@ -106,7 +106,7 @@ func createBoilerPlateCommands(packagesToInstall []common.Package) []*exec.Cmd {
 		if EnvBaseUrl == "" {
 			templateURL = fmt.Sprintf("%s/%s?ref=%s", DefaultBaseUrl, pkg.Template, pkg.Ref)
 		} else {
-			templateURL = fmt.Sprintf("%s/%s", EnvBaseUrl, pkg.Template)
+			templateURL = fmt.Sprintf("%s/%s?ref=%s", EnvBaseUrl, pkg.Template, pkg.Ref)
 		}
 
 		cmdArgs := []string{

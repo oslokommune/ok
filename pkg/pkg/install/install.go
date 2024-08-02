@@ -73,7 +73,6 @@ func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []strin
 	} else {
 		packagesToInstall = filterPackages(manifest.Packages, outputFolders)
 	}
-	manifest.Packages = packagesToInstall
 
 	// Install packages
 	cmds := createBoilerPlateCommands(packagesToInstall)

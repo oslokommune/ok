@@ -1,0 +1,5 @@
+AppName: "too-tikki"
+CreatePr: false
+GpgSign: true
+WorkingDirectory: "stacks/prod/app-{{ .AppName }}"
+ImageMetadataFile: "_config.auto.tfvars.json"

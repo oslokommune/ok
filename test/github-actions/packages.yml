@@ -1,0 +1,10 @@
+Config:
+  DefaultTemplatePathPrefix: "boilerplate/github-actions"
+
+Packages:
+  - OutputFolder: "output/.github"
+    Template: "receive-dispatch-event"
+    Ref: "main"
+    VarFiles:
+      - common-config.yml
+      - km-receive_dispatch_event.yml

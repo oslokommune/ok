@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.0](https://github.com/oslokommune/ok/compare/v1.26.0...v1.27.0) (2024-08-02)
+
+
+### Features
+
+* Support Ref when using BASE_URL ([c507740](https://github.com/oslokommune/ok/commit/c5077408b11d0097b2aa2095c25cd22d7d152393))
+
 ## [1.26.0](https://github.com/oslokommune/ok/compare/v1.25.0...v1.26.0) (2024-07-25)
 
 

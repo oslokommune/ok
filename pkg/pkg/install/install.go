@@ -10,6 +10,7 @@ import (
 )
 
 const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git"
+const DefaultTemplatePathPrefix = "boilerplate"
 
 func Run(pkgManifestFilename string, outputFolders []string) error {
 	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, outputFolders)

@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git"
+const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate/terraform"
 
 func Run(pkgManifestFilename string, outputFolders []string) error {
 	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, outputFolders)

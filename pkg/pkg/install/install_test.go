@@ -27,7 +27,7 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"/app?ref=app-v6.1.1",
+					"--template-url", DefaultBaseUrl+"/terraform/app?ref=app-v6.1.1",
 					"--output-folder", "out/app-hello",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -35,7 +35,7 @@ func TestInstall(t *testing.T) {
 				),
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"/networking?ref=main",
+					"--template-url", DefaultBaseUrl+"/terraform/networking?ref=main",
 					"--output-folder", "out/networking",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -50,11 +50,25 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"/app?ref=app-v6.1.1",
+					"--template-url", DefaultBaseUrl+"/terraform/app?ref=app-v6.1.1",
 					"--output-folder", "out/app-hello",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
 					"--var-file", "config/app-hello.yml",
+				),
+			},
+		},
+		{
+			testName:                "Should install package correctly when template path prefix set",
+			packageManifestFilename: "packages-github-actions.yml",
+			expectBoilerplateCommands: []*exec.Cmd{
+				exec.Command(
+					"boilerplate",
+					"--template-url", DefaultBaseUrl+"/github-actions/terraform-on-changed-dirs?ref=main",
+					"--output-folder", "out/.github/workflows",
+					"--non-interactive",
+					"--var-file", "config/common-config.yml",
+					"--var-file", "config/terraform-on-changed-dirs.yml",
 				),
 			},
 		},

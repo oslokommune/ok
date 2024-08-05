@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.1](https://github.com/oslokommune/ok/compare/v1.27.0...v1.27.1) (2024-08-05)
+
+
+### Bug Fixes
+
+* Revert changed base URL ([34c2748](https://github.com/oslokommune/ok/commit/34c2748522d5b44af2fe759005c551626d4303d3))
+
 ## [1.27.0](https://github.com/oslokommune/ok/compare/v1.26.0...v1.27.0) (2024-08-02)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.0](https://github.com/oslokommune/ok/compare/v1.27.1...v1.28.0) (2024-08-06)
+
+
+### Features
+
+* Add DefaultPackagePathPrefix ([#178](https://github.com/oslokommune/ok/issues/178)) ([aeff3e0](https://github.com/oslokommune/ok/commit/aeff3e0c370424119be26f3746839396b1874977))
+
 ## [1.27.1](https://github.com/oslokommune/ok/compare/v1.27.0...v1.27.1) (2024-08-05)
 
 

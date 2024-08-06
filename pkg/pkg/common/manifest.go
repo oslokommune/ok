@@ -3,8 +3,8 @@ package common
 import "fmt"
 
 type PackageManifest struct {
-	Packages                  []Package `yaml:"Packages"`
-	DefaultTemplatePathPrefix string    `yaml:"DefaultTemplatePathPrefix"`
+	Packages                 []Package `yaml:"Packages"`
+	DefaultPackagePathPrefix string    `yaml:"DefaultPackagePathPrefix"`
 }
 
 type Package struct {

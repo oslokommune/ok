@@ -10,7 +10,7 @@ import (
 )
 
 const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//"
-const DefaultTemplatePathPrefix = "boilerplate/terraform"
+const DefaultPackagePathPrefix = "boilerplate/terraform"
 
 func Run(pkgManifestFilename string, outputFolders []string) error {
 	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, outputFolders)
@@ -76,7 +76,7 @@ func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []strin
 	}
 
 	// Install packages
-	cmds, err := createBoilerPlateCommands(packagesToInstall, manifest.DefaultTemplatePathPrefix)
+	cmds, err := createBoilerPlateCommands(packagesToInstall, manifest.DefaultPackagePathPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("creating boilerplate commands: %w", err)
 	}
@@ -101,7 +101,7 @@ func filterPackages(packages []common.Package, outputFolders []string) []common.
 	return result
 }
 
-func createBoilerPlateCommands(packagesToInstall []common.Package, templatePathPrefix string) ([]*exec.Cmd, error) {
+func createBoilerPlateCommands(packagesToInstall []common.Package, packagePathPrefix string) ([]*exec.Cmd, error) {
 	var cmds []*exec.Cmd
 	for _, pkg := range packagesToInstall {
 		var envBaseUrl = os.Getenv("BASE_URL")
@@ -109,12 +109,12 @@ func createBoilerPlateCommands(packagesToInstall []common.Package, templatePathP
 			envBaseUrl = DefaultBaseUrl
 		}
 
-		if templatePathPrefix == "" {
-			templatePathPrefix = DefaultTemplatePathPrefix
+		if packagePathPrefix == "" {
+			packagePathPrefix = DefaultPackagePathPrefix
 		}
 
 		path := strings.Join(
-			[]string{templatePathPrefix, pkg.Template},
+			[]string{packagePathPrefix, pkg.Template},
 			"/")
 		templateURL := fmt.Sprintf("%s%s?ref=%s", envBaseUrl, path, pkg.Ref)
 

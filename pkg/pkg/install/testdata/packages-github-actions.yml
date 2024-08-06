@@ -1,0 +1,9 @@
+DefaultPackagePathPrefix: "boilerplate/github-actions"
+
+Packages:
+  - Template: "terraform-on-changed-dirs"
+    Ref: "main"
+    OutputFolder: "out/.github/workflows"
+    VarFiles:
+      - "config/common-config.yml"
+      - "config/terraform-on-changed-dirs.yml"

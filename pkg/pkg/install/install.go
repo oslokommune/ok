@@ -9,7 +9,8 @@ import (
 	"strings"
 )
 
-const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate/terraform"
+const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//"
+const DefaultPackagePathPrefix = "boilerplate/terraform"
 
 func Run(pkgManifestFilename string, outputFolders []string) error {
 	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, outputFolders)
@@ -75,7 +76,10 @@ func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []strin
 	}
 
 	// Install packages
-	cmds := createBoilerPlateCommands(packagesToInstall)
+	cmds, err := createBoilerPlateCommands(packagesToInstall, manifest.DefaultPackagePathPrefix)
+	if err != nil {
+		return nil, fmt.Errorf("creating boilerplate commands: %w", err)
+	}
 
 	return cmds, nil
 }
@@ -97,17 +101,22 @@ func filterPackages(packages []common.Package, outputFolders []string) []common.
 	return result
 }
 
-func createBoilerPlateCommands(packagesToInstall []common.Package) []*exec.Cmd {
+func createBoilerPlateCommands(packagesToInstall []common.Package, packagePathPrefix string) ([]*exec.Cmd, error) {
 	var cmds []*exec.Cmd
 	for _, pkg := range packagesToInstall {
-
-		var EnvBaseUrl = os.Getenv("BASE_URL")
-		var templateURL string
-		if EnvBaseUrl == "" {
-			templateURL = fmt.Sprintf("%s/%s?ref=%s", DefaultBaseUrl, pkg.Template, pkg.Ref)
-		} else {
-			templateURL = fmt.Sprintf("%s/%s?ref=%s", EnvBaseUrl, pkg.Template, pkg.Ref)
+		var envBaseUrl = os.Getenv("BASE_URL")
+		if envBaseUrl == "" {
+			envBaseUrl = DefaultBaseUrl
 		}
+
+		if packagePathPrefix == "" {
+			packagePathPrefix = DefaultPackagePathPrefix
+		}
+
+		path := strings.Join(
+			[]string{packagePathPrefix, pkg.Template},
+			"/")
+		templateURL := fmt.Sprintf("%s%s?ref=%s", envBaseUrl, path, pkg.Ref)
 
 		cmdArgs := []string{
 			"--template-url", templateURL,
@@ -122,5 +131,6 @@ func createBoilerPlateCommands(packagesToInstall []common.Package) []*exec.Cmd {
 		cmd := exec.Command("boilerplate", cmdArgs...)
 		cmds = append(cmds, cmd)
 	}
-	return cmds
+
+	return cmds, nil
 }

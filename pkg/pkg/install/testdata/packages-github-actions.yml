@@ -1,4 +1,4 @@
-DefaultTemplatePathPrefix: "github-actions"
+DefaultTemplatePathPrefix: "boilerplate/github-actions"
 
 Packages:
   - Template: "terraform-on-changed-dirs"

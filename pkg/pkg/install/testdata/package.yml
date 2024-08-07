@@ -1,0 +1,7 @@
+Packages:
+  - Template: "app"
+    Ref: "app-v6.1.1"
+    OutputFolder: "out/app-hello"
+    VarFiles:
+      - "config/common-config.yml"
+      - "config/app-hello.yml"

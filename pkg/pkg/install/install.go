@@ -13,7 +13,9 @@ const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//
 const DefaultPackagePathPrefix = "boilerplate/terraform"
 
 func Run(pkgManifestFilename string, outputFolders []string) error {
-	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, outputFolders)
+	baseUrlOrPath := os.Getenv("BASE_URL")
+
+	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, outputFolders, baseUrlOrPath)
 	if err != nil {
 		return fmt.Errorf("creating boilerplate command: %w", err)
 	}
@@ -59,7 +61,7 @@ func createPrettyCmdString(cmd *exec.Cmd) string {
 	return cmdString
 }
 
-func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []string) ([]*exec.Cmd, error) {
+func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []string, baseUrlOrPath string) ([]*exec.Cmd, error) {
 	fmt.Println("Installing packages...")
 
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
@@ -76,7 +78,7 @@ func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []strin
 	}
 
 	// Install packages
-	cmds, err := createBoilerPlateCommands(packagesToInstall, manifest.DefaultPackagePathPrefix)
+	cmds, err := createBoilerPlateCommands(packagesToInstall, manifest.DefaultPackagePathPrefix, baseUrlOrPath)
 	if err != nil {
 		return nil, fmt.Errorf("creating boilerplate commands: %w", err)
 	}
@@ -101,12 +103,11 @@ func filterPackages(packages []common.Package, outputFolders []string) []common.
 	return result
 }
 
-func createBoilerPlateCommands(packagesToInstall []common.Package, packagePathPrefix string) ([]*exec.Cmd, error) {
+func createBoilerPlateCommands(packagesToInstall []common.Package, packagePathPrefix string, baseUrlOrPath string) ([]*exec.Cmd, error) {
 	var cmds []*exec.Cmd
 	for _, pkg := range packagesToInstall {
-		var envBaseUrl = os.Getenv("BASE_URL")
-		if envBaseUrl == "" {
-			envBaseUrl = DefaultBaseUrl
+		if baseUrlOrPath == "" {
+			baseUrlOrPath = DefaultBaseUrl
 		}
 
 		if packagePathPrefix == "" {
@@ -116,7 +117,15 @@ func createBoilerPlateCommands(packagesToInstall []common.Package, packagePathPr
 		path := strings.Join(
 			[]string{packagePathPrefix, pkg.Template},
 			"/")
-		templateURL := fmt.Sprintf("%s%s?ref=%s", envBaseUrl, path, pkg.Ref)
+
+		// envBaseUrl can be a URL or a path
+		var templateURL string
+		if isUrl(baseUrlOrPath) {
+			templateURL = fmt.Sprintf("%s%s?ref=%s", baseUrlOrPath, path, pkg.Ref)
+		} else {
+			templateURL = fmt.Sprintf("%s%s", baseUrlOrPath, path)
+
+		}
 
 		cmdArgs := []string{
 			"--template-url", templateURL,
@@ -133,4 +142,10 @@ func createBoilerPlateCommands(packagesToInstall []common.Package, packagePathPr
 	}
 
 	return cmds, nil
+}
+
+func isUrl(str string) bool {
+	return strings.HasPrefix(str, "http://") ||
+		strings.HasPrefix(str, "https://") ||
+		strings.HasPrefix(str, "git@")
 }

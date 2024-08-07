@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.2](https://github.com/oslokommune/ok/compare/v1.28.1...v1.28.2) (2024-08-07)
+
+
+### Bug Fixes
+
+* Support both path and url for BASE_URL ([#182](https://github.com/oslokommune/ok/issues/182)) ([32c1d44](https://github.com/oslokommune/ok/commit/32c1d440f9f3b5a368314e73ac0baac6cdb6bb4b))
+
 ## [1.28.1](https://github.com/oslokommune/ok/compare/v1.28.0...v1.28.1) (2024-08-07)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.1](https://github.com/oslokommune/ok/compare/v1.28.0...v1.28.1) (2024-08-07)
+
+
+### Dependency Updates
+
+* bump github.com/charmbracelet/huh in the gomod-all group ([#172](https://github.com/oslokommune/ok/issues/172)) ([9002ef1](https://github.com/oslokommune/ok/commit/9002ef16732c1bd918b941f6b927f44de20db3d0))
+
 ## [1.28.0](https://github.com/oslokommune/ok/compare/v1.27.1...v1.28.0) (2024-08-06)
 
 

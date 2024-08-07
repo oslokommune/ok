@@ -6,6 +6,7 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 )
 
@@ -114,17 +115,14 @@ func createBoilerPlateCommands(packagesToInstall []common.Package, packagePathPr
 			packagePathPrefix = DefaultPackagePathPrefix
 		}
 
-		path := strings.Join(
-			[]string{packagePathPrefix, pkg.Template},
-			"/")
-
-		// envBaseUrl can be a URL or a path
 		var templateURL string
 		if isUrl(baseUrlOrPath) {
-			templateURL = fmt.Sprintf("%s%s?ref=%s", baseUrlOrPath, path, pkg.Ref)
-		} else {
-			templateURL = fmt.Sprintf("%s%s", baseUrlOrPath, path)
+			pathz := strings.Join(
+				[]string{packagePathPrefix, pkg.Template}, "/")
 
+			templateURL = fmt.Sprintf("%s%s?ref=%s", baseUrlOrPath, pathz, pkg.Ref)
+		} else {
+			templateURL = path.Join(baseUrlOrPath, packagePathPrefix, pkg.Template)
 		}
 
 		cmdArgs := []string{

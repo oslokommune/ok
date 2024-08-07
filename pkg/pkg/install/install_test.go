@@ -44,11 +44,11 @@ func TestInstall(t *testing.T) {
 		{
 			testName:                "Should support URL in BASE_URL",
 			packageManifestFilename: "package.yml",
-			baseUrl:                 DefaultBaseUrl,
+			baseUrl:                 "git@github.com:oslokommune/SOMETHING_ELSE.git//",
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"boilerplate/terraform/app?ref=app-v6.1.1",
+					"--template-url", "git@github.com:oslokommune/SOMETHING_ELSE.git//boilerplate/terraform/app?ref=app-v6.1.1",
 					"--output-folder", "out/app-hello",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -58,7 +58,7 @@ func TestInstall(t *testing.T) {
 		}, {
 			testName:                "Should support file path in BASE_URL",
 			packageManifestFilename: "package.yml",
-			baseUrl:                 "../",
+			baseUrl:                 "..",
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",

@@ -2,15 +2,12 @@ package install
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
-)
-
-import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -20,6 +17,7 @@ func TestInstall(t *testing.T) {
 		packageManifestFilename   string
 		expectBoilerplateCommands []*exec.Cmd
 		outputFolders             []string
+		baseUrl                   string
 	}{
 		{
 			testName:                "Should install all packages from packages.yml",
@@ -40,6 +38,35 @@ func TestInstall(t *testing.T) {
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
 					"--var-file", "config/networking.yml",
+				),
+			},
+		},
+		{
+			testName:                "Should support URL in BASE_URL",
+			packageManifestFilename: "package.yml",
+			baseUrl:                 "git@github.com:oslokommune/SOMETHING_ELSE.git//",
+			expectBoilerplateCommands: []*exec.Cmd{
+				exec.Command(
+					"boilerplate",
+					"--template-url", "git@github.com:oslokommune/SOMETHING_ELSE.git//boilerplate/terraform/app?ref=app-v6.1.1",
+					"--output-folder", "out/app-hello",
+					"--non-interactive",
+					"--var-file", "config/common-config.yml",
+					"--var-file", "config/app-hello.yml",
+				),
+			},
+		}, {
+			testName:                "Should support file path in BASE_URL",
+			packageManifestFilename: "package.yml",
+			baseUrl:                 "..",
+			expectBoilerplateCommands: []*exec.Cmd{
+				exec.Command(
+					"boilerplate",
+					"--template-url", "../boilerplate/terraform/app",
+					"--output-folder", "out/app-hello",
+					"--non-interactive",
+					"--var-file", "config/common-config.yml",
+					"--var-file", "config/app-hello.yml",
 				),
 			},
 		},
@@ -83,7 +110,7 @@ func TestInstall(t *testing.T) {
 			require.Nil(t, err)
 
 			// When
-			cmds, err := CreateBoilerplateCommands(inputFile, tc.outputFolders)
+			cmds, err := CreateBoilerplateCommands(inputFile, tc.outputFolders, tc.baseUrl)
 
 			// Then
 			assert.Nil(t, err)

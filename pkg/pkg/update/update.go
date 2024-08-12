@@ -2,17 +2,10 @@ package update
 
 import (
 	"fmt"
+
 	"github.com/oslokommune/ok/pkg/pkg/common"
-
-	"gopkg.in/yaml.v3"
-
-	"os"
+	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
-
-type Release struct {
-	Component string
-	Version   string
-}
 
 func Run(pkgManifestFilename string) error {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
@@ -20,7 +13,7 @@ func Run(pkgManifestFilename string) error {
 		return fmt.Errorf("loading package manifest: %w", err)
 	}
 
-	latestReleases, err := getLatestReleases()
+	latestReleases, err := githubreleases.GetLatestReleases()
 	if err != nil {
 		return fmt.Errorf("getting latest releases: %w", err)
 	}
@@ -30,28 +23,9 @@ func Run(pkgManifestFilename string) error {
 		manifest.Packages[i].Ref = fmt.Sprintf("%s-%s", pkg.Template, latestReleases[pkg.Template])
 	}
 
-	err = writePackageManifest(pkgManifestFilename, manifest)
+	err = common.SavePackageManifest(pkgManifestFilename, manifest)
 	if err != nil {
-		return fmt.Errorf("writing package manifest: %w", err)
-	}
-
-	return nil
-}
-
-func writePackageManifest(pkgManifestFilename string, manifest common.PackageManifest) error {
-	updatedYAML, err := yaml.Marshal(manifest)
-	if err != nil {
-		return fmt.Errorf("error marshaling updated manifest: %w", err)
-	}
-
-	fileInfo, err := os.Stat(pkgManifestFilename)
-	if err != nil {
-		return fmt.Errorf("error getting file info: %w", err)
-	}
-
-	err = os.WriteFile(pkgManifestFilename, updatedYAML, fileInfo.Mode())
-	if err != nil {
-		return fmt.Errorf("error writing updated manifest to file: %w", err)
+		return err
 	}
 
 	return nil

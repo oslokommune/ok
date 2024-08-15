@@ -8,7 +8,12 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
-func Run(pkgManifestFilename string, templateName, outputFolderName, appName string) error {
+/**
+ * Add Boilerplate template to packages manifest with an optional stack name.
+ * The template version is fetched from the latest release on GitHub and added to the packages manifest without applying the template.
+ * The output folder is prefixed with the stack name and added to the packages manifest.
+ */
+func Run(pkgManifestFilename string, templateName, outputFolderName, stackName string) error {
 
 	latestReleases, err := githubreleases.GetLatestReleases()
 	if err != nil {
@@ -20,14 +25,10 @@ func Run(pkgManifestFilename string, templateName, outputFolderName, appName str
 		return fmt.Errorf("template %s not found in latest releases", templateName)
 	}
 
-	templateAppName := templateName
-	if appName != "" {
-		templateAppName = fmt.Sprintf("%s-%s", templateName, appName)
-	}
-	outputFolder := filepath.Join(outputFolderName, templateAppName)
+	outputFolder := filepath.Join(outputFolderName, stackName)
 	varFiles := []string{
-		"config/common-config.yml",
-		fmt.Sprintf("config/%s.yml", templateAppName),
+		"_config/common-config.yml",
+		fmt.Sprintf("_config/%s.yml", stackName),
 	}
 	newPackage := common.Package{
 		Template:     templateName,

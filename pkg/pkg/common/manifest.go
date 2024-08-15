@@ -4,7 +4,7 @@ import "fmt"
 
 type PackageManifest struct {
 	Packages                 []Package `yaml:"Packages"`
-	DefaultPackagePathPrefix string    `yaml:"DefaultPackagePathPrefix"`
+	DefaultPackagePathPrefix string    `yaml:"DefaultPackagePathPrefix,omitempty"`
 }
 
 type Package struct {

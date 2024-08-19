@@ -42,7 +42,7 @@ func TestInstall(t *testing.T) {
 			},
 		},
 		{
-			testName:                "Should support URL in BASE_URL",
+			testName:                "Should support URL in OK_BASE_URL",
 			packageManifestFilename: "package.yml",
 			baseUrl:                 "git@github.com:oslokommune/SOMETHING_ELSE.git//",
 			expectBoilerplateCommands: []*exec.Cmd{
@@ -56,7 +56,7 @@ func TestInstall(t *testing.T) {
 				),
 			},
 		}, {
-			testName:                "Should support file path in BASE_URL",
+			testName:                "Should support file path in OK_BASE_URL",
 			packageManifestFilename: "package.yml",
 			baseUrl:                 "..",
 			expectBoilerplateCommands: []*exec.Cmd{

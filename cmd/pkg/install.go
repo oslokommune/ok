@@ -26,8 +26,8 @@ If one or more output folders are specified, the command installs only the packa
 
 Set the environment variable BASE_URL to specify where package templates are downloaded from.
 `,
-	Example: `ok install networking
-ok install networking my-app
+	Example: `ok pkg install networking
+ok pkg install networking my-app
 BASE_URL=../boilerplate/terraform ok install networking my-app
 `,
 	SilenceErrors: true,

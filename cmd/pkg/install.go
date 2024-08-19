@@ -24,11 +24,11 @@ If no arguments are used, the command installs all the packages specified in the
 
 If one or more output folders are specified, the command installs only the packages whose OutputFolder matches the specified folders. (OutputFolder is a field in the package manifest file.)
 
-Set the environment variable BASE_URL to specify where package templates are downloaded from.
+Set the environment variable ` + install.BaseUrlEnvName + ` to specify where package templates are downloaded from.
 `,
 	Example: `ok pkg install networking
 ok pkg install networking my-app
-BASE_URL=../boilerplate/terraform ok install networking my-app
+` + install.BaseUrlEnvName + `=../boilerplate/terraform ok pkg install networking my-app
 `,
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, outputFolders []string) error {

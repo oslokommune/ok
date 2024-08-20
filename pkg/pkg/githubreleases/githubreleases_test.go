@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/google/go-github/v63/github"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSplitComponentAndVersion(t *testing.T) {
@@ -36,16 +38,8 @@ func TestSplitComponentAndVersion(t *testing.T) {
 		}
 
 		components := splitComponentAndVersion(releases)
-		if len(components) != 1 {
-			t.Errorf("Expected 1 component, got %d", len(components))
-		}
-
-		if components[0].Component != tc.ExpectedComponent {
-			t.Errorf("Expected component to be %s, got %s", tc.ExpectedComponent, components[0].Component)
-		}
-
-		if components[0].Version != tc.ExpectedVersion {
-			t.Errorf("Expected version to be %s, got %s", tc.ExpectedVersion, components[0].Version)
-		}
+		require.Len(t, components, 1, "Unexpected number of components")
+		assert.Equal(t, tc.ExpectedComponent, components[0].Component, "Unexpected component name")
+		assert.Equal(t, tc.ExpectedVersion, components[0].Version, "Unexpected component version")
 	}
 }

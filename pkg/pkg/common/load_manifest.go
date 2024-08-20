@@ -14,14 +14,14 @@ func LoadPackageManifest(filePath string) (PackageManifest, error) {
 		return PackageManifest{}, nil
 	}
 	if err != nil {
-		return PackageManifest{}, fmt.Errorf("error opening manifest file %s: %w", filePath, err)
+		return PackageManifest{}, fmt.Errorf("opening manifest file '%s': %w", filePath, err)
 	}
 
 	var manifest PackageManifest
 
 	err = yaml.Unmarshal(fileContents, &manifest)
 	if err != nil {
-		return PackageManifest{}, fmt.Errorf("error unmarshalling YAML file %s: %w", filePath, err)
+		return PackageManifest{}, fmt.Errorf("unmarshalling YAML file '%s': %w", filePath, err)
 	}
 
 	return manifest, nil

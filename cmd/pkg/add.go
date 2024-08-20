@@ -10,10 +10,10 @@ import (
 
 var AddCommand = &cobra.Command{
 	Use:   "add template [outputFolder]",
-	Short: "Add Boilerplate template to packages manifest with an optional output folder",
-	Long: `Add Boilerplate template to packages manifest with an optional output folder.
-The template version is fetched from the latest release on GitHub and added to the packages manifest without applying the template.
-The output folder is useful to define if you need multiple instances of the same template with different configurations. For example having multiple apps in the same project.`,
+	Short: "Add the Boilerplate template to the package manifest with an optional output folder",
+	Long: `Add the Boilerplate template to the package manifest with an optional output folder.
+The template version is fetched from the latest GitHub release in the template repository.
+The output folder is useful when you need multiple instances of the same template with different configurations, for example having multiple instances of the application template.`,
 	Example: `ok pkg add databases my-postgres-database
 ok pkg add app ecommerce-website
 ok pkg add app ecommerce-api
@@ -31,7 +31,7 @@ ok pkg add app ecommerce-api
 		cmd.Printf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, PackagesManifestFilename, result.OutputFolder)
 		nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
 		if len(nonExistingConfigFiles) > 0 {
-			cmd.Printf("\nCreate these following configuration files:\n")
+			cmd.Printf("\nCreate the following configuration files:\n")
 			for _, configFile := range nonExistingConfigFiles {
 				cmd.Printf("- %s\n", configFile)
 			}

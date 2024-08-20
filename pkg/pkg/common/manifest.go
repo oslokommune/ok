@@ -8,9 +8,9 @@ type PackageManifest struct {
 }
 
 type Package struct {
+	OutputFolder string   `yaml:"OutputFolder"`
 	Template     string   `yaml:"Template"`
 	Ref          string   `yaml:"Ref"`
-	OutputFolder string   `yaml:"OutputFolder"`
 	VarFiles     []string `yaml:"VarFiles"`
 }
 

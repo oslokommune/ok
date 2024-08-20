@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/oslokommune/ok/compare/v1.29.0...v2.0.0) (2024-08-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* Bump major version
+
+### Features
+
+* Bump major version ([6688ab9](https://github.com/oslokommune/ok/commit/6688ab9c41ba3a972ab2634be958a9a5f41736f3))
+
 ## [1.29.0](https://github.com/oslokommune/ok/compare/v1.28.2...v1.29.0) (2024-08-20)
 
 

@@ -48,6 +48,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", defaultConfigPath))
 
 	rootCmd.AddCommand(pkgCommand)
+	pkgCommand.AddCommand(pkg.AddCommand)
 	pkgCommand.AddCommand(pkg.InstallCommand)
 	pkgCommand.AddCommand(pkg.UpdateCommand)
 

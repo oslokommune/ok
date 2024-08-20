@@ -4,13 +4,13 @@ import "fmt"
 
 type PackageManifest struct {
 	Packages                 []Package `yaml:"Packages"`
-	DefaultPackagePathPrefix string    `yaml:"DefaultPackagePathPrefix"`
+	DefaultPackagePathPrefix string    `yaml:"DefaultPackagePathPrefix,omitempty"`
 }
 
 type Package struct {
+	OutputFolder string   `yaml:"OutputFolder"`
 	Template     string   `yaml:"Template"`
 	Ref          string   `yaml:"Ref"`
-	OutputFolder string   `yaml:"OutputFolder"`
 	VarFiles     []string `yaml:"VarFiles"`
 }
 

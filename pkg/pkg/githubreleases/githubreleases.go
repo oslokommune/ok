@@ -1,9 +1,12 @@
 package githubreleases
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/Masterminds/semver"
@@ -39,7 +42,21 @@ func GetLatestReleases() (map[string]string, error) {
 	return latestReleases, nil
 }
 
+func GetGitHubToken() (string, error) {
+	return getGitHubToken()
+}
+
+func GetGitHubClient() (*github.Client, error) {
+	token, err := getGitHubToken()
+	if err != nil {
+		return nil, fmt.Errorf("getting GitHub token: %w", err)
+	}
+
+	return github.NewClient(nil).WithAuthToken(token), nil
+}
+
 func getGitHubToken() (string, error) {
+	var errorStrings []string
 	if token := os.Getenv("GH_TOKEN"); token != "" {
 		return token, nil
 	}
@@ -48,12 +65,31 @@ func getGitHubToken() (string, error) {
 		return token, nil
 	}
 
-	token, err := keyring.Get("gh:github.com", "")
-	if err != nil {
-		return "", fmt.Errorf("getting GitHub token from keyring: %w", err)
+	if token, err := keyring.Get("gh:github.com", ""); err == nil {
+		return token, nil
+	} else {
+		errorStrings = append(errorStrings, fmt.Sprintf("getting GitHub token from keyring: %s", err))
 	}
 
-	return token, nil
+	if token, err := getGHToken(); err == nil {
+		return token, nil
+	} else {
+		errorStrings = append(errorStrings, fmt.Sprintf("getting GitHub token from gh cli: %s", err))
+	}
+
+	return "", fmt.Errorf(strings.Join(errorStrings, ", "))
+}
+
+func getGHToken() (string, error) {
+	cmd := exec.Command("gh", "auth", "token")
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		return "", fmt.Errorf("getting token from gh cli: %s:  %w", stderr.String(), err)
+	}
+	return strings.TrimSpace(stdout.String()), nil
 }
 
 func listReleases(client *github.Client) ([]*github.RepositoryRelease, error) {
@@ -127,4 +163,25 @@ func parseLatestReleases(components []Release) (map[string]string, error) {
 		}
 	}
 	return latestComponents, nil
+}
+
+func DownloadGithubFile(ctx context.Context, client *github.Client, owner, repo, path, ref string) ([]byte, error) {
+	rc, response, err := client.Repositories.DownloadContents(ctx, owner, repo, path, &github.RepositoryContentGetOptions{Ref: ref})
+	if err != nil {
+		return nil, fmt.Errorf("downloading file: %w", err)
+	}
+
+	// check if response headers contains "application/vnd.github.raw"
+	if !strings.Contains(response.Header.Get("Content-Type"), "application/vnd.github.raw") {
+		return nil, fmt.Errorf("response content type is not application/vnd.github.raw")
+	}
+
+	defer rc.Close()
+
+	bodyText, err := io.ReadAll(rc)
+	if err != nil {
+		return nil, fmt.Errorf("reading response body: %w", err)
+	}
+
+	return bodyText, nil
 }

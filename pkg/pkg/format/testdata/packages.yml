@@ -1,0 +1,13 @@
+Packages:
+  - Template: app
+    OutputFolder: "out/app-hello"
+    Ref: app-v6.1.1
+    VarFiles:
+      - config/common-config.yml
+      - config/app-hello.yml
+  - OutputFolder: out/networking
+    Template: networking
+    Ref: main
+    VarFiles:
+      - config/common-config.yml
+      - "config/networking.yml"

@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/oslokommune/ok/compare/v3.0.0...v3.1.0) (2024-08-23)
+
+
+### Features
+
+* Add ok pkg fmt ([#193](https://github.com/oslokommune/ok/issues/193)) ([61e4277](https://github.com/oslokommune/ok/commit/61e4277d116c9cb14d1f83d6e08e884828e65406))
+
 ## [3.0.0](https://github.com/oslokommune/ok/compare/v2.0.0...v3.0.0) (2024-08-20)
 
 

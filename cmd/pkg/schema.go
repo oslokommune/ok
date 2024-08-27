@@ -6,11 +6,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/oslokommune/ok/pkg/jsonschema"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
-
-const JsonSchemaVersionString = "http://json-schema.org/draft-07/schema#"
 
 var TestCommand = &cobra.Command{
 	Use: "test",
@@ -44,7 +43,7 @@ var TestCommand = &cobra.Command{
 }
 
 var SchemaCommand = &cobra.Command{
-	Use: "schema",
+	Use: "schema dependencies-input schema-output",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		inputFile, err := os.Open(args[0])
@@ -52,6 +51,7 @@ var SchemaCommand = &cobra.Command{
 			return err
 		}
 		defer inputFile.Close()
+		schemaFileName := args[1]
 		dec := yaml.NewDecoder(inputFile)
 		var dependencies = make(map[string]*DownloadedBoilThingy)
 		if err = dec.Decode(&dependencies); err != nil {
@@ -64,7 +64,6 @@ var SchemaCommand = &cobra.Command{
 		}
 		allVariables := collectFolderVariables("", rootCfg.Path, rootCfg, dependencies)
 		jsonSchema := buildJsonSchemaFromNamespaceVariables(allVariables)
-		schemaFileName := "my.schema.json"
 		cmd.Printf("Writing schema file to %s\n", schemaFileName)
 		if err := writeJsonSchemaToFile(jsonSchema, schemaFileName); err != nil {
 			return err
@@ -74,7 +73,7 @@ var SchemaCommand = &cobra.Command{
 	},
 }
 
-func writeJsonSchemaToFile(jsonSchema JsonSchemaRoot, filename string) error {
+func writeJsonSchemaToFile(jsonSchema jsonschema.Document, filename string) error {
 	bts, err := json.MarshalIndent(jsonSchema, "", "  ")
 	if err != nil {
 		return err
@@ -123,25 +122,8 @@ func findRootConfig(dependencies map[string]*DownloadedBoilThingy) (*DownloadedB
 	return nil, fmt.Errorf("no root config found")
 }
 
-type (
-	JsonSchemaProperty struct {
-		Type        string                        `json:"type,omitempty"`
-		Description string                        `json:"description,omitempty"`
-		Default     any                           `json:"default,omitempty"`
-		Properties  map[string]JsonSchemaProperty `json:"properties,omitempty"`
-		Required    []string                      `json:"required,omitempty"`
-	}
-	JsonSchemaRoot struct {
-		Schema     string                        `json:"$schema"`
-		Title      string                        `json:"title"`
-		Type       string                        `json:"type"`
-		Properties map[string]JsonSchemaProperty `json:"properties"`
-		Required   []string                      `json:"required,omitempty"`
-	}
-)
-
-func buildJsonSchemaFromNamespaceVariables(nsVariables map[string][]BoilerplateVariable) JsonSchemaRoot {
-	properties := make(map[string]JsonSchemaProperty)
+func buildJsonSchemaFromNamespaceVariables(nsVariables map[string][]BoilerplateVariable) jsonschema.Document {
+	properties := make(map[string]jsonschema.Property)
 	for ns, variables := range nsVariables {
 		for _, v := range variables {
 			namespacedVariable := joinNamespacePath(ns, v.Name)
@@ -154,7 +136,7 @@ func buildJsonSchemaFromNamespaceVariables(nsVariables map[string][]BoilerplateV
 				goVariableType, _ := mapGoTypeToSchemaType(v.Default)
 				variableType = goVariableType
 			}
-			var subProperties map[string]JsonSchemaProperty = nil
+			var subProperties map[string]jsonschema.Property = nil
 			if variableType == "object" {
 				subProperties = mapDefaultMapToProperties("", v)
 				for k, v := range subProperties {
@@ -162,7 +144,7 @@ func buildJsonSchemaFromNamespaceVariables(nsVariables map[string][]BoilerplateV
 					properties[joinNamespacePath(namespacedVariable, k)] = v
 				}
 			}
-			properties[namespacedVariable] = JsonSchemaProperty{
+			properties[namespacedVariable] = jsonschema.Property{
 				Type:        variableType,
 				Description: v.Description,
 				Default:     v.Default,
@@ -181,8 +163,8 @@ func buildJsonSchemaFromNamespaceVariables(nsVariables map[string][]BoilerplateV
 			requiredFields = append(requiredFields, namespacedStackNameVariable)
 		}
 	}
-	return JsonSchemaRoot{
-		Schema:     JsonSchemaVersionString,
+	return jsonschema.Document{
+		Schema:     jsonschema.SchemaURI,
 		Title:      "Boilerplate Config",
 		Type:       "object",
 		Properties: properties,
@@ -190,13 +172,6 @@ func buildJsonSchemaFromNamespaceVariables(nsVariables map[string][]BoilerplateV
 	}
 }
 
-func mapVariableToSchemaProperty(variable BoilerplateVariable) JsonSchemaProperty {
-	return JsonSchemaProperty{
-		Type:        mapTypeToJsonSchema(variable.Type),
-		Description: variable.Description,
-		Default:     variable.Default,
-	}
-}
 func getStringKeys[T any](m map[string]T) []string {
 	keys := make([]string, 0, len(m))
 	for k := range m {
@@ -205,12 +180,12 @@ func getStringKeys[T any](m map[string]T) []string {
 	return keys
 }
 
-func mapDefaultMapToProperties(prefix string, variable BoilerplateVariable) map[string]JsonSchemaProperty {
+func mapDefaultMapToProperties(prefix string, variable BoilerplateVariable) map[string]jsonschema.Property {
 	defaultMap, ok := variable.Default.(map[string]any)
 	if !ok {
 		return nil
 	}
-	var properties = make(map[string]JsonSchemaProperty)
+	var properties = make(map[string]jsonschema.Property)
 
 	for k, v := range defaultMap {
 		schemaType, ok := mapGoTypeToSchemaType(v)
@@ -218,7 +193,7 @@ func mapDefaultMapToProperties(prefix string, variable BoilerplateVariable) map[
 			continue
 		}
 		variableName := joinNamespacePath(prefix, k)
-		properties[variableName] = JsonSchemaProperty{
+		properties[variableName] = jsonschema.Property{
 			Type: schemaType,
 			//Description: fmt.Sprintf("Part of: %s", variable.Description),
 			Default: v,

@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/oslokommune/ok/compare/v3.1.0...v3.2.0) (2024-08-27)
+
+
+### Features
+
+* Allow updating single package with `ok pkg update &lt;package-name&gt;` ([#198](https://github.com/oslokommune/ok/issues/198)) ([471a768](https://github.com/oslokommune/ok/commit/471a7689048d2b84afb274dd9eae7dc0146974d0))
+
 ## [3.1.0](https://github.com/oslokommune/ok/compare/v3.0.0...v3.1.0) (2024-08-23)
 
 

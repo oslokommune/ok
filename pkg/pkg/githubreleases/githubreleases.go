@@ -11,6 +11,20 @@ import (
 	"github.com/zalando/go-keyring"
 )
 
+const HelpMessage = `
+GitHub token not found in keyring or environment variables.
+
+Steps to resolve:
+
+1. Ensure you have the latest GitHub CLI version, which in most cases should store the token in the OS keyring:
+   https://cli.github.com/
+
+2. Try logging in again with GitHub CLI:
+   gh auth login
+
+3. If you're still encountering issues, you can bypass the keyring by setting the token as an environment variable:
+   export GH_TOKEN=$(gh auth token)`
+
 type Release struct {
 	Component string
 	Version   string

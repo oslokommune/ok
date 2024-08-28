@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0](https://github.com/oslokommune/ok/compare/v3.2.0...v3.3.0) (2024-08-28)
+
+
+### Features
+
+* Add help message if GitHub auth fails ([#200](https://github.com/oslokommune/ok/issues/200)) ([73492fd](https://github.com/oslokommune/ok/commit/73492fdbb329a76b70292e8515612c2a1171a43c))
+
 ## [3.2.0](https://github.com/oslokommune/ok/compare/v3.1.0...v3.2.0) (2024-08-27)
 
 

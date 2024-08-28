@@ -30,6 +30,27 @@ type Release struct {
 	Version   string
 }
 
+func GetLatestOkVersion() (*semver.Version, error) {
+	authToken, err := getGitHubToken()
+	if err != nil {
+		return nil, fmt.Errorf("getting GitHub token: %w", err)
+	}
+	client := github.NewClient(nil).WithAuthToken(authToken)
+
+	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "oslokommune", "ok")
+	if err != nil {
+		return nil, fmt.Errorf("error getting latest release: %v", err)
+	}
+
+	versionTag := release.GetTagName()
+	versionSemver, err := semver.NewVersion(versionTag)
+	if err != nil {
+		return nil, fmt.Errorf("parsing version string '%s': %w", versionTag, err)
+	}
+
+	return versionSemver, nil
+}
+
 func GetLatestReleases() (map[string]string, error) {
 
 	authToken, err := getGitHubToken()

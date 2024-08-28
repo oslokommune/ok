@@ -2,6 +2,8 @@ package add
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
@@ -23,6 +25,9 @@ func Run(pkgManifestFilename string, templateName, outputFolder string) (*AddRes
 
 	latestReleases, err := githubreleases.GetLatestReleases()
 	if err != nil {
+		if strings.Contains(err.Error(), "secret not found in keyring") {
+			fmt.Fprintf(os.Stderr, "%s\n\n", githubreleases.AuthErrorHelpMessage)
+		}
 		return nil, fmt.Errorf("failed getting latest github releases: %w", err)
 	}
 

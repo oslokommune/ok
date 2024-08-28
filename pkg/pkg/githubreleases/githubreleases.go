@@ -11,7 +11,7 @@ import (
 	"github.com/zalando/go-keyring"
 )
 
-const HelpMessage = `
+const AuthErrorHelpMessage = `
 GitHub token not found in keyring or environment variables.
 
 Steps to resolve:
@@ -64,7 +64,7 @@ func getGitHubToken() (string, error) {
 
 	token, err := keyring.Get("gh:github.com", "")
 	if err != nil {
-		return "", fmt.Errorf("getting GitHub token from keyring: %w", err)
+		return "", err
 	}
 
 	return token, nil

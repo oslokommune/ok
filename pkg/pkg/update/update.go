@@ -2,6 +2,7 @@ package update
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
@@ -16,8 +17,7 @@ func Run(pkgManifestFilename string, packageName string) error {
 	latestReleases, err := githubreleases.GetLatestReleases()
 	if err != nil {
 		if strings.Contains(err.Error(), "secret not found in keyring") {
-			fmt.Println(githubreleases.HelpMessage)
-			fmt.Println()
+			fmt.Fprintf(os.Stderr, "%s\n\n", githubreleases.AuthErrorHelpMessage)
 		}
 		return fmt.Errorf("failed getting latest github releases: %w", err)
 	}

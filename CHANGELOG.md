@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.0](https://github.com/oslokommune/ok/compare/v3.3.1...v3.4.0) (2024-08-28)
+
+
+### Features
+
+* Add update check when running ok version ([#203](https://github.com/oslokommune/ok/issues/203)) ([5663ed0](https://github.com/oslokommune/ok/commit/5663ed013f244bbe9fa4b6df082d764fa719f726))
+
 ## [3.3.1](https://github.com/oslokommune/ok/compare/v3.3.0...v3.3.1) (2024-08-28)
 
 

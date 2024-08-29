@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v63/github"
+	"github.com/oslokommune/ok/pkg/pkg/config"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -49,6 +50,56 @@ type DownloadedBoilThingy struct {
 
 var DownloadCommand = &cobra.Command{
 	Use: "download",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		gh, err := githubreleases.GetGitHubClient()
+		if err != nil {
+			return fmt.Errorf("getting GitHub client: %w", err)
+		}
+		releases, err := githubreleases.GetLatestReleases()
+		if err != nil {
+			return fmt.Errorf("getting latest releases: %w", err)
+		}
+
+		templateName := args[0]
+		templateVersion := releases[templateName]
+		githubRef := fmt.Sprintf("%s-%s", templateName, templateVersion)
+		templatePath := mustJoinUri("boilerplate/terraform", templateName)
+		//templatePath := "boilerplate/terraform"
+		fileDownloader := githubreleases.NewFileDownloader(gh, boilerplateRepoOwner, boilerplateRepoName, githubRef)
+		stacks, err := config.DownloadBoilerplateStacksWithDependencies(cmd.Context(), fileDownloader, templatePath)
+		if err != nil {
+			return fmt.Errorf("downloading boilerplate stacks: %w", err)
+		}
+		moduleVariables := config.BuildModuleVariables("", stacks[0], stacks, "some/output/folder")
+		schema, err := config.TransformModulesToJsonSchema(moduleVariables)
+		if err != nil {
+			return fmt.Errorf("transforming modules to json schema: %w", err)
+		}
+
+		bts, _ := json.MarshalIndent(schema, "", "  ")
+		fmt.Println(string(bts))
+
+		//		_ = stacks
+
+		/*
+			fileSchema := mustOpenFileWrite(fmt.Sprintf("%s-%s.schema.json", templateName, templateVersion))
+			fileDependencies := mustOpenFileWrite(fmt.Sprintf("%s-%s.dependencies.yml", templateName, templateVersion))
+			defer fileSchema.Close()
+			enc := yaml.NewEncoder(fileDependencies)
+			if err := enc.Encode(stacks); err != nil {
+				return fmt.Errorf("encoding downloaded: %w", err)
+			}
+			defer enc.Close()
+
+			//_, err = makeJsonSchemaFromDependencies(stacks)
+		*/
+		return err
+		//		return nil
+	},
+}
+
+var DownloadCommand2 = &cobra.Command{
+	Use: "download2",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		gh, err := githubreleases.GetGitHubClient()
 		if err != nil {
@@ -214,6 +265,14 @@ func joinNamespacePath(namespace, path string) string {
 	return fmt.Sprintf("%s.%s", namespace, path)
 }
 
+func joinNamespacePaths(namespace string, paths ...string) string {
+	ns := namespace
+	for _, path := range paths {
+		ns = joinNamespacePath(ns, path)
+	}
+	return ns
+}
+
 type (
 	BoilerplateVariable struct {
 		Name        string `yaml:"name,omitempty"`
@@ -259,6 +318,7 @@ func downloadBoilerplateConfig(ctx context.Context, gh *github.Client, directory
 
 func init() {
 	ConfigCommand.AddCommand(DownloadCommand)
+	ConfigCommand.AddCommand(DownloadCommand2)
 }
 
 func getGHToken() (string, error) {

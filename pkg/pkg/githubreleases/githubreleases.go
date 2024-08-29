@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"github.com/Masterminds/semver"
@@ -94,43 +95,58 @@ func getGHToken() (string, error) {
 
 func listReleases(client *github.Client) ([]*github.RepositoryRelease, error) {
 	options := &github.ListOptions{PerPage: 105}
-
 	var allReleases []*github.RepositoryRelease
 
 	for {
-
 		releases, response, err := client.Repositories.ListReleases(
 			context.Background(), "oslokommune", "golden-path-boilerplate", options)
-
 		if err != nil {
 			return nil, fmt.Errorf("listing releases: %w", err)
 		}
 
 		allReleases = append(allReleases, releases...)
-
 		if response.NextPage == 0 {
 			break
 		}
 
 		options.Page = response.NextPage
-
 	}
 
 	return allReleases, nil
 }
 
+var reNamespaceSemver = regexp.MustCompile(`(?m)^(?:(?P<namespace>[a-zA-Z][a-zA-Z0-9\-_]*?)(?:-?v?))?(?P<version>(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$`)
+
 func splitComponentAndVersion(releases []*github.RepositoryRelease) []Release {
+	var reGroups = reNamespaceSemver.SubexpNames()
 	var components []Release
 
 	for _, release := range releases {
-		tagName := *release.TagName
-		lastDashIndex := strings.LastIndex(tagName, "-")
-
-		if lastDashIndex > -1 {
-			component := tagName[:lastDashIndex]
-			version := tagName[lastDashIndex+1:]
-			components = append(components, Release{Component: component, Version: version})
+		if release.TagName == nil {
+			continue
 		}
+
+		tagName := *release.TagName
+		matches := reNamespaceSemver.FindStringSubmatch(tagName)
+		var namespace, version string
+		for groupID, group := range matches {
+			switch reGroups[groupID] {
+			case "namespace":
+				namespace = group
+			case "version":
+				version = group
+			}
+		}
+
+		if version == "" {
+			continue
+		} else if v, err := semver.NewVersion(version); err != nil {
+			continue
+		} else {
+			version = "v" + v.String()
+		}
+
+		components = append(components, Release{Component: namespace, Version: version})
 	}
 
 	return components
@@ -156,6 +172,11 @@ func parseLatestReleases(components []Release) (map[string]string, error) {
 		componentVersionSemver, err := semver.NewVersion(component.Version)
 		if err != nil {
 			return nil, fmt.Errorf("parsing version string '%s': %w", component.Version, err)
+		}
+
+		if componentVersionSemver.Prerelease() != "" {
+			// Skip prerelease versions
+			continue
 		}
 
 		if componentVersionSemver.GreaterThan(latestVersionSemver) {

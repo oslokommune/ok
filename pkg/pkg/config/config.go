@@ -25,9 +25,13 @@ type (
 		Variables    []BoilerplateVariable   `yaml:"variables"`
 		Dependencies []BoilerplateDependency `yaml:"dependencies"`
 	}
+	BoilerplateStack struct {
+		Path   string
+		Config *BoilerplateConfig
+	}
 )
 
-type GithubFileDownloader interface {
+type FileDownloader interface {
 	DownloadFile(ctx context.Context, file string) ([]byte, error)
 }
 
@@ -38,12 +42,54 @@ type GithubFileReference struct {
 	GitRef       string
 }
 
-func DownloadBoilerplateConfig(ctx context.Context, client GithubFileDownloader, filePath string) (*BoilerplateConfig, error) {
+func DownloadBoilerplateStacksWithDependencies(ctx context.Context, client FileDownloader, stackPath string) ([]*BoilerplateStack, error) {
+	stacks := make([]*BoilerplateStack, 0)
+	stackPathsToDownload := []string{stackPath}
+	downloadedStacks := make(map[string]bool)
+
+	for len(stackPathsToDownload) > 0 {
+		stackPath := stackPathsToDownload[0]
+		stackPathsToDownload = stackPathsToDownload[1:]
+		stack, err := DownloadBoilerplateStack(ctx, client, stackPath)
+		if err != nil {
+			return nil, fmt.Errorf("download boilerplate stack: %w", err)
+		}
+		stacks = append(stacks, stack)
+		downloadedStacks[stackPath] = true
+		// Add dependencies to download queue if not already downloaded
+		for _, dep := range stack.Config.Dependencies {
+			templateUrl := mustJoinUri(stackPath, dep.TemplateUrl)
+			if _, ok := downloadedStacks[templateUrl]; !ok {
+				stackPathsToDownload = append(stackPathsToDownload, templateUrl)
+			}
+		}
+	}
+	return stacks, nil
+}
+
+func DownloadBoilerplateStack(ctx context.Context, client FileDownloader, stackPath string) (*BoilerplateStack, error) {
+	boilerplatePath := mustJoinUri(stackPath, "boilerplate.yml")
+	cfg, err := DownloadBoilerplateConfig(ctx, client, boilerplatePath)
+	if err != nil {
+		return nil, fmt.Errorf("download boilerplate config: %w", err)
+	}
+
+	return &BoilerplateStack{
+		Path:   stackPath,
+		Config: cfg,
+	}, nil
+}
+
+func DownloadBoilerplateConfig(ctx context.Context, client FileDownloader, filePath string) (*BoilerplateConfig, error) {
 	data, err := client.DownloadFile(ctx, filePath)
 	if err != nil {
 		return nil, err
 	}
-	return parseBoilerplateConfig(data)
+	cfg, err := parseBoilerplateConfig(data)
+	if err != nil {
+		return nil, fmt.Errorf("parse boilerplate config: %w", err)
+	}
+	return cfg, nil
 }
 
 func parseBoilerplateConfig(data []byte) (*BoilerplateConfig, error) {

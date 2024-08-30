@@ -1,73 +1,55 @@
 package pkg
 
-/*
-var TestCommand = &cobra.Command{
-	Use: "test",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		var v any = make(map[string]any)
-		bin, err := os.ReadFile("app-v8.0.2.dependencies.yml")
-		if err != nil {
-			return err
-		}
-		if err := yaml.Unmarshal(bin, &v); err != nil {
-			return err
-		}
-		fmt.Printf("Type of root: %T\n", v)
-		vasmap, ok := v.(map[string]any)
-		if !ok {
-			fmt.Printf("NOPE\n")
-			return fmt.Errorf("not a map")
-		}
+import (
+	"encoding/json"
+	"fmt"
 
-		for k, vv := range vasmap {
-			fmt.Printf("Type of %s: %T\n", k, vv)
-			if _, ok := vv.(map[string]any); ok {
-				fmt.Printf("YEAH IT MATCHES map any!\n")
-			} else {
-				fmt.Printf("NOPE\n")
-			}
-		}
+	"github.com/oslokommune/ok/pkg/pkg/config"
+	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
+	"github.com/spf13/cobra"
+)
 
-		return nil
-	},
-}
-*/
-/*
 var SchemaCommand = &cobra.Command{
-	Use: "schema dependencies-input schema-output",
+	Use: "schema",
+}
+
+var SchemaDownloadCommand = &cobra.Command{
+	Use: "download",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		inputFile, err := os.Open(args[0])
+		gh, err := githubreleases.GetGitHubClient()
 		if err != nil {
-			return err
+			return fmt.Errorf("getting GitHub client: %w", err)
 		}
-		defer inputFile.Close()
-		schemaFileName := args[1]
-		dec := yaml.NewDecoder(inputFile)
-		var dependencies = make(map[string]*DownloadedBoilThingy)
-		if err = dec.Decode(&dependencies); err != nil {
-			return err
-		}
-
-		rootCfg, err := findRootConfig(dependencies)
+		releases, err := githubreleases.GetLatestReleases()
 		if err != nil {
-			return err
-		}
-		allVariables := collectFolderVariables("", rootCfg.Path, rootCfg, dependencies)
-		jsonSchema := buildJsonSchemaFromNamespaceVariables(allVariables)
-		cmd.Printf("Writing schema file to %s\n", schemaFileName)
-		if err := writeJsonSchemaToFile(jsonSchema, schemaFileName); err != nil {
-			return err
+			return fmt.Errorf("getting latest releases: %w", err)
 		}
 
-		return nil
+		templateName := args[0]
+		templateVersion := releases[templateName]
+		githubRef := fmt.Sprintf("%s-%s", templateName, templateVersion)
+		templatePath := config.JoinPath("boilerplate/terraform", templateName)
+		fileDownloader := githubreleases.NewFileDownloader(gh, boilerplateRepoOwner, boilerplateRepoName, githubRef)
+		stacks, err := config.DownloadBoilerplateStacksWithDependencies(cmd.Context(), fileDownloader, templatePath)
+		if err != nil {
+			return fmt.Errorf("downloading boilerplate stacks: %w", err)
+		}
+		if len(stacks) == 0 {
+			return fmt.Errorf("no stacks found")
+		}
+		moduleVariables := config.BuildModuleVariables("", stacks[0], stacks, "some/output/folder")
+		schema, err := config.TransformModulesToJsonSchema(moduleVariables)
+		if err != nil {
+			return fmt.Errorf("transforming modules to json schema: %w", err)
+		}
+
+		bts, _ := json.MarshalIndent(schema, "", "  ")
+		fmt.Println(string(bts))
+
+		return err
 	},
 }
-*/
-func init() {
 
-	/*
-		ConfigCommand.AddCommand(SchemaCommand)
-		ConfigCommand.AddCommand(TestCommand)
-	*/
+func init() {
+	SchemaCommand.AddCommand(SchemaDownloadCommand)
 }

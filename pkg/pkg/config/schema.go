@@ -35,13 +35,13 @@ type CombinedVariables struct {
 func BuildModuleVariables(namespace string, currentConfig *BoilerplateStack, configs []*BoilerplateStack, outputFolder string) []*ModuleVariables {
 	// ensure input arguments follow the correct format to avoid creating invalid namespaces
 	namespace = JoinNamespaces(namespace)
-	outputFolder = mustJoinUri(outputFolder, currentConfig.Path)
+	outputFolder = JoinPath(outputFolder, currentConfig.Path)
 
 	namespaceVariables := make(map[string][]BoilerplateVariable)
 	namespaceVariables[namespace] = currentConfig.Config.Variables
 
 	for _, dep := range currentConfig.Config.Dependencies {
-		depPath := mustJoinUri(currentConfig.Path, dep.TemplateUrl)
+		depPath := JoinPath(currentConfig.Path, dep.TemplateUrl)
 		depConfig, ok := findConfigFromPath(depPath, configs)
 		if !ok {
 			log.Printf("dependency %s not found in configs referenced by %s", depPath, currentConfig.Path)
@@ -49,7 +49,7 @@ func BuildModuleVariables(namespace string, currentConfig *BoilerplateStack, con
 		}
 
 		depNamespace := namespace
-		depOutputFolder := mustJoinUri(outputFolder, dep.OutputFolder)
+		depOutputFolder := JoinPath(outputFolder, dep.OutputFolder)
 		// if we move to a different output folder, then we need to create a new namespace
 		if depOutputFolder != outputFolder {
 			depNamespace = JoinNamespaces(depNamespace, dep.Name)
@@ -91,9 +91,10 @@ func JoinNamespaces(namespaces ...string) string {
 	return strings.Join(filtered, ".")
 }
 
-func mustJoinUri(base, path string) string {
+func JoinPath(base, path string) string {
 	uri, err := url.JoinPath(base, path)
 	if err != nil {
+		slog.Error("could not join paths", slog.String("base", base), slog.String("path", path), slog.String("error", err.Error()))
 		panic(err)
 	}
 	return uri

@@ -58,7 +58,7 @@ func DownloadBoilerplateStacksWithDependencies(ctx context.Context, client FileD
 		downloadedStacks[stackPath] = true
 		// Add dependencies to download queue if not already downloaded
 		for _, dep := range stack.Config.Dependencies {
-			templateUrl := mustJoinUri(stackPath, dep.TemplateUrl)
+			templateUrl := JoinPath(stackPath, dep.TemplateUrl)
 			if _, ok := downloadedStacks[templateUrl]; !ok {
 				stackPathsToDownload = append(stackPathsToDownload, templateUrl)
 			}
@@ -68,7 +68,7 @@ func DownloadBoilerplateStacksWithDependencies(ctx context.Context, client FileD
 }
 
 func DownloadBoilerplateStack(ctx context.Context, client FileDownloader, stackPath string) (*BoilerplateStack, error) {
-	boilerplatePath := mustJoinUri(stackPath, "boilerplate.yml")
+	boilerplatePath := JoinPath(stackPath, "boilerplate.yml")
 	cfg, err := DownloadBoilerplateConfig(ctx, client, boilerplatePath)
 	if err != nil {
 		return nil, fmt.Errorf("download boilerplate config: %w", err)

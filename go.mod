@@ -1,6 +1,6 @@
 module github.com/oslokommune/ok
 
-go 1.21.4
+go 1.22.5
 
 require (
 	github.com/Masterminds/semver v1.5.0

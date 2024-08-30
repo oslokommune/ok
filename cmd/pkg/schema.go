@@ -28,6 +28,9 @@ var SchemaDownloadCommand = &cobra.Command{
 			return fmt.Errorf("getting latest releases: %w", err)
 		}
 
+		if len(args) < 1 {
+			return fmt.Errorf("missing template name")
+		}
 		templateName := args[0]
 		templateVersion := releases[templateName]
 		githubRef := fmt.Sprintf("%s-%s", templateName, templateVersion)

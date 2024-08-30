@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net/url"
 	"strings"
 
@@ -90,33 +91,6 @@ func JoinNamespaces(namespaces ...string) string {
 	return strings.Join(filtered, ".")
 }
 
-/*
-func transformConfigsToStacks(rootStack *BoilerplateStack, allStacks []*BoilerplateStack) ([]*Stack, error) {
-	currentPath := rootStack.Path
-	folderStacks := make(map[string][]string)
-	fmt.Println()
-
-	for _, dep := range rootStack.Dependencies {
-		depPath := mustJoinUri(currentPath, dep.OutputFolder)
-		folderStacks[depPath] = append(folderStacks[depPath], dep.TemplateUrl)
-		dependencyConfig, ok := packageConfigs[dep.TemplateUrl]
-		if !ok {
-			continue
-		}
-
-		stack, err := transformConfigsToStacks(depPath, &dependencyConfig, packageConfigs)
-		for _, s := range stack {
-			folderStacks[depPath] = append(folderStacks[depPath], s...)
-		}
-		if err != nil {
-			return nil, err
-		}
-
-	}
-	return nil, fmt.Errorf("not implemented")
-}
-*/
-
 func mustJoinUri(base, path string) string {
 	uri, err := url.JoinPath(base, path)
 	if err != nil {
@@ -134,50 +108,41 @@ func TransformModulesToJsonSchema(modules []*ModuleVariables) (*jsonschema.Docum
 			if strings.Contains(variable.Description, "do NOT edit") {
 				continue
 			}
-			typ := mapVariableTypeToJsonSchema(variable.Type)
+			typ := mapBoilerplateVariableTypeToSchemaType(variable.Type)
 			name := JoinNamespaces(module.Namespace, variable.Name)
 			if _, ok := properties[name]; ok {
 				continue
 			}
+			// Special case for StackName, since it is a required property in all stacks.
 			if variable.Name == "StackName" {
 				requiredProperties = append(requiredProperties, name)
 			}
 
 			var requiredProperties []string
+			var objectProperties map[string]jsonschema.Property
+			// If we have an incoming map, we need to extract the keys and create a list of required properties
+			// since all properties have to be overridden in an object to avoid unknown null values.
+			// We also need to create a properties map for the default values in order to
+			// give autocomplete suggestions in the editor.
 			if typ == "object" {
 				requiredProperties = extractKeysFromTypeMap(variable.Default)
+				objectProperties = mapVariableObjectToProperties(variable)
+				// We also need to add the properties as flat properties to the root object to allow for easy overriding
+				// of single properties within a namespace.
+				// Example: Override single property of "a.b.c" by setting "a.b.c: somevalue" to a new value.
+				prefix := JoinNamespaces(module.Namespace, variable.Name)
+				flattened := mapVariableObjectToFlatProperties(prefix, variable)
+				addPropertiesIfNotExists(properties, flattened)
+
 			}
 			properties[name] = jsonschema.Property{
 				Type:        typ,
 				Description: variable.Description,
 				Default:     variable.Default,
 				Required:    requiredProperties,
+				Properties:  objectProperties,
 			}
 
-			// If we have a map, we need to flatten the properties
-			if typ == "object" {
-				prefix := JoinNamespaces(module.Namespace, variable.Name)
-				flattened := mapVariableObjectToFlatProperties(prefix, variable)
-				for k, v := range flattened {
-					if _, ok := properties[k]; ok {
-						continue
-					}
-					properties[k] = v
-				}
-				for name, p := range mapVariableObjectToFlatProperties(prefix, variable) {
-					properties[name] = p
-				}
-
-			}
-
-			/*
-				if variable.Type == "map" {
-					properties := mapVariableObjectToFlatProperties(module.Namespace, variable)
-					for _, p := range properties {
-						p.Type = mapVariableTypeToJsonSchema(p.Type)
-					}
-				}
-			*/
 		}
 	}
 
@@ -187,6 +152,19 @@ func TransformModulesToJsonSchema(modules []*ModuleVariables) (*jsonschema.Docum
 		Properties: properties,
 		Required:   requiredProperties,
 	}, nil
+}
+
+func addPropertiesIfNotExists(properties map[string]jsonschema.Property, newProperties map[string]jsonschema.Property) {
+	for k, v := range newProperties {
+		addPropertyIfNotExists(properties, k, v)
+	}
+}
+
+func addPropertyIfNotExists(properties map[string]jsonschema.Property, name string, property jsonschema.Property) {
+	if _, ok := properties[name]; ok {
+		return
+	}
+	properties[name] = property
 }
 
 func extractKeysFromTypeMap(d any) []string {
@@ -205,24 +183,40 @@ func getMapKeyNames[T any](m map[string]T) []string {
 	return keys
 }
 
-/*
-	func mapVariableToSchemaProperty(namespace string, variable BoilerplateVariable) map[string]jsonschema.Property {
-		typ := mapVariableTypeToJsonSchema(variable.Type)
+// mapVariableObjectToProperties turns a map into a list of properties with type information
+func mapVariableObjectToProperties(variable BoilerplateVariable) map[string]jsonschema.Property {
+	defaultMap, ok := variable.Default.(map[string]any)
+	if !ok {
+		return make(map[string]jsonschema.Property)
 	}
-*/
+	properties := make(map[string]jsonschema.Property)
+	for k, v := range defaultMap {
+		propertyName := k
+		schemaType, ok := mapGoTypeToSchemaType(v)
+		if !ok && v != nil {
+			slog.Warn("could not transform default map type to schema type", slog.String("variable", propertyName), slog.Any("defaultValue", v))
+		}
+		properties[propertyName] = jsonschema.Property{
+			Type:    schemaType,
+			Default: v,
+		}
+	}
+	return properties
+}
 
+// mapVariableObjectToFlatProperties turns a map into a flat list of properties prefixed with the namespace
+// For example if the namespace is "a.b" and the map is {"c": 1, "d": 2} the result will be {"a.b.c": 1, "a.b.d": 2}
 func mapVariableObjectToFlatProperties(namespace string, variable BoilerplateVariable) map[string]jsonschema.Property {
 	defaultMap, ok := variable.Default.(map[string]any)
 	if !ok {
-		return nil
+		return make(map[string]jsonschema.Property)
 	}
 	properties := make(map[string]jsonschema.Property)
 	for k, v := range defaultMap {
 		propertyName := JoinNamespaces(namespace, k)
 		schemaType, ok := mapGoTypeToSchemaType(v)
 		if !ok {
-			log.Printf("could not map type %T to schema type for variable %s", v, propertyName)
-			schemaType = ""
+			slog.Warn("could not transform default map type to schema type", slog.String("variable", propertyName))
 		}
 		properties[propertyName] = jsonschema.Property{
 			Type:        schemaType,
@@ -232,7 +226,8 @@ func mapVariableObjectToFlatProperties(namespace string, variable BoilerplateVar
 	}
 	return properties
 }
-func mapVariableTypeToJsonSchema(t string) string {
+
+func mapBoilerplateVariableTypeToSchemaType(t string) string {
 	switch t {
 	case "map":
 		return "object"
@@ -258,6 +253,6 @@ func mapGoTypeToSchemaType(v any) (string, bool) {
 	case map[string]any:
 		return "object", true
 	default:
-		return fmt.Sprintf("unknown: %T", v), false
+		return "", false
 	}
 }

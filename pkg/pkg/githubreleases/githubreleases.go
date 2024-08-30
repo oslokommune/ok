@@ -1,12 +1,10 @@
 package githubreleases
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 
@@ -18,10 +16,44 @@ import (
 const GithubOwner = "oslokommune"
 const GithubRepo = "golden-path-boilerplate"
 const BoilerplateStackPath = "boilerplate/terraform"
+const AuthErrorHelpMessage = `
+GitHub token not found in keyring or environment variables.
+
+Steps to resolve:
+
+1. Ensure you have the latest GitHub CLI version, which in most cases should store the token in the OS keyring:
+   https://cli.github.com/
+
+2. Try logging in again with GitHub CLI:
+   gh auth login
+
+3. If you're still encountering issues, you can bypass the keyring by setting the token as an environment variable:
+   export GH_TOKEN=$(gh auth token)`
 
 type Release struct {
 	Component string
 	Version   string
+}
+
+func GetLatestOkVersion() (*semver.Version, error) {
+	authToken, err := getGitHubToken()
+	if err != nil {
+		return nil, fmt.Errorf("getting GitHub token: %w", err)
+	}
+	client := github.NewClient(nil).WithAuthToken(authToken)
+
+	release, _, err := client.Repositories.GetLatestRelease(context.Background(), "oslokommune", "ok")
+	if err != nil {
+		return nil, fmt.Errorf("error getting latest release: %v", err)
+	}
+
+	versionTag := release.GetTagName()
+	versionSemver, err := semver.NewVersion(versionTag)
+	if err != nil {
+		return nil, fmt.Errorf("parsing version string '%s': %w", versionTag, err)
+	}
+
+	return versionSemver, nil
 }
 
 func GetLatestReleases() (map[string]string, error) {
@@ -61,7 +93,6 @@ func GetGitHubClient() (*github.Client, error) {
 }
 
 func getGitHubToken() (string, error) {
-	var errorStrings []string
 	if token := os.Getenv("GH_TOKEN"); token != "" {
 		return token, nil
 	}
@@ -70,31 +101,12 @@ func getGitHubToken() (string, error) {
 		return token, nil
 	}
 
-	if token, err := keyring.Get("gh:github.com", ""); err == nil {
-		return token, nil
-	} else {
-		errorStrings = append(errorStrings, fmt.Sprintf("getting GitHub token from keyring: %s", err))
-	}
-
-	if token, err := getGHToken(); err == nil {
-		return token, nil
-	} else {
-		errorStrings = append(errorStrings, fmt.Sprintf("getting GitHub token from gh cli: %s", err))
-	}
-
-	return "", fmt.Errorf(strings.Join(errorStrings, ", "))
-}
-
-func getGHToken() (string, error) {
-	cmd := exec.Command("gh", "auth", "token")
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	err := cmd.Run()
+	token, err := keyring.Get("gh:github.com", "")
 	if err != nil {
-		return "", fmt.Errorf("getting token from gh cli: %s:  %w", stderr.String(), err)
+		return "", err
 	}
-	return strings.TrimSpace(stdout.String()), nil
+
+	return token, nil
 }
 
 func listReleases(client *github.Client) ([]*github.RepositoryRelease, error) {

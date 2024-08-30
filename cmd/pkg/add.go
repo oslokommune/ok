@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var flagAddCommandUpdateSchema bool
+
 var AddCommand = &cobra.Command{
 	Use:   "add template [outputFolder]",
 	Short: "Add the Boilerplate template to the package manifest with an optional output folder",
@@ -23,7 +25,7 @@ ok pkg add app ecommerce-api
 		templateName := getArg(args, 0, "")
 		outputFolder := getArg(args, 1, templateName)
 
-		result, err := add.Run(PackagesManifestFilename, templateName, outputFolder)
+		result, err := add.Run(PackagesManifestFilename, templateName, outputFolder, flagAddCommandUpdateSchema)
 		if err != nil {
 			return err
 		}
@@ -38,6 +40,10 @@ ok pkg add app ecommerce-api
 		}
 		return nil
 	},
+}
+
+func init() {
+	AddCommand.Flags().BoolVar(&flagAddCommandUpdateSchema, "update-schema", true, "Update the JSON schema for affected packages")
 }
 
 func getArg(args []string, index int, fallback string) string {

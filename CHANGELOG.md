@@ -1,5 +1,40 @@
 # Changelog
 
+## [3.4.0](https://github.com/oslokommune/ok/compare/v3.3.1...v3.4.0) (2024-08-28)
+
+
+### Features
+
+* Add update check when running ok version ([#203](https://github.com/oslokommune/ok/issues/203)) ([5663ed0](https://github.com/oslokommune/ok/commit/5663ed013f244bbe9fa4b6df082d764fa719f726))
+
+## [3.3.1](https://github.com/oslokommune/ok/compare/v3.3.0...v3.3.1) (2024-08-28)
+
+
+### Dependency Updates
+
+* bump the gomod-all group across 1 directory with 5 updates ([#197](https://github.com/oslokommune/ok/issues/197)) ([0793baa](https://github.com/oslokommune/ok/commit/0793baa253b43e970cff0278264192c82a3593d2))
+
+## [3.3.0](https://github.com/oslokommune/ok/compare/v3.2.0...v3.3.0) (2024-08-28)
+
+
+### Features
+
+* Add help message if GitHub auth fails ([#200](https://github.com/oslokommune/ok/issues/200)) ([73492fd](https://github.com/oslokommune/ok/commit/73492fdbb329a76b70292e8515612c2a1171a43c))
+
+## [3.2.0](https://github.com/oslokommune/ok/compare/v3.1.0...v3.2.0) (2024-08-27)
+
+
+### Features
+
+* Allow updating single package with `ok pkg update &lt;package-name&gt;` ([#198](https://github.com/oslokommune/ok/issues/198)) ([471a768](https://github.com/oslokommune/ok/commit/471a7689048d2b84afb274dd9eae7dc0146974d0))
+
+## [3.1.0](https://github.com/oslokommune/ok/compare/v3.0.0...v3.1.0) (2024-08-23)
+
+
+### Features
+
+* Add ok pkg fmt ([#193](https://github.com/oslokommune/ok/issues/193)) ([61e4277](https://github.com/oslokommune/ok/commit/61e4277d116c9cb14d1f83d6e08e884828e65406))
+
 ## [3.0.0](https://github.com/oslokommune/ok/compare/v2.0.0...v3.0.0) (2024-08-20)
 
 

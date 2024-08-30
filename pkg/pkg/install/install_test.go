@@ -1,12 +1,10 @@
 package install
 
 import (
-	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -106,7 +104,7 @@ func TestInstall(t *testing.T) {
 
 		t.Run(tc.testName, func(t *testing.T) {
 			// Given
-			inputFile, err := getTestdataFilepath(tc.packageManifestFilename)
+			inputFile, err := common.GetTestdataFilepath(tc.packageManifestFilename)
 			require.Nil(t, err)
 
 			// When
@@ -125,13 +123,4 @@ func TestInstall(t *testing.T) {
 			assert.Equal(t, len(cmds), len(tc.expectBoilerplateCommands))
 		})
 	}
-}
-
-func getTestdataFilepath(testDataFilename string) (string, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return "", fmt.Errorf("getting current directory: %w", err)
-	}
-
-	return filepath.Join(cwd, "testdata", testDataFilename), nil
 }

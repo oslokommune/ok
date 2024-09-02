@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/oslokommune/ok/pkg/pkg/config"
@@ -66,7 +67,7 @@ var SchemaDownloadCommand = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("writing schema to file: %w", err)
 		}
-		cmd.PrintErrf("Schema for %s-%s written to %s\n", templateName, templateVersion, outputFile.Name())
+		slog.Info(fmt.Sprintf("Schema for %s-%s written to %s\n", templateName, templateVersion, outputFile.Name()))
 		return nil
 	},
 }

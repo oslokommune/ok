@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"errors"
+	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/oslokommune/ok/pkg/pkg/add"
@@ -30,12 +32,12 @@ ok pkg add app ecommerce-api
 			return err
 		}
 
-		cmd.Printf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, PackagesManifestFilename, result.OutputFolder)
+		slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, PackagesManifestFilename, result.OutputFolder))
 		nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
 		if len(nonExistingConfigFiles) > 0 {
-			cmd.Printf("\nCreate the following configuration files:\n")
+			slog.Info("\nCreate the following configuration files:\n")
 			for _, configFile := range nonExistingConfigFiles {
-				cmd.Printf("- %s\n", configFile)
+				slog.Info(fmt.Sprintf("- %s\n", configFile))
 			}
 		}
 		return nil

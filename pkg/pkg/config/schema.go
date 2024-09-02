@@ -27,8 +27,8 @@ func GenerateJsonSchemaForApp(ctx context.Context, downloader FileDownloader, st
 	return schema, nil
 }
 
-// WriteJsonSchemaFile writes a json schema to a file in the output directory with the given app and version.
-// The file will be named <app>-<version>.schema.json.
+// WriteJsonSchemaFile writes a json schema to a file in the output directory with the given template and version.
+// The file will be named <template>-<version>.schema.json.
 // The return value is the path to the file.
 func WriteJsonSchemaFile(filePath string, schema *jsonschema.Document) (string, error) {
 	outputDir := filepath.Dir(filePath)
@@ -79,7 +79,7 @@ func CreateOrUpdateConfigurationFile(configFilePath string, schemaName string, s
 	}
 	// Find if the first line starts with # yaml-language-server
 	cleanedConfig := stripYamlLanguageServerComment(string(data))
-	newConfig := appendYamlLAnugageServerComment(cleanedConfig, relativeSchemaPath)
+	newConfig := appendYamlLanguageServerComment(cleanedConfig, relativeSchemaPath)
 	err = os.WriteFile(configFilePath, []byte(newConfig), 0644)
 	if err != nil {
 		return "", fmt.Errorf("overwriting config file %s: %w", configFilePath, err)
@@ -96,7 +96,7 @@ func stripYamlLanguageServerComment(data string) string {
 	return data
 }
 
-func appendYamlLAnugageServerComment(data, schemaPath string) string {
+func appendYamlLanguageServerComment(data, schemaPath string) string {
 	return fmt.Sprintf("%s $schema=%s\n%s", yamlLanguageServerComment, schemaPath, data)
 }
 

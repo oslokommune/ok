@@ -1,12 +1,15 @@
 package format_test
 
 import (
+	"bytes"
+	"io"
+	"os"
+	"testing"
+
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/format"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
-	"testing"
 )
 
 func TestInstall(t *testing.T) {
@@ -17,7 +20,7 @@ func TestInstall(t *testing.T) {
 	}{
 		{
 			testName:                        "Should format packages.yml",
-			packageManifestFilename:         "packages.yml",
+			packageManifestFilename:         "packagesBadFormatting.yml",
 			expectedPackageManifestFilename: "packagesFormatted.yml",
 		},
 	}
@@ -30,28 +33,61 @@ func TestInstall(t *testing.T) {
 			packagesFilename, err := common.GetTestdataFilepath(tc.packageManifestFilename)
 			require.Nil(t, err)
 
+			// Create temporary file copy of the packages file
+			// which we can format
+			tempF, err := createTemporaryPackagesFile(packagesFilename)
+			require.Nil(t, err)
+			defer os.Remove(tempF.Name())
+
 			// When
-			err = format.Run(packagesFilename)
+			err = format.Run(tempF.Name())
 			require.NoError(t, err)
 
 			// Then
-			assertEqualFileContents(t, tc.expectedPackageManifestFilename, tc.packageManifestFilename)
+			expectedPackageFilePath, err := common.GetTestdataFilepath(tc.expectedPackageManifestFilename)
+			require.Nil(t, err)
+			assertEqualFileContents(t, expectedPackageFilePath, tempF.Name())
 		})
 	}
 }
 
-func assertEqualFileContents(t *testing.T, expectedFile string, actualFile string) {
-	expectedTestdataFilepath, err := common.GetTestdataFilepath(expectedFile)
-	require.Nil(t, err)
-
-	expected, err := os.ReadFile(expectedTestdataFilepath)
+func assertEqualFileContents(t *testing.T, expectedPath string, actualPath string) {
+	expected, err := os.ReadFile(expectedPath)
 	assert.NoError(t, err)
 
-	actualTestdataFilepath, err := common.GetTestdataFilepath(actualFile)
-	require.Nil(t, err)
-
-	actual, err := os.ReadFile(actualTestdataFilepath)
+	actual, err := os.ReadFile(actualPath)
 	assert.NoError(t, err)
 
-	assert.Equal(t, string(expected), string(actual))
+	assert.Equalf(t, string(expected), string(actual), "Expected file contents to be equal, temp file: %s (correct %s)", actualPath, expectedPath)
+}
+
+func createTemporaryPackagesFile(inputPath string) (file *os.File, err error) {
+	inputData, err := os.ReadFile(inputPath)
+	if err != nil {
+		return nil, err
+	}
+
+	tempF, err := os.CreateTemp("", "packages.yml")
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		// if we fail, we should clean up the file before returning
+		if err != nil {
+			tempF.Close()
+			os.Remove(tempF.Name())
+		}
+	}()
+
+	_, err = io.Copy(tempF, bytes.NewReader(inputData))
+	if err != nil {
+		return nil, err
+	}
+
+	err = tempF.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return tempF, nil
 }

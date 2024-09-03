@@ -1,15 +1,17 @@
-package install
+package boilerplate
 
 import (
-	"github.com/oslokommune/ok/pkg/pkg/common"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"context"
 	"os/exec"
 	"strings"
 	"testing"
+
+	"github.com/oslokommune/ok/pkg/pkg/common"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestInstall(t *testing.T) {
+func TestCreateBoilerplateExecCmds(t *testing.T) {
 	testCases := []struct {
 		testName                  string
 		packageManifestFilename   string
@@ -108,11 +110,13 @@ func TestInstall(t *testing.T) {
 			require.Nil(t, err)
 
 			// When
-			cmds, err := CreateBoilerplateCommands(inputFile, tc.outputFolders, tc.baseUrl)
+			ctx := context.Background()
+			cmds, err := createBoilerplateCmdsFromManifest(ctx, inputFile, tc.outputFolders, tc.baseUrl)
 
 			// Then
 			assert.Nil(t, err)
 
+			require.Lenf(t, cmds, len(tc.expectBoilerplateCommands), "Did we fail to read file %s?", inputFile)
 			for i, cmd := range cmds {
 				assert.Equal(t, cmd.Path, tc.expectBoilerplateCommands[i].Path)
 				assert.Equal(t,

@@ -10,10 +10,12 @@ import (
 )
 
 var flagInstallInteractive bool
+var flagInstallWithLegacyRenderer bool
 
 func init() {
 	InstallCommand.Flags().BoolVarP(&flagInstallInteractive,
 		"interactive", "i", false, "Select package(s) to install interactively")
+	InstallCommand.Flags().BoolVar(&flagInstallWithLegacyRenderer, "use-legacy-boilerplate", false, "Use legacy boilerplate renderer")
 }
 
 var InstallCommand = &cobra.Command{
@@ -51,7 +53,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 			outputFolders = selectedOutputFolders
 		}
 
-		err := install.Run(PackagesManifestFilename, outputFolders)
+		err := install.Run(PackagesManifestFilename, outputFolders, flagInstallWithLegacyRenderer)
 		if err != nil {
 			return fmt.Errorf("installing packages: %w", err)
 		}

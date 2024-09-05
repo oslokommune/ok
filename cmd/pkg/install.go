@@ -2,7 +2,9 @@ package pkg
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/install/interactive"
 
 	"github.com/oslokommune/ok/pkg/pkg/install"
@@ -31,7 +33,8 @@ Set the environment variable BASE_URL to specify where package templates are dow
 ok pkg install networking my-app
 BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 `,
-	SilenceErrors: true,
+	ValidArgsFunction: installTabCompletion,
+	SilenceErrors:     true,
 	RunE: func(cmd *cobra.Command, outputFolders []string) error {
 		if flagInstallInteractive && len(outputFolders) > 0 {
 			return fmt.Errorf("cannot use both --interactive and outputFolder arguments")
@@ -58,4 +61,23 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 
 		return nil
 	},
+}
+
+func installTabCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	manifest, err := common.LoadPackageManifest(PackagesManifestFilename)
+	if err != nil {
+		cmd.PrintErrf("failed to load package manifest: %s\n", err)
+		return nil, cobra.ShellCompDirectiveError
+	}
+
+	var completions []string
+	for _, p := range manifest.Packages {
+		if argsContainsElement(args, p.OutputFolder) {
+			continue
+		}
+		if strings.HasPrefix(p.OutputFolder, toComplete) {
+			completions = append(completions, p.OutputFolder)
+		}
+	}
+	return completions, cobra.ShellCompDirectiveNoFileComp
 }

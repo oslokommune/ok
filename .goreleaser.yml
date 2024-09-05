@@ -2,10 +2,6 @@
 changelog:
   disable: true
 
-before:
-  hooks:
-    - ./scripts/completions.sh
-
 builds:
   - binary: ok
     goos:
@@ -27,7 +23,3 @@ brews:
     directory: Formula
     install: |
       bin.install "ok"
-    extra_install: |-
-      bash_completion.install "completions/ok.bash" => "ok"
-      zsh_completion.install "completions/ok.zsh" => "_ok"
-      fish_completion.install "completions/ok.fish"

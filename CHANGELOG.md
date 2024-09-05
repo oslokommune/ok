@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.0](https://github.com/oslokommune/ok/compare/v3.4.1...v3.5.0) (2024-09-05)
+
+
+### Features
+
+* ok pkg tab-completions ([#208](https://github.com/oslokommune/ok/issues/208)) ([76dca1c](https://github.com/oslokommune/ok/commit/76dca1c6e80ede8e389ffd2aac38498fc86b3b2d))
+
 ## [3.4.1](https://github.com/oslokommune/ok/compare/v3.4.0...v3.4.1) (2024-09-04)
 
 

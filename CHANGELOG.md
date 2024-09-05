@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.1](https://github.com/oslokommune/ok/compare/v3.5.0...v3.5.1) (2024-09-05)
+
+
+### Bug Fixes
+
+* Fix broken Homebrew formula (auto complete installation) ([670e8bc](https://github.com/oslokommune/ok/commit/670e8bc9af83bea7be22a426d37ae90e0b28aa67))
+
 ## [3.5.0](https://github.com/oslokommune/ok/compare/v3.4.1...v3.5.0) (2024-09-05)
 
 

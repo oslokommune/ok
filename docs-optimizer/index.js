@@ -31,6 +31,16 @@ const processor = unified()
         }
       }
 
+      // Change "SEE ALSO" to "See also" in level 2 headings
+      if (node.type === 'heading' && node.depth === 2) {
+        const textNode = node.children[0];
+        if (textNode && textNode.type === 'text') {
+          if (textNode.value === 'SEE ALSO') {
+            textNode.value = 'See also';
+          }
+        }
+      }
+
       // Add 'sh' language to code blocks without a specified language
       if (node.type === 'code' && !node.lang) {
         node.lang = 'sh';

@@ -5,11 +5,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path/filepath"
-	"regexp"
-	"strings"
 
 	"dagger.io/dagger"
 	"github.com/magefile/mage/sh"
@@ -37,32 +33,12 @@ func Docs() error {
 		return err
 	}
 
-	// Step 4: Format the docs to make them more readable
-	err := filepath.Walk("docs", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && strings.HasSuffix(path, ".md") {
-			content, err := ioutil.ReadFile(path)
-			if err != nil {
-				return err
-			}
+	// Step 4: Optimize the docs
+	if err := sh.RunV("node", "docs-optimizer/index.js"); err != nil {
+		return err
+	}
 
-			text := string(content)
-			text = regexp.MustCompile(`SEE ALSO`).ReplaceAllString(text, "See also")
-			text = regexp.MustCompile(`(?m)^## `).ReplaceAllString(text, "# ")
-			text = regexp.MustCompile(`(?m)^### `).ReplaceAllString(text, "## ")
-			text = regexp.MustCompile(`(?m)^#### `).ReplaceAllString(text, "### ")
-			text = regexp.MustCompile(`(?m)^##### `).ReplaceAllString(text, "#### ")
-
-			if err := ioutil.WriteFile(path, []byte(text), info.Mode()); err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-
-	return err
+	return nil
 }
 
 // Run the project.

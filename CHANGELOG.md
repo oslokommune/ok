@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.6.0](https://github.com/oslokommune/ok/compare/v3.5.1...v3.6.0) (2024-09-06)
+
+
+### Features
+
+* Add docs command to generate Markdown documentation ([#216](https://github.com/oslokommune/ok/issues/216)) ([8ca8d12](https://github.com/oslokommune/ok/commit/8ca8d129f45defa73dfc6948cae49e7b2f090af9))
+
 ## [3.5.1](https://github.com/oslokommune/ok/compare/v3.5.0...v3.5.1) (2024-09-05)
 
 

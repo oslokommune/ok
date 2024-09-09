@@ -50,8 +50,8 @@ const processMarkdownNode = (node) => {
 
 const markdownProcessor = unified()
   .use(remarkParse)
-  .use(() => (tree) => {
-    const visitAndProcessNodes = (node) => {
+  .use(() => tree => {
+    const visitAndProcessNodes = node => {
       processMarkdownNode(node);
       if (node.children) {
         node.children = node.children.map(visitAndProcessNodes);

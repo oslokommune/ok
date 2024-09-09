@@ -10,7 +10,7 @@ import prettier from 'prettier';
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = path.dirname(currentFilePath);
 
-function processMarkdownNode(node) {
+const processMarkdownNode = (node) => {
   switch (node.type) {
     case 'heading':
       // Ensure headings start at level 1 and maintain hierarchy
@@ -44,7 +44,7 @@ function processMarkdownNode(node) {
       }
       break;
   }
-}
+};
 
 const markdownProcessor = unified()
   .use(remarkParse)
@@ -61,7 +61,7 @@ const markdownProcessor = unified()
   })
   .use(remarkStringify);
 
-async function processMarkdownFile(filePath) {
+const processMarkdownFile = async (filePath) => {
   const markdownContent = await readFile(filePath, 'utf8');
   const processedMarkdown = await markdownProcessor.process(markdownContent);
 
@@ -72,13 +72,13 @@ async function processMarkdownFile(filePath) {
 
   await writeFile(filePath, formattedMarkdown);
   console.log(`Processed and formatted: ${filePath}`);
-}
+};
 
-async function processAllMarkdownFiles() {
+const processAllMarkdownFiles = async () => {
   const docsDirectoryPath = path.resolve(currentDirPath, '..', 'docs');
   const markdownFilePaths = await glob('**/*.md', { cwd: docsDirectoryPath });
 
   await Promise.all(markdownFilePaths.map(filePath => processMarkdownFile(path.join(docsDirectoryPath, filePath))));
-}
+};
 
 processAllMarkdownFiles().catch(console.error);

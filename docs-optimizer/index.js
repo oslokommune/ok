@@ -50,8 +50,8 @@ const processMarkdownNode = (node) => {
 
 const markdownProcessor = unified()
   .use(remarkParse)
-  .use(() => tree => {
-    const visitAndProcessNodes = node => {
+  .use(() => (tree) => {
+    const visitAndProcessNodes = (node) => {
       processMarkdownNode(node);
       if (node.children) {
         node.children = node.children.map(visitAndProcessNodes);
@@ -63,28 +63,28 @@ const markdownProcessor = unified()
   })
   .use(remarkStringify);
 
-  const processMarkdownFile = async (markdownFilePath) => {
-    const markdownContent = await readFile(markdownFilePath, "utf8");
-    const processedMarkdown = await markdownProcessor.process(markdownContent);
+const processMarkdownFile = async (markdownFilePath) => {
+  const markdownContent = await readFile(markdownFilePath, "utf8");
+  const processedMarkdown = await markdownProcessor.process(markdownContent);
 
-    const formattedMarkdown = await prettier.format(String(processedMarkdown), {
-      parser: "markdown",
-      proseWrap: "always",
-    });
+  const formattedMarkdown = await prettier.format(String(processedMarkdown), {
+    parser: "markdown",
+    proseWrap: "always",
+  });
 
-    await writeFile(markdownFilePath, formattedMarkdown);
-    console.log(`Processed and formatted: ${markdownFilePath}`);
-  };
+  await writeFile(markdownFilePath, formattedMarkdown);
+  console.log(`Processed and formatted: ${markdownFilePath}`);
+};
 
-  const processAllMarkdownFiles = async () => {
-    const docsDirectoryPath = path.resolve(currentScriptDir, "..", "docs");
-    const markdownFilePaths = await glob("**/*.md", { cwd: docsDirectoryPath });
+const processAllMarkdownFiles = async () => {
+  const docsDirectoryPath = path.join(currentScriptDir, "..", "docs");
+  const markdownFilePaths = await glob("**/*.md", { cwd: docsDirectoryPath });
 
-    await Promise.all(
-      markdownFilePaths.map((relativeFilePath) =>
-        processMarkdownFile(path.join(docsDirectoryPath, relativeFilePath))
-      )
-    );
-  };
+  await Promise.all(
+    markdownFilePaths.map((relativeFilePath) =>
+      processMarkdownFile(path.join(docsDirectoryPath, relativeFilePath))
+    )
+  );
+};
 
-  processAllMarkdownFiles().catch(console.error);
+processAllMarkdownFiles().catch(console.error);

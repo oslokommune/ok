@@ -7,10 +7,10 @@ import { readFile, writeFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import prettier from 'prettier';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirPath = path.dirname(currentFilePath);
 
-function processNode(node) {
+function processMarkdownNode(node) {
   switch (node.type) {
     case 'heading':
       // Ensure headings start at level 1 and maintain hierarchy
@@ -46,39 +46,39 @@ function processNode(node) {
   }
 }
 
-const processor = unified()
+const markdownProcessor = unified()
   .use(remarkParse)
   .use(() => (tree) => {
-    const visitNodes = (node) => {
-      processNode(node);
+    const visitAndProcessNodes = (node) => {
+      processMarkdownNode(node);
       if (node.children) {
-        node.children = node.children.map(visitNodes);
+        node.children = node.children.map(visitAndProcessNodes);
       }
       return node;
     };
 
-    return visitNodes(tree);
+    return visitAndProcessNodes(tree);
   })
   .use(remarkStringify);
 
-async function processFile(filePath) {
-  const content = await readFile(filePath, 'utf8');
-  const result = await processor.process(content);
+async function processMarkdownFile(filePath) {
+  const markdownContent = await readFile(filePath, 'utf8');
+  const processedMarkdown = await markdownProcessor.process(markdownContent);
 
-  const formattedResult = await prettier.format(String(result), {
+  const formattedMarkdown = await prettier.format(String(processedMarkdown), {
     parser: 'markdown',
     proseWrap: 'always',
   });
 
-  await writeFile(filePath, formattedResult);
+  await writeFile(filePath, formattedMarkdown);
   console.log(`Processed and formatted: ${filePath}`);
 }
 
-async function main() {
-  const docsDir = path.resolve(__dirname, '..', 'docs');
-  const files = await glob('**/*.md', { cwd: docsDir });
+async function processAllMarkdownFiles() {
+  const docsDirectoryPath = path.resolve(currentDirPath, '..', 'docs');
+  const markdownFilePaths = await glob('**/*.md', { cwd: docsDirectoryPath });
 
-  await Promise.all(files.map(file => processFile(path.join(docsDir, file))));
+  await Promise.all(markdownFilePaths.map(filePath => processMarkdownFile(path.join(docsDirectoryPath, filePath))));
 }
 
-main().catch(console.error);
+processAllMarkdownFiles().catch(console.error);

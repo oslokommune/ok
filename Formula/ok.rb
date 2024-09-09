@@ -5,23 +5,29 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "3.7.0"
+  version "3.7.1"
 
   on_macos do
     on_intel do
-      url "https://github.com/oslokommune/ok/releases/download/v3.7.0/ok_3.7.0_darwin_amd64.tar.gz"
-      sha256 "8c474a5e0e809141de29f94d806a0182f3be4c04b86a6697f659a3a1fa770520"
+      url "https://github.com/oslokommune/ok/releases/download/v3.7.1/ok_3.7.1_darwin_amd64.tar.gz"
+      sha256 "4de2a36201a5e3d67f510805d2c15204b525bd2178107421593670d7e61eeab4"
 
       def install
         bin.install "ok"
+        bash_completion.install "completions/ok.bash" => "ok"
+        zsh_completion.install "completions/ok.zsh" => "_ok"
+        fish_completion.install "completions/ok.fish"
       end
     end
     on_arm do
-      url "https://github.com/oslokommune/ok/releases/download/v3.7.0/ok_3.7.0_darwin_arm64.tar.gz"
-      sha256 "974d84ae5f2dbd76db8767ce281089d1ccb07b9ac0033f235679671f02602098"
+      url "https://github.com/oslokommune/ok/releases/download/v3.7.1/ok_3.7.1_darwin_arm64.tar.gz"
+      sha256 "16f13c2f06eddc0473dcb7268345e426df7d009fd5b4b035bd09f1124e7c8b68"
 
       def install
         bin.install "ok"
+        bash_completion.install "completions/ok.bash" => "ok"
+        zsh_completion.install "completions/ok.zsh" => "_ok"
+        fish_completion.install "completions/ok.fish"
       end
     end
   end
@@ -29,21 +35,27 @@ class Ok < Formula
   on_linux do
     on_intel do
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v3.7.0/ok_3.7.0_linux_amd64.tar.gz"
-        sha256 "b46d9d22815e5c5d2b5f32520b96a65eb894f81180181ab76c2fef7ecc76f121"
+        url "https://github.com/oslokommune/ok/releases/download/v3.7.1/ok_3.7.1_linux_amd64.tar.gz"
+        sha256 "f98e87985aaa02d90ee32d4d668489407589163cc21565d6cce62453266b1a76"
 
         def install
           bin.install "ok"
+          bash_completion.install "completions/ok.bash" => "ok"
+          zsh_completion.install "completions/ok.zsh" => "_ok"
+          fish_completion.install "completions/ok.fish"
         end
       end
     end
     on_arm do
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v3.7.0/ok_3.7.0_linux_arm64.tar.gz"
-        sha256 "09f0081232b21d5f3c2b7f2497375dd9e8f1c2aa1b1048982a7155babc1c38c4"
+        url "https://github.com/oslokommune/ok/releases/download/v3.7.1/ok_3.7.1_linux_arm64.tar.gz"
+        sha256 "a0231f881395707fe0953cc8febdd1a13ff93431b0a555b53f3eb124b2db62d3"
 
         def install
           bin.install "ok"
+          bash_completion.install "completions/ok.bash" => "ok"
+          zsh_completion.install "completions/ok.zsh" => "_ok"
+          fish_completion.install "completions/ok.fish"
         end
       end
     end

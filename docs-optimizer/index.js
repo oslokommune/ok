@@ -76,9 +76,7 @@ async function main() {
   const docsDir = path.resolve(__dirname, '..', 'docs');
   const files = await glob('**/*.md', { cwd: docsDir });
 
-  for (const file of files) {
-    await processFile(path.join(docsDir, file));
-  }
+  await Promise.all(files.map(file => processFile(path.join(docsDir, file))));
 }
 
 main().catch(console.error);

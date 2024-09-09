@@ -3,7 +3,7 @@ import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
 import { glob } from 'glob';
 import path from 'path';
-import fs from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import prettier from 'prettier';
 
@@ -61,7 +61,7 @@ const processor = unified()
   .use(remarkStringify);
 
 async function processFile(filePath) {
-  const content = await fs.readFile(filePath, 'utf8');
+  const content = await readFile(filePath, 'utf8');
   const result = await processor.process(content);
 
   const formattedResult = await prettier.format(String(result), {
@@ -69,7 +69,7 @@ async function processFile(filePath) {
     proseWrap: 'always',
   });
 
-  await fs.writeFile(filePath, formattedResult);
+  await writeFile(filePath, formattedResult);
   console.log(`Processed and formatted: ${filePath}`);
 }
 

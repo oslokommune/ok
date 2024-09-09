@@ -1,46 +1,46 @@
-import { unified } from 'unified';
-import remarkParse from 'remark-parse';
-import remarkStringify from 'remark-stringify';
-import { glob } from 'glob';
-import path from 'path';
-import { readFile, writeFile } from 'fs/promises';
-import { fileURLToPath } from 'url';
-import prettier from 'prettier';
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkStringify from "remark-stringify";
+import { glob } from "glob";
+import path from "path";
+import { readFile, writeFile } from "fs/promises";
+import { fileURLToPath } from "url";
+import prettier from "prettier";
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = path.dirname(currentFilePath);
 
 const processMarkdownNode = (node) => {
   switch (node.type) {
-    case 'heading':
+    case "heading":
       // Ensure headings start at level 1 and maintain hierarchy
       if (node.depth > 1) {
         node.depth = Math.max(1, node.depth - 1);
       }
 
-      if (node.children?.[0]?.type === 'text') {
+      if (node.children?.[0]?.type === "text") {
         switch (node.depth) {
           case 2:
-            if (node.children[0].value === 'SEE ALSO') {
-              node.children[0].value = 'See also';
+            if (node.children[0].value === "SEE ALSO") {
+              node.children[0].value = "See also";
             }
             break;
           case 3:
             switch (node.children[0].value) {
-              case 'Linux:':
-                node.children[0].value = 'Linux';
+              case "Linux:":
+                node.children[0].value = "Linux";
                 break;
-              case 'macOS:':
-                node.children[0].value = 'macOS';
+              case "macOS:":
+                node.children[0].value = "macOS";
                 break;
             }
             break;
         }
       }
       break;
-    case 'code':
+    case "code":
       if (!node.lang) {
-        node.lang = 'sh';
+        node.lang = "sh";
       }
       break;
   }
@@ -62,12 +62,12 @@ const markdownProcessor = unified()
   .use(remarkStringify);
 
 const processMarkdownFile = async (filePath) => {
-  const markdownContent = await readFile(filePath, 'utf8');
+  const markdownContent = await readFile(filePath, "utf8");
   const processedMarkdown = await markdownProcessor.process(markdownContent);
 
   const formattedMarkdown = await prettier.format(String(processedMarkdown), {
-    parser: 'markdown',
-    proseWrap: 'always',
+    parser: "markdown",
+    proseWrap: "always",
   });
 
   await writeFile(filePath, formattedMarkdown);
@@ -75,10 +75,14 @@ const processMarkdownFile = async (filePath) => {
 };
 
 const processAllMarkdownFiles = async () => {
-  const docsDirectoryPath = path.resolve(currentDirPath, '..', 'docs');
-  const markdownFilePaths = await glob('**/*.md', { cwd: docsDirectoryPath });
+  const docsDirectoryPath = path.resolve(currentDirPath, "..", "docs");
+  const markdownFilePaths = await glob("**/*.md", { cwd: docsDirectoryPath });
 
-  await Promise.all(markdownFilePaths.map(filePath => processMarkdownFile(path.join(docsDirectoryPath, filePath))));
+  await Promise.all(
+    markdownFilePaths.map((filePath) =>
+      processMarkdownFile(path.join(docsDirectoryPath, filePath))
+    )
+  );
 };
 
 processAllMarkdownFiles().catch(console.error);

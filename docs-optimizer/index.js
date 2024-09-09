@@ -12,32 +12,34 @@ const currentDirPath = path.dirname(currentFilePath);
 
 const processMarkdownNode = (node) => {
   switch (node.type) {
-    case "heading":
+    case "heading": {
       // Ensure headings start at level 1 and maintain hierarchy
       if (node.depth > 1) {
         node.depth = Math.max(1, node.depth - 1);
       }
 
       if (node.children?.[0]?.type === "text") {
+        const { value } = node.children[0];
         switch (node.depth) {
           case 2:
-            if (node.children[0].value === "SEE ALSO") {
+            if (value === "SEE ALSO") {
               node.children[0].value = "See also";
             }
             break;
-          case 3:
-            switch (node.children[0].value) {
-              case "Linux:":
-                node.children[0].value = "Linux";
-                break;
-              case "macOS:":
-                node.children[0].value = "macOS";
-                break;
+          case 3: {
+            const updates = {
+              "Linux:": "Linux",
+              "macOS:": "macOS",
+            };
+            if (value in updates) {
+              node.children[0].value = updates[value];
             }
             break;
+          }
         }
       }
       break;
+    }
     case "code":
       if (!node.lang) {
         node.lang = "sh";

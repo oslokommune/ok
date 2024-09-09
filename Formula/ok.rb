@@ -5,20 +5,20 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "3.6.0"
+  version "3.7.0"
 
   on_macos do
     on_intel do
-      url "https://github.com/oslokommune/ok/releases/download/v3.6.0/ok_3.6.0_darwin_amd64.tar.gz"
-      sha256 "c5810c01e6bd239db322c5166056d7ee1ccdd4069257f96d4abceaa1c8c76f44"
+      url "https://github.com/oslokommune/ok/releases/download/v3.7.0/ok_3.7.0_darwin_amd64.tar.gz"
+      sha256 "8c474a5e0e809141de29f94d806a0182f3be4c04b86a6697f659a3a1fa770520"
 
       def install
         bin.install "ok"
       end
     end
     on_arm do
-      url "https://github.com/oslokommune/ok/releases/download/v3.6.0/ok_3.6.0_darwin_arm64.tar.gz"
-      sha256 "210a06131c0cf49d954ae9e6382e649db3778046ed9a06d2c930fba8fe3deb81"
+      url "https://github.com/oslokommune/ok/releases/download/v3.7.0/ok_3.7.0_darwin_arm64.tar.gz"
+      sha256 "974d84ae5f2dbd76db8767ce281089d1ccb07b9ac0033f235679671f02602098"
 
       def install
         bin.install "ok"
@@ -29,8 +29,8 @@ class Ok < Formula
   on_linux do
     on_intel do
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v3.6.0/ok_3.6.0_linux_amd64.tar.gz"
-        sha256 "e980087d817d7734dcc05b1f244fb5aad91333be94431cdd1846c7cc4e94cd6a"
+        url "https://github.com/oslokommune/ok/releases/download/v3.7.0/ok_3.7.0_linux_amd64.tar.gz"
+        sha256 "b46d9d22815e5c5d2b5f32520b96a65eb894f81180181ab76c2fef7ecc76f121"
 
         def install
           bin.install "ok"
@@ -39,8 +39,8 @@ class Ok < Formula
     end
     on_arm do
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v3.6.0/ok_3.6.0_linux_arm64.tar.gz"
-        sha256 "fa48c66272446952d951994a0c3217559329e8da7f3a7f8206f0ceb258760477"
+        url "https://github.com/oslokommune/ok/releases/download/v3.7.0/ok_3.7.0_linux_arm64.tar.gz"
+        sha256 "09f0081232b21d5f3c2b7f2497375dd9e8f1c2aa1b1048982a7155babc1c38c4"
 
         def install
           bin.install "ok"

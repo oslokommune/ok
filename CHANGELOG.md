@@ -1,5 +1,33 @@
 # Changelog
 
+## [3.6.0](https://github.com/oslokommune/ok/compare/v3.5.1...v3.6.0) (2024-09-06)
+
+
+### Features
+
+* Add docs command to generate Markdown documentation ([#216](https://github.com/oslokommune/ok/issues/216)) ([8ca8d12](https://github.com/oslokommune/ok/commit/8ca8d129f45defa73dfc6948cae49e7b2f090af9))
+
+## [3.5.1](https://github.com/oslokommune/ok/compare/v3.5.0...v3.5.1) (2024-09-05)
+
+
+### Bug Fixes
+
+* Fix broken Homebrew formula (auto complete installation) ([670e8bc](https://github.com/oslokommune/ok/commit/670e8bc9af83bea7be22a426d37ae90e0b28aa67))
+
+## [3.5.0](https://github.com/oslokommune/ok/compare/v3.4.1...v3.5.0) (2024-09-05)
+
+
+### Features
+
+* ok pkg tab-completions ([#208](https://github.com/oslokommune/ok/issues/208)) ([76dca1c](https://github.com/oslokommune/ok/commit/76dca1c6e80ede8e389ffd2aac38498fc86b3b2d))
+
+## [3.4.1](https://github.com/oslokommune/ok/compare/v3.4.0...v3.4.1) (2024-09-04)
+
+
+### Dependency Updates
+
+* bump the gomod-all group with 3 updates ([#211](https://github.com/oslokommune/ok/issues/211)) ([50be353](https://github.com/oslokommune/ok/commit/50be353e5f41ff521c8fc01334f1bdc83aa4ddbb))
+
 ## [3.4.0](https://github.com/oslokommune/ok/compare/v3.3.1...v3.4.0) (2024-08-28)
 
 

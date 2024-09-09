@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/add"
+	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +24,8 @@ The output folder is useful when you need multiple instances of the same templat
 ok pkg add app ecommerce-website
 ok pkg add app ecommerce-api
 	`,
-	Args: cobra.RangeArgs(1, 2),
+	ValidArgsFunction: addTabCompletion,
+	Args:              cobra.RangeArgs(1, 2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		templateName := getArg(args, 0, "")
 		outputFolder := getArg(args, 1, templateName)
@@ -65,4 +68,30 @@ func findNonExistingConfigurationFiles(varFiles []string) []string {
 		}
 	}
 	return nonExisting
+}
+
+func addTabCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	// Only complete the first argument as the second argument is a self-assigned output folder
+	if len(args) == 0 {
+		return addTabCompletionApp(cmd, toComplete)
+	}
+
+	return nil, cobra.ShellCompDirectiveNoFileComp
+}
+
+func addTabCompletionApp(cmd *cobra.Command, toComplete string) ([]string, cobra.ShellCompDirective) {
+	latest, err := githubreleases.GetLatestReleases()
+	if err != nil {
+		cmd.PrintErrf("failed to load package manifest: %s\n", err)
+		return nil, cobra.ShellCompDirectiveError
+	}
+
+	var completions []string
+	for template := range latest {
+		if strings.HasPrefix(template, toComplete) {
+			completions = append(completions, template)
+		}
+	}
+
+	return completions, cobra.ShellCompDirectiveNoFileComp
 }

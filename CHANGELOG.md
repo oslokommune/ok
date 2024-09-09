@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.7.1](https://github.com/oslokommune/ok/compare/v3.7.0...v3.7.1) (2024-09-09)
+
+
+### Bug Fixes
+
+* enable tab completions in ok for brew release ([#220](https://github.com/oslokommune/ok/issues/220)) ([bdadde6](https://github.com/oslokommune/ok/commit/bdadde6a1048738dc448ba9671fbdfb3f85597b7))
+
 ## [3.7.0](https://github.com/oslokommune/ok/compare/v3.6.0...v3.7.0) (2024-09-09)
 
 

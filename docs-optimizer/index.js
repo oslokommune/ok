@@ -10,45 +10,47 @@ import prettier from 'prettier';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function processNode(node) {
+  switch (node.type) {
+    case 'heading':
+      // Ensure headings start at level 1 and maintain hierarchy
+      if (node.depth > 1) {
+        node.depth = Math.max(1, node.depth - 1);
+      }
+
+      if (node.children?.[0]?.type === 'text') {
+        switch (node.depth) {
+          case 2:
+            if (node.children[0].value === 'SEE ALSO') {
+              node.children[0].value = 'See also';
+            }
+            break;
+          case 3:
+            switch (node.children[0].value) {
+              case 'Linux:':
+                node.children[0].value = 'Linux';
+                break;
+              case 'macOS:':
+                node.children[0].value = 'macOS';
+                break;
+            }
+            break;
+        }
+      }
+      break;
+    case 'code':
+      if (!node.lang) {
+        node.lang = 'sh';
+      }
+      break;
+  }
+}
+
 const processor = unified()
   .use(remarkParse)
   .use(() => (tree) => {
-    const visitor = (node) => {
-      // Ensure that headings are at the correct level
-      if (node.type === 'heading' && node.depth > 1) {
-        node.depth -= 1;
-      }
-
-      // Change "Linux:" to "Linux" and "macOS:" to "macOS" in level 3 headings
-      if (node.type === 'heading' && node.depth === 3) {
-        const textNode = node.children[0];
-        if (textNode && textNode.type === 'text') {
-          if (textNode.value === 'Linux:') {
-            textNode.value = 'Linux';
-          } else if (textNode.value === 'macOS:') {
-            textNode.value = 'macOS';
-          }
-        }
-      }
-
-      // Change "SEE ALSO" to "See also" in level 2 headings
-      if (node.type === 'heading' && node.depth === 2) {
-        const textNode = node.children[0];
-        if (textNode && textNode.type === 'text') {
-          if (textNode.value === 'SEE ALSO') {
-            textNode.value = 'See also';
-          }
-        }
-      }
-
-      // Add 'sh' language to code blocks without a specified language
-      if (node.type === 'code' && !node.lang) {
-        node.lang = 'sh';
-      }
-    };
-
     const visitNodes = (node) => {
-      visitor(node);
+      processNode(node);
       if (node.children) {
         node.children.forEach(visitNodes);
       }
@@ -62,7 +64,6 @@ async function processFile(filePath) {
   const content = await fs.readFile(filePath, 'utf8');
   const result = await processor.process(content);
 
-  // Format the result with Prettier
   const formattedResult = await prettier.format(String(result), {
     parser: 'markdown',
     proseWrap: 'always',

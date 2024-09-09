@@ -52,11 +52,12 @@ const processor = unified()
     const visitNodes = (node) => {
       processNode(node);
       if (node.children) {
-        node.children.forEach(visitNodes);
+        node.children = node.children.map(visitNodes);
       }
+      return node;
     };
 
-    visitNodes(tree);
+    return visitNodes(tree);
   })
   .use(remarkStringify);
 

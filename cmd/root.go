@@ -52,6 +52,7 @@ func init() {
 	pkgCommand.AddCommand(pkg.InstallCommand)
 	pkgCommand.AddCommand(pkg.UpdateCommand)
 	pkgCommand.AddCommand(pkg.FmtCommand)
+	pkgCommand.AddCommand(pkg.SchemaCommand)
 
 	rootCmd.AddCommand(awsCommand)
 	awsCommand.AddCommand(aws.EcsExecCommand)

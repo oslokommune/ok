@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var flagUpdateCommandUpdateSchema bool
+
 var UpdateCommand = &cobra.Command{
 	Use:   "update [package-name]",
 	Short: "Update Boilerplate package manifest",
@@ -25,7 +27,7 @@ If no package name is provided, all packages will be updated.`,
 			packageName = args[0]
 		}
 
-		err := update.Run(PackagesManifestFilename, packageName)
+		err := update.Run(PackagesManifestFilename, packageName, flagUpdateCommandUpdateSchema)
 		if err != nil {
 			return err
 		}
@@ -38,6 +40,10 @@ If no package name is provided, all packages will be updated.`,
 
 		return nil
 	},
+}
+
+func init() {
+	UpdateCommand.Flags().BoolVar(&flagUpdateCommandUpdateSchema, "update-schema", true, "Update the JSON schema for affected packages")
 }
 
 func updateTabCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

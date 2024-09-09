@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.7.0](https://github.com/oslokommune/ok/compare/v3.6.0...v3.7.0) (2024-09-09)
+
+
+### Features
+
+* download jsonschema for pkg configurations ([#207](https://github.com/oslokommune/ok/issues/207)) ([b15811a](https://github.com/oslokommune/ok/commit/b15811ab147711b2a6fac39f81c94effeb48c6b1))
+
 ## [3.6.0](https://github.com/oslokommune/ok/compare/v3.5.1...v3.6.0) (2024-09-06)
 
 

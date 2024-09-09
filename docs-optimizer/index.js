@@ -41,9 +41,7 @@ const processMarkdownNode = (node) => {
       break;
     }
     case "code":
-      if (!node.lang) {
-        node.lang = "sh";
-      }
+      node.lang = node.lang ?? "sh";
       break;
   }
 };

@@ -24,4 +24,8 @@ go.work
 ok
 .idea
 
+# Output from goreleaser
+/completions/
+/dist/
+
 main

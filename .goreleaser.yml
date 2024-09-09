@@ -2,6 +2,10 @@
 changelog:
   disable: true
 
+before:
+  hooks:
+    - ./scripts/completions.sh
+
 builds:
   - binary: ok
     goos:
@@ -10,6 +14,9 @@ builds:
     goarch:
       - amd64
       - arm64
+archives:
+  - files:
+      - completions/*
 
 brews:
   - name: ok
@@ -23,3 +30,6 @@ brews:
     directory: Formula
     install: |
       bin.install "ok"
+      bash_completion.install "completions/ok.bash" => "ok"
+      zsh_completion.install "completions/ok.zsh" => "_ok"
+      fish_completion.install "completions/ok.fish"

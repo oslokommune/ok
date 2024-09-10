@@ -25,3 +25,14 @@ updates:
           - "*"
     commit-message:
       prefix: deps
+
+  - package-ecosystem: npm
+    directory: "docs-optimizer"
+    schedule:
+      interval: weekly
+    groups:
+      npm-all:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: deps

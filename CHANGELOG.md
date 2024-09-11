@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.10.0](https://github.com/oslokommune/ok/compare/v3.9.0...v3.10.0) (2024-09-11)
+
+
+### Features
+
+* Put schemas in separate dir ([#232](https://github.com/oslokommune/ok/issues/232)) ([a77d87a](https://github.com/oslokommune/ok/commit/a77d87a33b5b69ebdf3f5dfee68db2137f1bcb1e))
+
 ## [3.9.0](https://github.com/oslokommune/ok/compare/v3.8.0...v3.9.0) (2024-09-11)
 
 

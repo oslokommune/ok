@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.9.0](https://github.com/oslokommune/ok/compare/v3.8.0...v3.9.0) (2024-09-11)
+
+
+### Features
+
+* Remove assume command ([#227](https://github.com/oslokommune/ok/issues/227)) ([82d2e4f](https://github.com/oslokommune/ok/commit/82d2e4fc525020fb75b7c8230ef08bc9be665ef3))
+
 ## [3.8.0](https://github.com/oslokommune/ok/compare/v3.7.2...v3.8.0) (2024-09-11)
 
 

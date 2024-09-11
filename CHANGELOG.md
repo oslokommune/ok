@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.8.0](https://github.com/oslokommune/ok/compare/v3.7.2...v3.8.0) (2024-09-11)
+
+
+### Features
+
+* Improve help texts for various commands ([#228](https://github.com/oslokommune/ok/issues/228)) ([afaff84](https://github.com/oslokommune/ok/commit/afaff844bd5d2d9afc83293c060a6cbce04efe80))
+
 ## [3.7.2](https://github.com/oslokommune/ok/compare/v3.7.1...v3.7.2) (2024-09-09)
 
 

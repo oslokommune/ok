@@ -6,5 +6,5 @@ import (
 
 var awsCommand = &cobra.Command{
 	Use:   "aws",
-	Short: "Do AWS stuff",
+	Short: "Group of AWS related commands.",
 }

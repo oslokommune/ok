@@ -11,7 +11,7 @@ func init() {
 
 var bootstrapCommand = &cobra.Command{
 	Use:   "bootstrap",
-	Short: "This command will create the necessary S3 bucket and DynamoDB table that will be used to store Terraform state.",
+	Short: "Bootstrap code for a S3 bucket and DynamoDB table to store Terraform state.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fullArgs := append([]string{"bootstrap"}, args...)
 		scriptrunner.RunScript("ok.sh", fullArgs)

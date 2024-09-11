@@ -10,8 +10,9 @@ func init() {
 }
 
 var getTemplateCommand = &cobra.Command{
-	Use:   "get-template",
-	Short: "Downloads a template from the golden-path-iac repository.",
+	Use:        "get-template",
+	Short:      "Downloads a template from the `golden-path-iac` repository.",
+	Deprecated: "and will be removed in a future release. Use the `pkg` command instead.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fullArgs := append([]string{"get-template"}, args...)
 		scriptrunner.RunScript("ok.sh", fullArgs)

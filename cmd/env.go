@@ -11,7 +11,7 @@ func init() {
 
 var envCommand = &cobra.Command{
 	Use:   "env",
-	Short: "Creates a new env.yml file with placeholder values.",
+	Short: "Creates a new `env.yml` file with placeholder values.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fullArgs := append([]string{"env"}, args...)
 		scriptrunner.RunScript("ok.sh", fullArgs)

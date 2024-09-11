@@ -15,9 +15,11 @@ import (
 var (
 	// rootCmd represents the base command when called without any subcommands.
 	rootCmd = &cobra.Command{
-		Use:           "ok",
-		Short:         "The ok tool.",
-		Long:          "The ok tool.",
+		Use:   "ok",
+		Short: "The `ok` infrastructure toolbox.",
+		Long: "The " + "`ok` " + `tool helps you to create a fresh Terraform environment (like prod or development) and configure it to use remote state storage.
+
+Your environment is configured using a ` + "`packages.yml`" + ` file. This file is a package manifest listing the components from Golden Path that you wish to use. An example can be found in the ` + "`pirates-iac` " + `repository.`,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}

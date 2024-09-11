@@ -17,7 +17,7 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Prints the version of the ok tool and the current latest version available.",
+	Short: "Prints the version of the `ok` tool and the current latest version available.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("Version: %s\n", VersionData.Version)
 		fmt.Printf("Date:    %s\n", VersionData.Date)

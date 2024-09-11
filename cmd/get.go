@@ -10,7 +10,7 @@ import (
 
 var getCommand = &cobra.Command{
 	Use:   "get",
-	Short: "Get a template",
+	Short: "Get a template.",
 	Run: func(cmd *cobra.Command, args []string) {
 		baseURL := "git@github.com:oslokommune/golden-path-boilerplate.git//boilerplate"
 		ref := "main"

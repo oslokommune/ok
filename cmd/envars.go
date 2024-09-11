@@ -11,7 +11,7 @@ func init() {
 
 var envarsCommand = &cobra.Command{
 	Use:   "envars",
-	Short: "Exports the values in env.yml as environment variables.",
+	Short: "Exports the values in `env.yml` as environment variables.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fullArgs := append([]string{"envars"}, args...)
 		scriptrunner.RunScript("ok.sh", fullArgs)

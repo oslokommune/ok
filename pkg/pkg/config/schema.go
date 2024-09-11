@@ -56,13 +56,18 @@ const yamlLanguageServerComment = "# yaml-language-server:"
 
 func CreateOrUpdateConfigurationFile(configFilePath string, schemaName string, schema *jsonschema.Document) (string, error) {
 	configDir := filepath.Dir(configFilePath)
+	schemasDir := filepath.Join(configDir, ".schemas")
+
 	if err := os.MkdirAll(configDir, 0755); err != nil {
+		return "", fmt.Errorf("creating output directory: %w", err)
+	}
+	if err := os.MkdirAll(schemasDir, 0755); err != nil {
 		return "", fmt.Errorf("creating output directory: %w", err)
 	}
 	// write schema to the config dir with the name <schemaName>.schema.json
 	schemaFileName := fmt.Sprintf("%s.schema.json", schemaName)
-	schemaFilePath := filepath.Join(configDir, schemaFileName)
-	slog.Info("writing schema file", slog.String("path", schemaFilePath), slog.String("configDir", configDir), slog.String("schemaId", schema.ID))
+	schemaFilePath := filepath.Join(schemasDir, schemaFileName)
+	slog.Debug("writing schema file", slog.String("path", schemaFilePath), slog.String("configDir", configDir), slog.String("schemaDir", schemasDir), slog.String("schemaId", schema.ID))
 	_, err := WriteJsonSchemaFile(schemaFilePath, schema)
 	if err != nil {
 		return "", fmt.Errorf("writing schema file to %s: %w", schemaFilePath, err)

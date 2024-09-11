@@ -82,3 +82,19 @@ then
   fi
 fi
 ```
+
+### Manually sourcing completions
+
+If you do not use, or do not want to enable completions by default from Brew, you have the option to source the completions offered by `ok` manually.
+
+Add one of the lines below to your `~/.zshrc` or `~/.bash_profile`
+
+Using bash
+```sh
+source <(ok completions bash)
+```
+
+Using zsh
+```sh
+source <(ok completions zsh)
+```

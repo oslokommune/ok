@@ -6,9 +6,45 @@ import path from "path";
 import { readFile, writeFile } from "fs/promises";
 import { fileURLToPath } from "url";
 import prettier from "prettier";
+import { visit } from "unist-util-visit";
 
 const currentScriptPath = fileURLToPath(import.meta.url);
 const currentScriptDir = path.dirname(currentScriptPath);
+
+const removeHeadingAndSubsectionsPlugin = ({ targetHeading = "" } = {}) => {
+  return (tree) => {
+    visit(tree, "heading", (currentHeading, currentIndex, parentNode) => {
+      if (currentHeading.children[0]?.value !== targetHeading) return;
+
+      const nextSiblingHeadingIndex = findNextSiblingHeadingIndex(
+        parentNode.children,
+        currentIndex,
+        currentHeading.depth
+      );
+      const sectionLength = calculateSectionLength(
+        nextSiblingHeadingIndex,
+        parentNode.children.length,
+        currentIndex
+      );
+
+      parentNode.children.splice(currentIndex, sectionLength);
+      return [visit.SKIP, currentIndex];
+    });
+  };
+};
+
+const findNextSiblingHeadingIndex = (siblings, startIndex, currentDepth) => {
+  return siblings.findIndex(
+    (sibling, index) =>
+      index > startIndex &&
+      sibling.type === "heading" &&
+      sibling.depth <= currentDepth
+  );
+};
+
+const calculateSectionLength = (endIndex, totalSiblings, startIndex) => {
+  return endIndex === -1 ? totalSiblings - startIndex : endIndex - startIndex;
+};
 
 const processMarkdownNode = (node) => {
   switch (node.type) {
@@ -58,6 +94,9 @@ const markdownProcessor = unified()
     };
 
     return visitAndProcessNodes(tree);
+  })
+  .use(removeHeadingAndSubsectionsPlugin, {
+    targetHeading: "Options inherited from parent commands",
   })
   .use(remarkStringify);
 

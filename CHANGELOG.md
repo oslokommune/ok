@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.11.0](https://github.com/oslokommune/ok/compare/v3.10.0...v3.11.0) (2024-09-13)
+
+
+### Features
+
+* Move DefaultPackagePathPrefix to top ([26f3ebc](https://github.com/oslokommune/ok/commit/26f3ebc6815c2c1d862a5a619d6eb9f232036944))
+
 ## [3.10.0](https://github.com/oslokommune/ok/compare/v3.9.0...v3.10.0) (2024-09-11)
 
 

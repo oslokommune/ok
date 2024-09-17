@@ -28,12 +28,12 @@ func StartAdminSession() error {
 	if err != nil {
 		return err
 	}
-	pressEnterToContinue("Confirm with ENTER when you have received a Slack notification " +
-		"saying that you have been added to the group. Should usually happen within 30-60 seconds.")
+	fmt.Print("You should now be added to the needed EntraID group (usually within 30-60s).\n\n")
+	pressEnterToContinue("Confirm with ENTER when membership is confirmed on Slack")
 
 	printDivider()
 
-	fmt.Print("\nStarting SSO Login\n\n")
+	fmt.Print("\nSelect matching AWS profile\n\n")
 	awsProfile, err := selectAWSProfile()
 	if err != nil {
 		return err
@@ -48,8 +48,7 @@ func StartAdminSession() error {
 
 	printDivider()
 
-	fmt.Print("\nLogging into AWS with selected profile\n\n")
-	pressEnterToContinue("Press ENTER to open the login page")
+	fmt.Print("\nStart SSO Login\n\n")
 	err = doAWSLogin(awsProfile)
 	if err != nil {
 		return err
@@ -63,13 +62,13 @@ func StartAdminSession() error {
 	fmt.Println()
 	printDivider()
 	if err != nil {
-		fmt.Print(red.Render("\nBlaah!! You don't have the correct rights!\n\n"))
+		fmt.Print("\n", red.Render("Blaah!! You don't have the correct rights!"), "\n\n")
 		return cleanupAndQuit()
 	}
 
-	fmt.Print(green.Render("\nGreat! Access granted\n\n"))
+	fmt.Print("\n", green.Render("Great! Access granted"), "\n\n")
 	fmt.Print("Remove your Access Package when done (or extend if needed):\n")
-	fmt.Print(yellow.Render("https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages/active\n\n"))
+	fmt.Print(yellow.Render("https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages/active"), "\n\n")
 
 	waitUntilCompleteOrTimeout()
 	return cleanupAndQuit()
@@ -89,7 +88,7 @@ func selectAWSProfile() (string, error) {
 
 	var selectedProfile string
 	selector := huh.NewSelect[string]().
-		Title("Select matching AWS profile:").
+		Title("Select AWS profile:").
 		Options(profiles...).
 		Validate(func(t string) error {
 			if len(t) <= 0 {
@@ -146,7 +145,10 @@ func handleAWSLoginOutput(reader io.Reader) {
 		}
 		fmt.Printf("%s\n", line)
 		if len(line) == 9 {
-			sendMacNotification("Admin Session", "Login Code: "+string(line))
+			err := sendMacNotification("Admin Session", "Login Code: "+string(line))
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 }

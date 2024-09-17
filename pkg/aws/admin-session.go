@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 	"io"
 	"os"
 	"os/exec"
@@ -12,11 +13,15 @@ import (
 )
 
 func StartAdminSession() error {
+	red := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
+	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("3"))
+
 	printDivider()
 
 	fmt.Print("\nEnable needed Access Package\n\n")
 	fmt.Print("Open this url in your favorite browser:\n")
-	fmt.Print(yellow("https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages\n\n"))
+	fmt.Print(yellow.Render("https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages\n\n"))
 	pressEnterToContinue("Press ENTER to continue when access is confirmed on Slack")
 
 	printDivider()
@@ -46,18 +51,18 @@ func StartAdminSession() error {
 
 	printDivider()
 
-	fmt.Print("\nValidating access by listing S3 buckets\n\n")
+	fmt.Print("\nVerifying selected AWS profile by listing S3 buckets\n\n")
 	err = listS3Buckets(awsProfile)
 	fmt.Println()
 	printDivider()
 	if err != nil {
-		fmt.Print(red("\nBlaah!! You don't have the correct rights!\n\n"))
+		fmt.Print(red.Render("\nBlaah!! You don't have the correct rights!\n\n"))
 		return cleanupAndQuit()
 	}
 
-	fmt.Print(green("\nGreat! Access granted\n\n"))
+	fmt.Print(green.Render("\nGreat! Access granted\n\n"))
 	fmt.Print("Remove your Access Package when done (or extend if needed):\n")
-	fmt.Print(yellow("https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages/active\n\n"))
+	fmt.Print(yellow.Render("https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages/active\n\n"))
 
 	waitUntilCompleteOrTimeout()
 	return cleanupAndQuit()
@@ -214,21 +219,6 @@ func pressEnterToContinue(message string) {
 }
 
 func printDivider() {
-	fmt.Println(purple("=============================="))
-}
-
-func purple(message string) string {
-	return "\033[35m" + message + "\033[0m"
-}
-
-func yellow(message string) string {
-	return "\033[33m" + message + "\033[0m"
-}
-
-func green(message string) string {
-	return "\033[32m" + message + "\033[0m"
-}
-
-func red(message string) string {
-	return "\033[31m" + message + "\033[0m"
+	purple := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
+	fmt.Println(purple.Render("------------------------------------------------------------"))
 }

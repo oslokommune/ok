@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 const AccessPackageUrl = "https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages"
@@ -70,8 +69,10 @@ func StartAdminSession() error {
 	fmt.Print("Remove your Access Package when done (or extend if needed):\n")
 	fmt.Print(yellow.Render("https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages/active"), "\n\n")
 
-	waitUntilCompleteOrTimeout()
-	return cleanupAndQuit()
+	fmt.Print("After the Access Package is disabled, please log out of current session.\n\n")
+	fmt.Print("Easily done with: ", yellow.Render("aws sso logout"), "\n\n")
+	fmt.Print("Take care - have fun!\n")
+	return nil
 }
 
 func selectAWSProfile() (string, error) {
@@ -163,43 +164,6 @@ func listS3Buckets(awsProfile string) error {
 		return err
 	}
 	return nil
-}
-
-func waitUntilCompleteOrTimeout() {
-	fmt.Print("Press ENTER to log out of current session when removal is confirmed on Slack\n\n")
-
-	enterPressed := make(chan struct{})
-
-	go func() {
-		scanner := bufio.NewScanner(os.Stdin)
-		scanner.Scan()
-		enterPressed <- struct{}{}
-	}()
-
-	const maxTime = 3 * time.Hour
-	deadLine := time.Now().Add(maxTime)
-	timeout := time.After(maxTime)
-	ticker := time.NewTicker(1 * time.Minute)
-	defer ticker.Stop()
-
-	printElapsed(deadLine.Sub(time.Now()))
-
-	for {
-		select {
-		case <-enterPressed:
-			fmt.Println()
-			return
-		case <-ticker.C:
-			printElapsed(deadLine.Sub(time.Now()))
-		case <-timeout:
-			fmt.Print("\n\nTimes up!\n\n")
-			return
-		}
-	}
-}
-
-func printElapsed(timeLeft time.Duration) {
-	fmt.Printf("\rTime left: %v     ", timeLeft.Round(time.Minute))
 }
 
 func cleanupAndQuit() error {

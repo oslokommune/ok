@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const AccessPackageUrl = "https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages"
+
 func StartAdminSession() error {
 	red := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
 	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
@@ -19,14 +21,19 @@ func StartAdminSession() error {
 
 	printDivider()
 
-	fmt.Print("\nEnable needed Access Package\n\n")
+	fmt.Print("\nEnable Access Package\n\n")
 	fmt.Print("Open this url in your favorite browser:\n")
-	fmt.Print(yellow.Render("https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages\n\n"))
-	pressEnterToContinue("Press ENTER to continue when access is confirmed on Slack")
+	fmt.Print(yellow.Render(AccessPackageUrl), "\n\n")
+	err := openURL(AccessPackageUrl)
+	if err != nil {
+		return err
+	}
+	pressEnterToContinue("Confirm with ENTER when you have received a Slack notification " +
+		"saying that you have been added to the group. Should usually happen within 30-60 seconds.")
 
 	printDivider()
 
-	fmt.Print("\nStarting SSO access\n\n")
+	fmt.Print("\nStarting SSO Login\n\n")
 	awsProfile, err := selectAWSProfile()
 	if err != nil {
 		return err
@@ -82,7 +89,7 @@ func selectAWSProfile() (string, error) {
 
 	var selectedProfile string
 	selector := huh.NewSelect[string]().
-		Title("Select AWS profile:").
+		Title("Select matching AWS profile:").
 		Options(profiles...).
 		Validate(func(t string) error {
 			if len(t) <= 0 {
@@ -139,18 +146,8 @@ func handleAWSLoginOutput(reader io.Reader) {
 		}
 		fmt.Printf("%s\n", line)
 		if len(line) == 9 {
-			sendMacNotification(string(line))
+			sendMacNotification("Admin Session", "Login Code: "+string(line))
 		}
-	}
-}
-
-func sendMacNotification(code string) {
-	message := fmt.Sprintf("display notification \"Login Code: %s\" with title \"Admin Session\"", code)
-	cmd := exec.Command("osascript", "-e", message)
-	err := cmd.Run()
-	if err != nil {
-		// TODO: Only supporting MacOS for now :)
-		fmt.Println("Failed sending login notification (only mac support)")
 	}
 }
 

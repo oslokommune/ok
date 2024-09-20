@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/format"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +17,7 @@ var FmtCommand = &cobra.Command{
 	SilenceErrors: true,
 	Args:          cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := format.Run(PackagesManifestFilename)
+		err := format.Run(common.PackagesManifestFilename)
 		if err != nil {
 			return fmt.Errorf("formatting package manifest file packages: %w", err)
 		}

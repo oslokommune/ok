@@ -10,9 +10,6 @@ import (
 	"strings"
 )
 
-const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//"
-const DefaultPackagePathPrefix = "boilerplate/terraform"
-
 func Run(pkgManifestFilename string, outputFolders []string) error {
 	baseUrlOrPath := os.Getenv("BASE_URL")
 
@@ -108,11 +105,11 @@ func createBoilerPlateCommands(packagesToInstall []common.Package, packagePathPr
 	var cmds []*exec.Cmd
 	for _, pkg := range packagesToInstall {
 		if baseUrlOrPath == "" {
-			baseUrlOrPath = DefaultBaseUrl
+			baseUrlOrPath = common.DefaultBaseUrl
 		}
 
 		if packagePathPrefix == "" {
-			packagePathPrefix = DefaultPackagePathPrefix
+			packagePathPrefix = common.DefaultPackagePathPrefix
 		}
 
 		var templateURL string

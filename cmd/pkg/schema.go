@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"log/slog"
 	"os"
 
@@ -32,12 +33,16 @@ var SchemaDownloadCommand = &cobra.Command{
 		if len(args) < 1 {
 			return fmt.Errorf("missing template name")
 		}
+		manifest, err := common.LoadPackageManifest(common.PackagesManifestFilename)
+		if err != nil {
+			return fmt.Errorf("could not load package manifest: %w", err)
+		}
 		templateName := args[0]
 		templateVersion := releases[templateName]
 		githubRef := fmt.Sprintf("%s-%s", templateName, templateVersion)
 
-		templatePath := githubreleases.GetTemplatePath(templateName)
-		fileDownloader := githubreleases.NewFileDownloader(gh, boilerplateRepoOwner, boilerplateRepoName, githubRef)
+		templatePath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), templateName)
+		fileDownloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, githubRef)
 		stacks, err := config.DownloadBoilerplateStacksWithDependencies(cmd.Context(), fileDownloader, templatePath)
 		if err != nil {
 			return fmt.Errorf("downloading boilerplate stacks: %w", err)

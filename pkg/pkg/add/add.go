@@ -76,8 +76,8 @@ func Run(pkgManifestFilename string, templateName, outputFolder string, updateSc
 	}
 
 	if updateSchema {
-		downloader := githubreleases.NewFileDownloader(gh, githubreleases.GithubOwner, githubreleases.GithubRepo, gitRef)
-		stackPath := githubreleases.GetTemplatePath(templateName)
+		downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoOwner, gitRef)
+		stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), templateName)
 		schema, err := config.GenerateJsonSchemaForApp(ctx, downloader, stackPath, gitRef)
 		if err != nil {
 			return nil, fmt.Errorf("generating json schema for app: %w", err)

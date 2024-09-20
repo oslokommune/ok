@@ -1,6 +1,8 @@
 package common
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type PackageManifest struct {
 	DefaultPackagePathPrefix string    `yaml:"DefaultPackagePathPrefix,omitempty"`
@@ -12,6 +14,13 @@ type Package struct {
 	Template     string   `yaml:"Template"`
 	Ref          string   `yaml:"Ref"`
 	VarFiles     []string `yaml:"VarFiles"`
+}
+
+func (pm *PackageManifest) PackagePrefix() string {
+	if pm.DefaultPackagePathPrefix != "" {
+		return pm.DefaultPackagePathPrefix
+	}
+	return DefaultPackagePathPrefix
 }
 
 func (p Package) String() string {

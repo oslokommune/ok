@@ -3,6 +3,7 @@ package pkg
 import (
 	"errors"
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"log/slog"
 	"os"
 	"strings"
@@ -30,12 +31,12 @@ ok pkg add app ecommerce-api
 		templateName := getArg(args, 0, "")
 		outputFolder := getArg(args, 1, templateName)
 
-		result, err := add.Run(PackagesManifestFilename, templateName, outputFolder, flagAddCommandUpdateSchema)
+		result, err := add.Run(common.PackagesManifestFilename, templateName, outputFolder, flagAddCommandUpdateSchema)
 		if err != nil {
 			return err
 		}
 
-		slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, PackagesManifestFilename, result.OutputFolder))
+		slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, common.PackagesManifestFilename, result.OutputFolder))
 		nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
 		if len(nonExistingConfigFiles) > 0 {
 			slog.Info("\nCreate the following configuration files:\n")

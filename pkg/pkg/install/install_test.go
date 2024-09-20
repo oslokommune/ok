@@ -23,7 +23,7 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"boilerplate/terraform/app?ref=app-v6.1.1",
+					"--template-url", common.DefaultBaseUrl+"boilerplate/terraform/app?ref=app-v6.1.1",
 					"--output-folder", "out/app-hello",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -31,7 +31,7 @@ func TestInstall(t *testing.T) {
 				),
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"boilerplate/terraform/networking?ref=main",
+					"--template-url", common.DefaultBaseUrl+"boilerplate/terraform/networking?ref=main",
 					"--output-folder", "out/networking",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -75,7 +75,7 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"boilerplate/terraform/app?ref=app-v6.1.1",
+					"--template-url", common.DefaultBaseUrl+"boilerplate/terraform/app?ref=app-v6.1.1",
 					"--output-folder", "out/app-hello",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -89,7 +89,7 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"boilerplate/github-actions/terraform-on-changed-dirs?ref=main",
+					"--template-url", common.DefaultBaseUrl+"boilerplate/github-actions/terraform-on-changed-dirs?ref=main",
 					"--output-folder", "out/.github/workflows",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",

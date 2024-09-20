@@ -81,8 +81,8 @@ func Run(pkgManifestFilename string, packageName string, updateConfigSchema bool
 			if !ok {
 				continue
 			}
-			downloader := githubreleases.NewFileDownloader(gh, githubreleases.GithubOwner, githubreleases.GithubRepo, newRef)
-			stackPath := githubreleases.GetTemplatePath(pkg.Template)
+			downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, newRef)
+			stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), pkg.Template)
 			schema, err := config.GenerateJsonSchemaForApp(ctx, downloader, stackPath, newRef)
 			if err != nil {
 				return fmt.Errorf("generating json schema for app: %w", err)

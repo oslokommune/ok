@@ -12,7 +12,7 @@ func openURL(url string) error {
 	return exec.Command("open", url).Start()
 }
 
-func sendMacNotification(title string, text string) error {
+func sendNotification(title string, text string) error {
 	message := fmt.Sprintf("display notification \"%s\" with title \"%s\"", text, title)
 	return exec.Command("osascript", "-e", message).Start()
 }

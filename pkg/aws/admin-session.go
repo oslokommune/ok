@@ -146,7 +146,7 @@ func handleAWSLoginOutput(reader io.Reader) {
 		}
 		fmt.Printf("%s\n", line)
 		if len(line) == 9 {
-			err := sendMacNotification("Admin Session", "Login Code: "+string(line))
+			err := sendNotification("Admin Session", "Login Code: "+string(line))
 			if err != nil {
 				panic(err)
 			}

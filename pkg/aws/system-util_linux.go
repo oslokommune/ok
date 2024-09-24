@@ -26,7 +26,7 @@ func openURL(url string) error {
 	return exec.Command(cmd, args...).Start()
 }
 
-func sendMacNotification(title string, text string) error {
+func sendNotification(title string, text string) error {
 	// Not implemented for this platform
 	return nil
 }

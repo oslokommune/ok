@@ -56,7 +56,7 @@ func StartAdminSession() error {
 
 	printDivider()
 
-	fmt.Print("\nVerifying selected AWS profile by listing S3 buckets\n\n")
+	fmt.Print("\nVerifying selected AWS profile by querying S3 buckets\n")
 	err = listS3Buckets(awsProfile)
 	fmt.Println()
 	printDivider()
@@ -159,7 +159,7 @@ func handleAWSLoginOutput(reader io.Reader) {
 func listS3Buckets(awsProfile string) error {
 	cmd := exec.Command("aws", "s3", "ls")
 	cmd.Env = append(os.Environ(), "AWS_PROFILE="+awsProfile)
-	cmd.Stdout = os.Stdout
+	cmd.Stdout = io.Discard
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {

@@ -2,6 +2,8 @@ package aws
 
 import (
 	"bufio"
+	"context"
+	"errors"
 	"fmt"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
@@ -13,7 +15,7 @@ import (
 
 const AccessPackageUrl = "https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages"
 
-func StartAdminSession() error {
+func StartAdminSession(startShell bool) error {
 	red := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
 	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("3"))
@@ -61,7 +63,7 @@ func StartAdminSession() error {
 	fmt.Println()
 	printDivider()
 	if err != nil {
-		fmt.Print("\n", red.Render("Blaah!! You don't have the correct rights!"), "\n\n")
+		fmt.Print("\n", red.Render("Blaah!! You don't have the correct rights!"), "\n")
 		return cleanupAndQuit(awsProfile)
 	}
 
@@ -69,10 +71,24 @@ func StartAdminSession() error {
 	fmt.Print("Remove your Access Package when done (or extend if needed):\n")
 	fmt.Print(yellow.Render("https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages/active"), "\n\n")
 
-	fmt.Print("After the Access Package is disabled, please log out of current session.\n\n")
-	fmt.Print("Easily done with: ", yellow.Render("aws sso logout"), "\n\n")
-	fmt.Print("Take care - have fun!\n")
-	return nil
+	if startShell {
+		printDivider()
+		fmt.Print("\nCreating working shell!\n\n")
+		fmt.Print("After you are done, ", yellow.Render("log out of the shell"), " and you will be logged out of AWS.\n\n")
+		fmt.Print("Take care - have fun!\n\n")
+
+		err := startWorkingShell(awsProfile)
+		if err != nil {
+			return err
+		}
+		return cleanupAndQuit(awsProfile)
+	} else {
+		fmt.Print("Ensure to set your environment: ", yellow.Render("export AWS_PROFILE = "+awsProfile), "\n\n")
+		fmt.Print("After the Access Package is disabled, please log out of current session.\n")
+		fmt.Print("Easily done with: ", yellow.Render("aws sso logout"), "\n\n")
+		fmt.Print("Take care - have fun!\n")
+		return nil
+	}
 }
 
 func selectAWSProfile() (string, error) {
@@ -169,13 +185,75 @@ func listS3Buckets(awsProfile string) error {
 }
 
 func cleanupAndQuit(awsProfile string) error {
-	fmt.Print("Logging out to kill existing session\n\n")
+	fmt.Print("\nLogging out to kill existing AWS session\n\n")
 	err := doAWSLogout(awsProfile)
 	if err != nil {
 		return err
 	}
 	fmt.Print("Logged out!\n")
 	return nil
+}
+
+func startWorkingShell(awsProfile string) error {
+	shell := os.Getenv("SHELL")
+	if isZsh(shell) {
+		return startZshWorkingShell(awsProfile)
+	} else if isBash(shell) {
+		return startBashWorkingShell(awsProfile)
+	} else {
+		return errors.New("Not supported shell: " + shell)
+	}
+}
+
+func startZshWorkingShell(awsProfile string) error {
+	setup := "mkdir -p /tmp/zsh-sso-admin-session;" +
+		"find $HOME -type f -maxdepth 1 -name \".zsh*\" | xargs -I {} cp {} /tmp/zsh-sso-admin-session;" +
+		"echo 'export AWS_PROFILE=" + awsProfile + "' >> /tmp/zsh-sso-admin-session/.zshrc;" +
+		"echo 'export PROMPT=\"%F{red}SSO-Admin-Session%f (${AWS_PROFILE}) %~ $ \"' >> /tmp/zsh-sso-admin-session/.zshrc"
+	cmd := exec.Command(os.Getenv("SHELL"), "-c", setup)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	cmd = exec.CommandContext(context.Background(), os.Getenv("SHELL"))
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	cmd.Env = append(cmd.Env, "ZDOTDIR=/tmp/zsh-sso-admin-session")
+	return cmd.Run()
+}
+
+func startBashWorkingShell(awsProfile string) error {
+	setup := "mkdir -p /tmp/bash-sso-admin-session;" +
+		"find $HOME -type f -maxdepth 1 -name \".bashrc\" | xargs -I {} cp {} /tmp/bash-sso-admin-session;" +
+		"echo 'export AWS_PROFILE=" + awsProfile + "' >> /tmp/bash-sso-admin-session/.bashrc;" +
+		"echo 'export PS1=\"\\e[31m\\]SSO-Admin-Session\\e[0m\\] (${AWS_PROFILE}) \\w $ \"' >> /tmp/bash-sso-admin-session/.bashrc"
+	cmd := exec.Command(os.Getenv("SHELL"), "-c", setup)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+
+	cmd = exec.CommandContext(context.Background(), os.Getenv("SHELL"), "--rcfile", "/tmp/bash-sso-admin-session/.bashrc")
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	return cmd.Run()
+}
+
+func isZsh(shell string) bool {
+	return strings.HasSuffix(shell, "zsh")
+}
+
+func isBash(shell string) bool {
+	return strings.HasSuffix(shell, "bash")
 }
 
 func pressEnterToContinue(message string) {

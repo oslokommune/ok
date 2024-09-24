@@ -40,7 +40,7 @@ func StartAdminSession() error {
 
 	fmt.Printf("\nUsing AWS_PROFILE = %s\n\n", awsProfile)
 	fmt.Print("Logging out of AWS to refresh privileges\n\n")
-	err = doAWSLogout()
+	err = doAWSLogout(awsProfile)
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func StartAdminSession() error {
 	printDivider()
 	if err != nil {
 		fmt.Print("\n", red.Render("Blaah!! You don't have the correct rights!"), "\n\n")
-		return cleanupAndQuit()
+		return cleanupAndQuit(awsProfile)
 	}
 
 	fmt.Print("\n", green.Render("Great! Access granted"), "\n\n")
@@ -105,8 +105,10 @@ func selectAWSProfile() (string, error) {
 	return selectedProfile, nil
 }
 
-func doAWSLogout() error {
+func doAWSLogout(awsProfile string) error {
 	cmd := exec.Command("aws", "sso", "logout")
+	// Logout does fail when wrong profile is set
+	cmd.Env = append(os.Environ(), "AWS_PROFILE="+awsProfile)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
@@ -166,9 +168,9 @@ func listS3Buckets(awsProfile string) error {
 	return nil
 }
 
-func cleanupAndQuit() error {
+func cleanupAndQuit(awsProfile string) error {
 	fmt.Print("Logging out to kill existing session\n\n")
-	err := doAWSLogout()
+	err := doAWSLogout(awsProfile)
 	if err != nil {
 		return err
 	}

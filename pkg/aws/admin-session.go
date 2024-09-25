@@ -29,7 +29,7 @@ func StartAdminSession(startShell bool) error {
 	if err != nil {
 	    return fmt.Errorf("opening URL: %w", err)
 	}
-	fmt.Print("You should now be added to the needed EntraID group (usually within 30-60s).\n\n")
+	fmt.Print("After requesting access, you should be added to the needed EntraID group (usually within 30-60s).\n\n")
 	pressEnterToContinue("Confirm with ENTER when membership is confirmed on Slack")
 
 	printDivider()

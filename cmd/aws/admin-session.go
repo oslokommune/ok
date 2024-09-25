@@ -19,3 +19,4 @@ var AdminSessionCommand = &cobra.Command{
 func init() {
 	AdminSessionCommand.Flags().BoolVarP(&startShell, "start-shell", "s", false, "Start a working shell to execute AWS commands")
 }
+

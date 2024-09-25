@@ -27,7 +27,7 @@ func StartAdminSession(startShell bool) error {
 	fmt.Print(yellow.Render(AccessPackageUrl), "\n\n")
 	err := openURL(AccessPackageUrl)
 	if err != nil {
-	    return fmt.Errorf("opening URL: %w", err)
+		return fmt.Errorf("opening URL: %w", err)
 	}
 	fmt.Print("After requesting access, you should be added to the needed EntraID group (usually within 30-60s).\n\n")
 	pressEnterToContinue("Confirm with ENTER when membership is confirmed on Slack")
@@ -44,7 +44,7 @@ func StartAdminSession(startShell bool) error {
 	fmt.Print("Logging out of AWS to refresh privileges\n\n")
 	err = doAWSLogout(awsProfile)
 	if err != nil {
-		return err
+		return fmt.Errorf("logging out from AWS: %w", err)
 	}
 
 	printDivider()
@@ -52,7 +52,7 @@ func StartAdminSession(startShell bool) error {
 	fmt.Print("\nStart SSO Login\n\n")
 	err = doAWSLogin(awsProfile)
 	if err != nil {
-		return fmt.Errorf("logging out from AWS: %w", err)
+		return fmt.Errorf("logging in to AWS: %w", err)
 	}
 	fmt.Println()
 
@@ -83,7 +83,7 @@ func StartAdminSession(startShell bool) error {
 		}
 		return cleanupAndQuit(awsProfile)
 	} else {
-		fmt.Print("Ensure to set your environment: ", yellow.Render("export AWS_PROFILE="+awsProfile), "\n\n")
+		fmt.Print("Ensure to set your environment: \n", yellow.Render("export AWS_PROFILE="+awsProfile), "\n\n")
 		fmt.Print("After the Access Package is disabled, please log out of current session.\n")
 		fmt.Print("Easily done with: ", yellow.Render("aws sso logout"), "\n\n")
 		fmt.Print("Take care - have fun!\n")
@@ -96,7 +96,7 @@ func selectAWSProfile() (string, error) {
 	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 	if err != nil {
-	    return "", fmt.Errorf("running command: %w", err)
+		return "", fmt.Errorf("listing AWS profiles: %w", err)
 	}
 	var profiles []huh.Option[string]
 	for _, profile := range strings.Split(string(out), "\n") {
@@ -215,7 +215,7 @@ func startZshWorkingShell(awsProfile string) error {
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("running command: %w", err)
+		return fmt.Errorf("initializing Zsh: %w", err)
 	}
 
 	cmd = exec.CommandContext(context.Background(), os.Getenv("SHELL"))
@@ -237,7 +237,7 @@ func startBashWorkingShell(awsProfile string) error {
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("running command: %w", err)
+		return fmt.Errorf("initializing Bash: %w", err)
 	}
 
 	cmd = exec.CommandContext(context.Background(), os.Getenv("SHELL"), "--rcfile", "/tmp/bash-sso-admin-session/.bashrc")

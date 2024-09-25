@@ -23,7 +23,7 @@ func StartAdminSession(startShell bool) error {
 	printDivider()
 
 	fmt.Print("\nEnable Access Package\n\n")
-	fmt.Print("Open this url in your favorite browser:\n")
+	fmt.Print("Open this url in your favorite browser, and request access to an account of your choice:\n")
 	fmt.Print(yellow.Render(AccessPackageUrl), "\n\n")
 	err := openURL(AccessPackageUrl)
 	if err != nil {

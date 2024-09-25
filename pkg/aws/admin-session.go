@@ -52,7 +52,7 @@ func StartAdminSession(startShell bool) error {
 	fmt.Print("\nStart SSO Login\n\n")
 	err = doAWSLogin(awsProfile)
 	if err != nil {
-		return err
+		return fmt.Errorf("logging out from AWS: %w", err)
 	}
 	fmt.Println()
 

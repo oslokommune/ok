@@ -37,7 +37,7 @@ func StartAdminSession(startShell bool) error {
 	fmt.Print("\nSelect matching AWS profile\n\n")
 	awsProfile, err := selectAWSProfile()
 	if err != nil {
-		return err
+		return fmt.Errorf("selecting AWS profile: %w", err)
 	}
 
 	fmt.Printf("\nUsing AWS_PROFILE = %s\n\n", awsProfile)

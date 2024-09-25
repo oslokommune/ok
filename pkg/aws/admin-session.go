@@ -237,7 +237,7 @@ func startBashWorkingShell(awsProfile string) error {
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err != nil {
-		return err
+		return fmt.Errorf("running command: %w", err)
 	}
 
 	cmd = exec.CommandContext(context.Background(), os.Getenv("SHELL"), "--rcfile", "/tmp/bash-sso-admin-session/.bashrc")

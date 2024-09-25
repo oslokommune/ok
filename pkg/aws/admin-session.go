@@ -83,7 +83,7 @@ func StartAdminSession(startShell bool) error {
 		}
 		return cleanupAndQuit(awsProfile)
 	} else {
-		fmt.Print("Ensure to set your environment: ", yellow.Render("export AWS_PROFILE = "+awsProfile), "\n\n")
+		fmt.Print("Ensure to set your environment: ", yellow.Render("export AWS_PROFILE="+awsProfile), "\n\n")
 		fmt.Print("After the Access Package is disabled, please log out of current session.\n")
 		fmt.Print("Easily done with: ", yellow.Render("aws sso logout"), "\n\n")
 		fmt.Print("Take care - have fun!\n")

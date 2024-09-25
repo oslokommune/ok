@@ -79,7 +79,7 @@ func StartAdminSession(startShell bool) error {
 
 		err := startWorkingShell(awsProfile)
 		if err != nil {
-			return err
+			return fmt.Errorf("starting shell: %w", err)
 		}
 		return cleanupAndQuit(awsProfile)
 	} else {

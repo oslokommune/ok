@@ -58,6 +58,7 @@ func init() {
 
 	rootCmd.AddCommand(awsCommand)
 	awsCommand.AddCommand(aws.EcsExecCommand)
+	awsCommand.AddCommand(aws.AdminSessionCommand)
 
 	initializeConfiguration()
 }

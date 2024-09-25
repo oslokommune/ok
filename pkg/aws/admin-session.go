@@ -96,7 +96,7 @@ func selectAWSProfile() (string, error) {
 	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 	if err != nil {
-		return "", err
+	    return "", fmt.Errorf("running command: %w", err)
 	}
 	var profiles []huh.Option[string]
 	for _, profile := range strings.Split(string(out), "\n") {

@@ -45,28 +45,29 @@ func Run(pkgManifestFilename string, templateName, outputFolder string, updateSc
 	}
 	gitRef := fmt.Sprintf("%s-%s", templateName, templateVersion)
 
-	configFile := fmt.Sprintf("_config/%s.yml", outputFolder)
+	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
+	if err != nil {
+		return nil, err
+	}
+
+	configFile := common.ConfigFile(manifest.PackageConfigPrefix(), outputFolder)
+	commonConfigFile := common.ConfigFile(manifest.PackageConfigPrefix(), "common-config")
+
 	varFiles := []string{
-		"_config/common-config.yml",
+		commonConfigFile,
 		configFile,
 	}
 
 	newPackage := common.Package{
 		Template:     templateName,
 		Ref:          gitRef,
-		OutputFolder: outputFolder,
+		OutputFolder: manifest.PackageOutputFolder(outputFolder),
 		VarFiles:     varFiles,
 	}
 
-	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, pkg := range manifest.Packages {
-		if pkg.OutputFolder == newPackage.OutputFolder {
-			return nil, fmt.Errorf("output folder %s already exists in manifest", newPackage.OutputFolder)
-		}
+	_err := allowDuplicateOutputFolder(manifest, newPackage)
+	if _err != nil {
+		return nil, _err
 	}
 
 	manifest.Packages = append(manifest.Packages, newPackage)
@@ -76,7 +77,7 @@ func Run(pkgManifestFilename string, templateName, outputFolder string, updateSc
 	}
 
 	if updateSchema {
-		downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoOwner, gitRef)
+		downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, gitRef)
 		stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), templateName)
 		schema, err := config.GenerateJsonSchemaForApp(ctx, downloader, stackPath, gitRef)
 		if err != nil {
@@ -89,9 +90,22 @@ func Run(pkgManifestFilename string, templateName, outputFolder string, updateSc
 	}
 
 	return &AddResult{
-		OutputFolder:    outputFolder,
+		OutputFolder:    manifest.PackageOutputFolder(outputFolder),
 		VarFiles:        varFiles,
 		TemplateName:    templateName,
 		TemplateVersion: templateVersion,
 	}, nil
+}
+
+func allowDuplicateOutputFolder(manifest common.PackageManifest, newPackage common.Package) error {
+	// If we are generating GHA there is no restriction on output folder
+	if manifest.PackagePrefix() == common.BoilerplatePackageGitHubActionsPath {
+		return nil
+	}
+	for _, pkg := range manifest.Packages {
+		if pkg.OutputFolder == newPackage.OutputFolder {
+			return fmt.Errorf("output folder %s already exists in packages manifest", newPackage.OutputFolder)
+		}
+	}
+	return nil
 }

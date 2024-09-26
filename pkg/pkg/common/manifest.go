@@ -23,6 +23,28 @@ func (pm *PackageManifest) PackagePrefix() string {
 	return DefaultPackagePathPrefix
 }
 
+// Different package types have different config prefixes
+func (pm *PackageManifest) PackageConfigPrefix() string {
+	prefix := pm.PackagePrefix()
+	if prefix == BoilerplatePackageGitHubActionsPath {
+		return BoilerplatePackageGitHubActionsConfigPrefix
+	}
+	if prefix == BoilerplatePackageTerraformPath {
+		return BoilerplatePackageTerraformConfigPrefix
+	}
+	return DefaultPackageConfigPrefix
+}
+
+func (pm *PackageManifest) PackageOutputFolder(outputFolder string) string {
+	prefix := pm.PackagePrefix()
+	// All GHA must have the same output folder, so we can't use the outputFolder argument
+	// that the user is supplying to decide where to configure the output
+	if prefix == BoilerplatePackageGitHubActionsPath {
+		return BoilerplatePackageGitHubActionsOutputFolder
+	}
+	return outputFolder
+}
+
 func (p Package) String() string {
 	return fmt.Sprintf("%s (%s)", p.OutputFolder, p.Ref)
 }

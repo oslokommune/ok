@@ -30,7 +30,7 @@ func Run(pkgManifestFilename string, packageName string, updateConfigSchema bool
 		// Update only the specified package
 		updated := false
 		for i, pkg := range manifest.Packages {
-			if pkg.Template == packageName {
+			if pkg.OutputFolder == packageName {
 				latestRelease, ok := latestReleases[pkg.Template]
 				if !ok {
 					return fmt.Errorf("no latest release found for package: %s", packageName)
@@ -41,7 +41,14 @@ func Run(pkgManifestFilename string, packageName string, updateConfigSchema bool
 					updatedPackages = append(updatedPackages, manifest.Packages[i])
 				}
 				updated = true
-				break
+
+				// TODO: This is a temporary fix
+				// Right now we must support multiple packages with the same output folder for GHA
+				// we can't break here - 'ok pkg update ../..' for GHA would only update the first package
+				// and we don't have any unique identifier for the package yet
+				if manifest.PackagePrefix() != common.BoilerplatePackageGitHubActionsPath {
+					break
+				}
 			}
 		}
 		if !updated {

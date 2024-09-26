@@ -76,7 +76,7 @@ func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []strin
 	}
 
 	// Install packages
-	cmds, err := createBoilerPlateCommands(packagesToInstall, manifest.DefaultPackagePathPrefix, baseUrlOrPath)
+	cmds, err := createBoilerPlateCommands(packagesToInstall, manifest.PackagePrefix(), baseUrlOrPath)
 	if err != nil {
 		return nil, fmt.Errorf("creating boilerplate commands: %w", err)
 	}
@@ -106,10 +106,6 @@ func createBoilerPlateCommands(packagesToInstall []common.Package, packagePathPr
 	for _, pkg := range packagesToInstall {
 		if baseUrlOrPath == "" {
 			baseUrlOrPath = common.DefaultBaseUrl
-		}
-
-		if packagePathPrefix == "" {
-			packagePathPrefix = common.DefaultPackagePathPrefix
 		}
 
 		var templateURL string

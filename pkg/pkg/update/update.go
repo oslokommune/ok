@@ -3,11 +3,11 @@ package update
 import (
 	"context"
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"os"
 	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
-	"github.com/oslokommune/ok/pkg/pkg/config"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
@@ -112,12 +112,12 @@ func updateSchemaConfig(ctx context.Context, updatedPackages []common.Package, m
 		}
 		downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, newRef)
 		stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), pkg.Template)
-		schema, err := config.GenerateJsonSchemaForApp(ctx, downloader, stackPath, newRef)
+		generatedSchema, err := schema.GenerateJsonSchemaForApp(ctx, downloader, stackPath, newRef)
 		if err != nil {
 			return fmt.Errorf("generating json schema for app: %w", err)
 		}
 
-		_, err = config.CreateOrUpdateConfigurationFile(configFile, newRef, schema)
+		_, err = schema.CreateOrUpdateConfigurationFile(configFile, newRef, generatedSchema)
 		if err != nil {
 			return fmt.Errorf("creating or updating configuration file: %w", err)
 		}

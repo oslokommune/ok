@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/common"
+	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"log/slog"
 	"os"
 
@@ -50,9 +51,9 @@ var SchemaDownloadCommand = &cobra.Command{
 		if len(stacks) == 0 {
 			return fmt.Errorf("no stacks found")
 		}
-		moduleVariables := config.BuildModuleVariables(stacks)
+		moduleVariables := schema.BuildModuleVariables(stacks)
 		schemaId := fmt.Sprintf("%s-%s", templatePath, templateVersion)
-		schema, err := config.TransformModulesToJsonSchema(schemaId, moduleVariables)
+		schema, err := schema.TransformModulesToJsonSchema(schemaId, moduleVariables)
 		if err != nil {
 			return fmt.Errorf("transforming modules to json schema: %w", err)
 		}

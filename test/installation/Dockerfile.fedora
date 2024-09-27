@@ -1,6 +1,8 @@
 FROM fedora:latest
 
-RUN dnf install -y gh rpm
+RUN dnf install -y 'dnf-command(config-manager)' && \
+    dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+    dnf install -y gh
 
 RUN TEMP_DIR=$(mktemp -d) && \
     gh release download --repo "oslokommune/ok" --pattern "*amd64.rpm" --dir "$TEMP_DIR" && \

@@ -1,6 +1,6 @@
 FROM archlinux:latest
 
-RUN pacman -Sy --noconfirm gh
+RUN pacman -Sy --noconfirm github-cli
 
 RUN TEMP_DIR=$(mktemp -d) && \
     gh release download --repo "oslokommune/ok" --pattern "*amd64.pkg.tar.zst" --dir "$TEMP_DIR" && \

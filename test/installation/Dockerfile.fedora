@@ -4,6 +4,10 @@ RUN dnf install -y 'dnf-command(config-manager)' && \
     dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
     dnf install -y gh
 
+RUN --mount=type=secret,id=github_token \
+    GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
+    echo "$GITHUB_TOKEN" | gh auth login --with-token
+
 RUN TEMP_DIR=$(mktemp -d) && \
     gh release download --repo "oslokommune/ok" --pattern "*amd64.rpm" --dir "$TEMP_DIR" && \
     rpm -ivh "$TEMP_DIR"/*amd64.rpm && \

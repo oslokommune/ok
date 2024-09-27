@@ -2,6 +2,10 @@ FROM archlinux:latest
 
 RUN pacman -Sy --noconfirm github-cli
 
+RUN --mount=type=secret,id=github_token \
+    GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
+    echo "$GITHUB_TOKEN" | gh auth login --with-token
+
 RUN TEMP_DIR=$(mktemp -d) && \
     gh release download --repo "oslokommune/ok" --pattern "*amd64.pkg.tar.zst" --dir "$TEMP_DIR" && \
     pacman -U --noconfirm "$TEMP_DIR"/*amd64.pkg.tar.zst && \

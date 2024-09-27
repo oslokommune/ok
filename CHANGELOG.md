@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/oslokommune/ok/compare/v3.12.2...v4.0.0) (2024-09-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* use DefaultPackagePathPrefix when adding/updating or getting schema ([#250](https://github.com/oslokommune/ok/issues/250))
+
+### Features
+
+* use DefaultPackagePathPrefix when adding/updating or getting schema ([#250](https://github.com/oslokommune/ok/issues/250)) ([f5af9d1](https://github.com/oslokommune/ok/commit/f5af9d19b879e2167e5d1207c94ee9f655095292))
+
 ## [3.12.2](https://github.com/oslokommune/ok/compare/v3.12.1...v3.12.2) (2024-09-27)
 
 

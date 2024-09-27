@@ -10,10 +10,8 @@ RUN mkdir -p -m 755 /etc/apt/keyrings && \
     apt-get install -y gh
 
 RUN --mount=type=secret,id=github_token \
-    GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
-    echo "$GITHUB_TOKEN" | gh auth login --with-token
-
-RUN TEMP_DIR=$(mktemp -d) && \
+    export GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
+    TEMP_DIR=$(mktemp -d) && \
     gh release download --repo "oslokommune/ok" --pattern "*amd64.deb" --dir "$TEMP_DIR" && \
     dpkg -i "$TEMP_DIR"/*amd64.deb && \
     rm -rf "$TEMP_DIR"

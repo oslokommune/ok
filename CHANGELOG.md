@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.12.2](https://github.com/oslokommune/ok/compare/v3.12.1...v3.12.2) (2024-09-27)
+
+
+### Dependency Updates
+
+* bump the gomod-all group with 2 updates ([#249](https://github.com/oslokommune/ok/issues/249)) ([c681862](https://github.com/oslokommune/ok/commit/c681862629032cd1068447a1bc190bf50836e77c))
+
 ## [3.12.1](https://github.com/oslokommune/ok/compare/v3.12.0...v3.12.1) (2024-09-25)
 
 

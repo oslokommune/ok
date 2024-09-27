@@ -11,11 +11,16 @@ jobs:
         dockerfile: [fedora, ubuntu, archlinux]
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          sparse-checkout: test/installation
+
 
       - name: Build Docker image
-        run: docker build -f Dockerfile.${{ matrix.dockerfile }} -t ok-${{ matrix.dockerfile }} .
+        run: docker build -f test/installation/Dockerfile.${{ matrix.dockerfile }} -t ok-${{ matrix.dockerfile }} .
+
 
       - name: Test Docker image
         run: docker run --rm ok-${{ matrix.dockerfile }}

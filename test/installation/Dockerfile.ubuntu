@@ -1,0 +1,10 @@
+FROM ubuntu:latest
+
+RUN apt-get update && apt-get install -y gh
+
+RUN TEMP_DIR=$(mktemp -d) && \
+    gh release download --repo "oslokommune/ok" --pattern "*amd64.deb" --dir "$TEMP_DIR" && \
+    dpkg -i "$TEMP_DIR"/*amd64.deb && \
+    rm -rf "$TEMP_DIR"
+
+CMD ["ok"]

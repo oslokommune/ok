@@ -1,0 +1,10 @@
+FROM fedora:latest
+
+RUN dnf install -y gh rpm
+
+RUN TEMP_DIR=$(mktemp -d) && \
+    gh release download --repo "oslokommune/ok" --pattern "*amd64.rpm" --dir "$TEMP_DIR" && \
+    rpm -ivh "$TEMP_DIR"/*amd64.rpm && \
+    rm -rf "$TEMP_DIR"
+
+CMD ["ok"]

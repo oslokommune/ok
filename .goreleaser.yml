@@ -21,6 +21,13 @@ archives:
   - files:
       - completions/*
 
+nfpms:
+  - package_name: ok
+    formats:
+      - deb
+      - rpm
+      - archlinux
+
 brews:
   - name: ok
     description: A CLI called ok

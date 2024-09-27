@@ -23,7 +23,7 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"boilerplate/terraform/app?ref=app-v6.1.1",
+					"--template-url", common.DefaultBaseUrl+"boilerplate/terraform/app?ref=app-v6.1.1",
 					"--output-folder", "out/app-hello",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -31,7 +31,7 @@ func TestInstall(t *testing.T) {
 				),
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"boilerplate/terraform/networking?ref=main",
+					"--template-url", common.DefaultBaseUrl+"boilerplate/terraform/networking?ref=main",
 					"--output-folder", "out/networking",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -75,7 +75,7 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"boilerplate/terraform/app?ref=app-v6.1.1",
+					"--template-url", common.DefaultBaseUrl+"boilerplate/terraform/app?ref=app-v6.1.1",
 					"--output-folder", "out/app-hello",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -89,7 +89,7 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", DefaultBaseUrl+"boilerplate/github-actions/terraform-on-changed-dirs?ref=main",
+					"--template-url", common.DefaultBaseUrl+"boilerplate/github-actions/terraform-on-changed-dirs?ref=main",
 					"--output-folder", "out/.github/workflows",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -121,6 +121,106 @@ func TestInstall(t *testing.T) {
 			}
 
 			assert.Equal(t, len(cmds), len(tc.expectBoilerplateCommands))
+		})
+	}
+}
+
+func TestIsUrl(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected bool
+	}{
+		{
+			name:     "valid http URL",
+			input:    "http://example.com",
+			expected: true,
+		},
+		{
+			name:     "valid https URL",
+			input:    "https://example.com",
+			expected: true,
+		},
+		{
+			name:     "valid git URL",
+			input:    "git@github.com:example/repo.git",
+			expected: true,
+		},
+		{
+			name:     "invalid URL",
+			input:    "ftp://example.com",
+			expected: false,
+		},
+		{
+			name:     "plain text",
+			input:    "example.com",
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := isUrl(tt.input)
+			require.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestFilterPackages(t *testing.T) {
+	tests := []struct {
+		name          string
+		packages      []common.Package
+		outputFolders []string
+		expected      []common.Package
+	}{
+		{
+			name: "no output folders specified",
+			packages: []common.Package{
+				{OutputFolder: "out/folder1"},
+				{OutputFolder: "out/folder2"},
+			},
+			outputFolders: []string{},
+			expected:      []common.Package{},
+		},
+		{
+			name: "single output folder specified",
+			packages: []common.Package{
+				{OutputFolder: "out/folder1"},
+				{OutputFolder: "out/folder2"},
+			},
+			outputFolders: []string{"out/folder1"},
+			expected: []common.Package{
+				{OutputFolder: "out/folder1"},
+			},
+		},
+		{
+			name: "multiple output folders specified",
+			packages: []common.Package{
+				{OutputFolder: "out/folder1"},
+				{OutputFolder: "out/folder2"},
+				{OutputFolder: "out/folder3"},
+			},
+			outputFolders: []string{"out/folder1", "out/folder3"},
+			expected: []common.Package{
+				{OutputFolder: "out/folder1"},
+				{OutputFolder: "out/folder3"},
+			},
+		},
+		{
+			name: "no matching output folders",
+			packages: []common.Package{
+				{OutputFolder: "out/folder1"},
+				{OutputFolder: "out/folder2"},
+			},
+			outputFolders: []string{"out/folder3"},
+			expected:      []common.Package{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := filterPackages(tt.packages, tt.outputFolders)
+			require.Equal(t, tt.expected, result)
 		})
 	}
 }

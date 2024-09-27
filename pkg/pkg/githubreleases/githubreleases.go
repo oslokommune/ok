@@ -8,14 +8,13 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/oslokommune/ok/pkg/pkg/common"
+
 	"github.com/Masterminds/semver"
 	"github.com/google/go-github/v63/github"
 	"github.com/zalando/go-keyring"
 )
 
-const GithubOwner = "oslokommune"
-const GithubRepo = "golden-path-boilerplate"
-const BoilerplateStackPath = "boilerplate/terraform"
 const AuthErrorHelpMessage = `
 GitHub token not found in keyring or environment variables.
 
@@ -115,7 +114,7 @@ func listReleases(client *github.Client) ([]*github.RepositoryRelease, error) {
 
 	for {
 		releases, response, err := client.Repositories.ListReleases(
-			context.Background(), GithubOwner, GithubRepo, options)
+			context.Background(), common.BoilerplateRepoOwner, common.BoilerplateRepoName, options)
 		if err != nil {
 			return nil, fmt.Errorf("listing releases: %w", err)
 		}
@@ -223,6 +222,6 @@ func DownloadGithubFile(ctx context.Context, client *github.Client, owner, repo,
 	return bodyText, nil
 }
 
-func GetTemplatePath(app string) string {
-	return fmt.Sprintf("%s/%s", BoilerplateStackPath, app)
+func GetTemplatePath(stackPath string, app string) string {
+	return fmt.Sprintf("%s/%s", stackPath, app)
 }

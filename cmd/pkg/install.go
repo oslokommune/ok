@@ -41,7 +41,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 		}
 
 		if flagInstallInteractive {
-			selectedOutputFolders, err := interactive.SelectPackagesToInstall(PackagesManifestFilename)
+			selectedOutputFolders, err := interactive.SelectPackagesToInstall(common.PackagesManifestFilename)
 			if err != nil {
 				return fmt.Errorf("selecting package: %w", err)
 			}
@@ -54,7 +54,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 			outputFolders = selectedOutputFolders
 		}
 
-		err := install.Run(PackagesManifestFilename, outputFolders)
+		err := install.Run(common.PackagesManifestFilename, outputFolders)
 		if err != nil {
 			return fmt.Errorf("installing packages: %w", err)
 		}
@@ -64,7 +64,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 }
 
 func installTabCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	manifest, err := common.LoadPackageManifest(PackagesManifestFilename)
+	manifest, err := common.LoadPackageManifest(common.PackagesManifestFilename)
 	if err != nil {
 		cmd.PrintErrf("failed to load package manifest: %s\n", err)
 		return nil, cobra.ShellCompDirectiveError

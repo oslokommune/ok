@@ -27,7 +27,7 @@ If no package name is provided, all packages will be updated.`,
 			packageName = args[0]
 		}
 
-		err := update.Run(PackagesManifestFilename, packageName, flagUpdateCommandUpdateSchema)
+		err := update.Run(common.PackagesManifestFilename, packageName, flagUpdateCommandUpdateSchema)
 		if err != nil {
 			return err
 		}
@@ -51,7 +51,7 @@ func updateTabCompletion(cmd *cobra.Command, args []string, toComplete string) (
 	if len(args) > 0 {
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}
-	manifest, err := common.LoadPackageManifest(PackagesManifestFilename)
+	manifest, err := common.LoadPackageManifest(common.PackagesManifestFilename)
 	if err != nil {
 		cmd.PrintErrf("failed to load package manifest: %s\n", err)
 		return nil, cobra.ShellCompDirectiveError

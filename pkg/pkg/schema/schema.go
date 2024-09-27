@@ -1,12 +1,12 @@
-package config
+package schema
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/config"
 	"log"
 	"log/slog"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,8 +14,8 @@ import (
 	"github.com/oslokommune/ok/pkg/jsonschema"
 )
 
-func GenerateJsonSchemaForApp(ctx context.Context, downloader FileDownloader, stackPath, gitRef string) (*jsonschema.Document, error) {
-	stacks, err := DownloadBoilerplateStacksWithDependencies(ctx, downloader, stackPath)
+func GenerateJsonSchemaForApp(ctx context.Context, downloader config.FileDownloader, stackPath, gitRef string) (*jsonschema.Document, error) {
+	stacks, err := config.DownloadBoilerplateStacksWithDependencies(ctx, downloader, stackPath)
 	if err != nil {
 		return nil, fmt.Errorf("downloading boilerplate stacks: %w", err)
 	}
@@ -105,29 +105,29 @@ func appendYamlLanguageServerComment(data, schemaPath string) string {
 	return fmt.Sprintf("%s $schema=%s\n%s", yamlLanguageServerComment, schemaPath, data)
 }
 
-func BuildJsonSchemaFromConfig(config *BoilerplateConfig, dependencies []BoilerplateConfig) (*jsonschema.Document, error) {
+func BuildJsonSchemaFromConfig(config *config.BoilerplateConfig, dependencies []config.BoilerplateConfig) (*jsonschema.Document, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
 type Stack struct {
 	Name         string
-	Config       *BoilerplateConfig
+	Config       *config.BoilerplateConfig
 	OutputFolder string
 	Dependencies []string
 }
 
 type ModuleVariables struct {
 	Namespace string
-	Variables []BoilerplateVariable
+	Variables []config.BoilerplateVariable
 }
 
 type CombinedVariables struct {
 	OutputFolder string
 	Namespace    string
-	Variables    []BoilerplateVariable
+	Variables    []config.BoilerplateVariable
 }
 
-func BuildModuleVariables(configs []*BoilerplateStack) []*ModuleVariables {
+func BuildModuleVariables(configs []*config.BoilerplateStack) []*ModuleVariables {
 	if len(configs) == 0 {
 		return nil
 	}
@@ -135,16 +135,16 @@ func BuildModuleVariables(configs []*BoilerplateStack) []*ModuleVariables {
 	return buildModuleVariables("", configs[0], configs, "some/output/folder")
 }
 
-func buildModuleVariables(namespace string, currentConfig *BoilerplateStack, configs []*BoilerplateStack, outputFolder string) []*ModuleVariables {
+func buildModuleVariables(namespace string, currentConfig *config.BoilerplateStack, configs []*config.BoilerplateStack, outputFolder string) []*ModuleVariables {
 	// ensure input arguments follow the correct format to avoid creating invalid namespaces
 	namespace = JoinNamespaces(namespace)
-	outputFolder = JoinPath(outputFolder, currentConfig.Path)
+	outputFolder = config.JoinPath(outputFolder, currentConfig.Path)
 
-	namespaceVariables := make(map[string][]BoilerplateVariable)
+	namespaceVariables := make(map[string][]config.BoilerplateVariable)
 	namespaceVariables[namespace] = currentConfig.Config.Variables
 
 	for _, dep := range currentConfig.Config.Dependencies {
-		depPath := JoinPath(currentConfig.Path, dep.TemplateUrl)
+		depPath := config.JoinPath(currentConfig.Path, dep.TemplateUrl)
 		depConfig, ok := findConfigFromPath(depPath, configs)
 		if !ok {
 			log.Printf("dependency %s not found in configs referenced by %s", depPath, currentConfig.Path)
@@ -152,7 +152,7 @@ func buildModuleVariables(namespace string, currentConfig *BoilerplateStack, con
 		}
 
 		depNamespace := namespace
-		depOutputFolder := JoinPath(outputFolder, dep.OutputFolder)
+		depOutputFolder := config.JoinPath(outputFolder, dep.OutputFolder)
 		// if we move to a different output folder, then we need to create a new namespace
 		if depOutputFolder != outputFolder {
 			depNamespace = JoinNamespaces(depNamespace, dep.Name)
@@ -174,7 +174,7 @@ func buildModuleVariables(namespace string, currentConfig *BoilerplateStack, con
 	return moduleVariables
 }
 
-func findConfigFromPath(path string, configs []*BoilerplateStack) (*BoilerplateStack, bool) {
+func findConfigFromPath(path string, configs []*config.BoilerplateStack) (*config.BoilerplateStack, bool) {
 	for _, c := range configs {
 		if c.Path == path {
 			return c, true
@@ -192,15 +192,6 @@ func JoinNamespaces(namespaces ...string) string {
 	}
 
 	return strings.Join(filtered, ".")
-}
-
-func JoinPath(base, path string) string {
-	uri, err := url.JoinPath(base, path)
-	if err != nil {
-		slog.Error("could not join paths", slog.String("base", base), slog.String("path", path), slog.String("error", err.Error()))
-		panic(err)
-	}
-	return uri
 }
 
 func TransformModulesToJsonSchema(schemaId string, modules []*ModuleVariables) (*jsonschema.Document, error) {
@@ -289,7 +280,7 @@ func getMapKeyNames[T any](m map[string]T) []string {
 }
 
 // mapVariableObjectToProperties turns a map into a list of properties with type information
-func mapVariableObjectToProperties(variable BoilerplateVariable) map[string]jsonschema.Property {
+func mapVariableObjectToProperties(variable config.BoilerplateVariable) map[string]jsonschema.Property {
 	defaultMap, ok := variable.Default.(map[string]any)
 	if !ok {
 		return make(map[string]jsonschema.Property)
@@ -311,7 +302,7 @@ func mapVariableObjectToProperties(variable BoilerplateVariable) map[string]json
 
 // mapVariableObjectToFlatProperties turns a map into a flat list of properties prefixed with the namespace
 // For example if the namespace is "a.b" and the map is {"c": 1, "d": 2} the result will be {"a.b.c": 1, "a.b.d": 2}
-func mapVariableObjectToFlatProperties(namespace string, variable BoilerplateVariable) map[string]jsonschema.Property {
+func mapVariableObjectToFlatProperties(namespace string, variable config.BoilerplateVariable) map[string]jsonschema.Property {
 	defaultMap, ok := variable.Default.(map[string]any)
 	if !ok {
 		return make(map[string]jsonschema.Property)

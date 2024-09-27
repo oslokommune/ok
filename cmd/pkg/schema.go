@@ -3,6 +3,8 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
+	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"log/slog"
 	"os"
 
@@ -32,12 +34,16 @@ var SchemaDownloadCommand = &cobra.Command{
 		if len(args) < 1 {
 			return fmt.Errorf("missing template name")
 		}
+		manifest, err := common.LoadPackageManifest(common.PackagesManifestFilename)
+		if err != nil {
+			return fmt.Errorf("could not load package manifest: %w", err)
+		}
 		templateName := args[0]
 		templateVersion := releases[templateName]
 		githubRef := fmt.Sprintf("%s-%s", templateName, templateVersion)
 
-		templatePath := githubreleases.GetTemplatePath(templateName)
-		fileDownloader := githubreleases.NewFileDownloader(gh, boilerplateRepoOwner, boilerplateRepoName, githubRef)
+		templatePath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), templateName)
+		fileDownloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, githubRef)
 		stacks, err := config.DownloadBoilerplateStacksWithDependencies(cmd.Context(), fileDownloader, templatePath)
 		if err != nil {
 			return fmt.Errorf("downloading boilerplate stacks: %w", err)
@@ -45,9 +51,9 @@ var SchemaDownloadCommand = &cobra.Command{
 		if len(stacks) == 0 {
 			return fmt.Errorf("no stacks found")
 		}
-		moduleVariables := config.BuildModuleVariables(stacks)
+		moduleVariables := schema.BuildModuleVariables(stacks)
 		schemaId := fmt.Sprintf("%s-%s", templatePath, templateVersion)
-		schema, err := config.TransformModulesToJsonSchema(schemaId, moduleVariables)
+		schema, err := schema.TransformModulesToJsonSchema(schemaId, moduleVariables)
 		if err != nil {
 			return fmt.Errorf("transforming modules to json schema: %w", err)
 		}

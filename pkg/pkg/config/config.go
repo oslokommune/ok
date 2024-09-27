@@ -3,6 +3,8 @@ package config
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"net/url"
 
 	"gopkg.in/yaml.v3"
 )
@@ -99,4 +101,13 @@ func parseBoilerplateConfig(data []byte) (*BoilerplateConfig, error) {
 		return nil, fmt.Errorf("unmarshal boilerplate config: %w", err)
 	}
 	return &config, nil
+}
+
+func JoinPath(base, path string) string {
+	uri, err := url.JoinPath(base, path)
+	if err != nil {
+		slog.Error("could not join paths", slog.String("base", base), slog.String("path", path), slog.String("error", err.Error()))
+		panic(err)
+	}
+	return uri
 }

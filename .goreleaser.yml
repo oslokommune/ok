@@ -23,6 +23,7 @@ archives:
 
 nfpms:
   - package_name: ok
+    maintainer: Oslo kommune
     formats:
       - deb
       - rpm

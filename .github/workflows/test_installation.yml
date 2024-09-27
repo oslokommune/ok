@@ -2,6 +2,9 @@ name: Test installation
 
 on:
   workflow_dispatch:
+  release:
+    types:
+      - edited
 
 jobs:
   build:

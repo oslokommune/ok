@@ -14,12 +14,22 @@ import (
 
 var (
 	// rootCmd represents the base command when called without any subcommands.
-	rootCmd = &cobra.Command{
+	okString = "`ok`"
+	rootCmd  = &cobra.Command{
 		Use:   "ok",
 		Short: "The `ok` infrastructure toolbox.",
-		Long: "The " + "`ok` " + `tool helps you to create a fresh Terraform environment (like prod or development) and configure it to use remote state storage.
+		Long: fmt.Sprintf(`The %s tool is a comprehensive infrastructure management toolbox designed to streamline the setup and maintenance of Terraform environments. It provides a variety of commands to bootstrap infrastructure, manage environment configurations, handle AWS operations, and more.
 
-Your environment is configured using a ` + "`packages.yml`" + ` file. This file is a package manifest listing the components from Golden Path that you wish to use. An example can be found in the ` + "`pirates-iac` " + `repository.`,
+Key functionalities include:
+
+- Creating and configuring new Terraform environments.
+- Bootstrapping S3 buckets and DynamoDB tables for remote state storage.
+- Managing environment variables and configuration files.
+- Executing AWS-specific commands.
+- Scaffolding new Terraform projects with predefined Boilerplate templates.
+- Managing and updating Boilerplate templates.
+
+Whether you're setting up a new environment or maintaining an existing one, %s simplifies and automates many of the repetitive tasks involved in infrastructure management.`, okString, okString),
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}

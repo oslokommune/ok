@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0](https://github.com/oslokommune/ok/compare/v4.0.1...v4.1.0) (2024-09-30)
+
+
+### Features
+
+* Update root command description ([a7defd1](https://github.com/oslokommune/ok/commit/a7defd1cc8b5264b9c546c8e999b3b4c9ee6f220))
+
 ## [4.0.1](https://github.com/oslokommune/ok/compare/v4.0.0...v4.0.1) (2024-09-30)
 
 

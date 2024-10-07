@@ -68,13 +68,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-      - name: Trigger Test Installation Workflow
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
-        with:
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'test_installation.yml',
-              ref: context.ref,
-            });
+  ################################################################################
+  # Test installation of OS packages
+  ################################################################################
+  test-installation:
+    name: Test installation of OS packages
+    needs: [goreleaser]
+    uses: ./.github/workflows/test_installation.yml

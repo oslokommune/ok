@@ -1,6 +1,7 @@
 name: Test installation
 
 on:
+  workflow_call:
   workflow_dispatch:
   release:
     types:

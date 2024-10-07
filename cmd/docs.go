@@ -7,7 +7,7 @@ import (
 
 var docsCommand = &cobra.Command{
 	Use:                   "docs",
-	Short:                 "Generates ok's command line docs",
+	Short:                 "Generates ok's command line docs.",
 	Long:                  "Generates Markdown documentation for all commands in the CLI.",
 	SilenceUsage:          true,
 	DisableFlagsInUseLine: true,

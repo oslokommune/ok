@@ -74,4 +74,4 @@ jobs:
   test-installation:
     name: Test installation of OS packages
     needs: [goreleaser]
-    uses: ./.github/workflows/test_installation.yml
+    uses: ./.github/workflows/test_os_packages.yml

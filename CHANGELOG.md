@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.0](https://github.com/oslokommune/ok/compare/v4.1.1...v4.2.0) (2024-10-07)
+
+
+### Features
+
+* Add missing period from help text ([2b371d1](https://github.com/oslokommune/ok/commit/2b371d1c9ef18110a0736aeec0eec74fc9891a41))
+
 ## [4.1.1](https://github.com/oslokommune/ok/compare/v4.1.0...v4.1.1) (2024-10-07)
 
 

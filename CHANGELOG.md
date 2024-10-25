@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.0](https://github.com/oslokommune/ok/compare/v4.2.0...v4.3.0) (2024-10-25)
+
+
+### Features
+
+* Display packages in ok pkg install --interactive ([#278](https://github.com/oslokommune/ok/issues/278)) ([de8af27](https://github.com/oslokommune/ok/commit/de8af27dc1217332511aae3016ad64ed05028238))
+
 ## [4.2.0](https://github.com/oslokommune/ok/compare/v4.1.1...v4.2.0) (2024-10-07)
 
 

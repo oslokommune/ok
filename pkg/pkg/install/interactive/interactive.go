@@ -7,6 +7,12 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/common"
 )
 
+const (
+	outputFolderWidth = 45
+	templateWidth     = 40
+	varFilesWidth     = 80
+)
+
 func SelectPackagesToInstall(pkgManifestFilename string) ([]string, error) {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
@@ -15,8 +21,11 @@ func SelectPackagesToInstall(pkgManifestFilename string) ([]string, error) {
 
 	options := make([]huh.Option[string], 0)
 
-	for _, p := range manifest.Packages {
-		options = append(options, huh.NewOption(p.OutputFolder, p.OutputFolder))
+	for _, pkg := range manifest.Packages {
+		displayText := createDisplayText(pkg)
+		value := pkg.OutputFolder
+
+		options = append(options, huh.NewOption[string](displayText, value))
 	}
 
 	var packages []string
@@ -37,4 +46,18 @@ func SelectPackagesToInstall(pkgManifestFilename string) ([]string, error) {
 	}
 
 	return packages, nil
+}
+
+func createDisplayText(pkg common.Package) string {
+	/*
+	   Format specifiers explained:
+	   %-*.*s formats a string with a specified width and precision.
+	   - The first * sets the minimum width, padding with spaces if shorter.
+	   - The second * sets the maximum length, truncating if longer.
+	*/
+	outputFolder := fmt.Sprintf("%-*.*s", outputFolderWidth, outputFolderWidth, pkg.OutputFolder)
+	template := fmt.Sprintf("%-*.*s", templateWidth, templateWidth, pkg.Template)
+	varFiles := fmt.Sprintf("%-*.*s", varFilesWidth, varFilesWidth, fmt.Sprint(pkg.VarFiles))
+
+	return fmt.Sprintf("%s %s %s", outputFolder, template, varFiles)
 }

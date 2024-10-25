@@ -9,8 +9,8 @@ import (
 
 const (
 	outputFolderWidth = 45
-	templateWidth     = 30
-	varFilesWidth     = 60
+	templateWidth     = 40
+	varFilesWidth     = 80
 )
 
 func SelectPackagesToInstall(pkgManifestFilename string) ([]string, error) {
@@ -50,12 +50,11 @@ func SelectPackagesToInstall(pkgManifestFilename string) ([]string, error) {
 
 func createDisplayText(pkg common.Package) string {
 	/*
-		The format string below means:
-		%s: Format as a string.
-		%-20: Pad string with whitespaces so it becomes 20 characters, if it's shorter.
-		.20: Truncate the string to a maximum of 20 characters if it's longer.
+	   Format specifiers explained:
+	   %-*.*s formats a string with a specified width and precision.
+	   - The first * sets the minimum width, padding with spaces if shorter.
+	   - The second * sets the maximum length, truncating if longer.
 	*/
-
 	outputFolder := fmt.Sprintf("%-*.*s", outputFolderWidth, outputFolderWidth, pkg.OutputFolder)
 	template := fmt.Sprintf("%-*.*s", templateWidth, templateWidth, pkg.Template)
 	varFiles := fmt.Sprintf("%-*.*s", varFilesWidth, varFilesWidth, fmt.Sprint(pkg.VarFiles))

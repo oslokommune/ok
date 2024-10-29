@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.3.1](https://github.com/oslokommune/ok/compare/v4.3.0...v4.3.1) (2024-10-29)
+
+
+### Bug Fixes
+
+* Fix bug on missing line feed on last line ([ef5cb90](https://github.com/oslokommune/ok/commit/ef5cb90487a3ff7811e07e3b0ff7138edaab325c))
+
 ## [4.3.0](https://github.com/oslokommune/ok/compare/v4.2.0...v4.3.0) (2024-10-25)
 
 

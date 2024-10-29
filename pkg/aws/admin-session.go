@@ -208,6 +208,7 @@ func startWorkingShell(awsProfile string) error {
 func startZshWorkingShell(awsProfile string) error {
 	setup := "mkdir -p /tmp/zsh-sso-admin-session;" +
 		"find $HOME -type f -maxdepth 1 -name \".zsh*\" | xargs -I {} cp {} /tmp/zsh-sso-admin-session;" +
+		"echo >> /tmp/zsh-sso-admin-session/.zshrc;" +
 		"echo 'export AWS_PROFILE=" + awsProfile + "' >> /tmp/zsh-sso-admin-session/.zshrc;" +
 		"echo 'export PROMPT=\"%F{red}SSO-Admin-Session%f (${AWS_PROFILE}) %~ $ \"' >> /tmp/zsh-sso-admin-session/.zshrc"
 	cmd := exec.Command(os.Getenv("SHELL"), "-c", setup)
@@ -230,6 +231,7 @@ func startZshWorkingShell(awsProfile string) error {
 func startBashWorkingShell(awsProfile string) error {
 	setup := "mkdir -p /tmp/bash-sso-admin-session;" +
 		"find $HOME -type f -maxdepth 1 -name \".bashrc\" | xargs -I {} cp {} /tmp/bash-sso-admin-session;" +
+		"echo >> /tmp/bash-sso-admin-session/.bashrc;" +
 		"echo 'export AWS_PROFILE=" + awsProfile + "' >> /tmp/bash-sso-admin-session/.bashrc;" +
 		"echo 'export PS1=\"\\e[31m\\]SSO-Admin-Session\\e[0m\\] (${AWS_PROFILE}) \\w $ \"' >> /tmp/bash-sso-admin-session/.bashrc"
 	cmd := exec.Command(os.Getenv("SHELL"), "-c", setup)

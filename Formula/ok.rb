@@ -5,12 +5,12 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "4.3.0"
+  version "4.3.1"
 
   on_macos do
     on_intel do
-      url "https://github.com/oslokommune/ok/releases/download/v4.3.0/ok_4.3.0_darwin_amd64.tar.gz"
-      sha256 "861808f19c2ad11ab9c1694aa57d26264b52f0529bbf2b77ff7e726c0cdede74"
+      url "https://github.com/oslokommune/ok/releases/download/v4.3.1/ok_4.3.1_darwin_amd64.tar.gz"
+      sha256 "0881b4163203a92a4d89ba29d0a795b99e30aa3872962c4d0e20c8b2035df370"
 
       def install
         bin.install "ok"
@@ -20,8 +20,8 @@ class Ok < Formula
       end
     end
     on_arm do
-      url "https://github.com/oslokommune/ok/releases/download/v4.3.0/ok_4.3.0_darwin_arm64.tar.gz"
-      sha256 "facf7e83c8f0bdccdc3b8f715f0da92d7090472196b18e4ad0f5407e5da86bd9"
+      url "https://github.com/oslokommune/ok/releases/download/v4.3.1/ok_4.3.1_darwin_arm64.tar.gz"
+      sha256 "cc0b54b67e7a9d436efda8eec0059628595acb52941022f60e7fccd07cfd5c94"
 
       def install
         bin.install "ok"
@@ -35,8 +35,8 @@ class Ok < Formula
   on_linux do
     on_intel do
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v4.3.0/ok_4.3.0_linux_amd64.tar.gz"
-        sha256 "21e5937b02c2d1224758c80225d6153b62342a4c83e9f491b98dd9331a714d5f"
+        url "https://github.com/oslokommune/ok/releases/download/v4.3.1/ok_4.3.1_linux_amd64.tar.gz"
+        sha256 "63bd863f9138a013f028d72d343a207210b519663a594dfbae038b1db68e8c74"
 
         def install
           bin.install "ok"
@@ -48,8 +48,8 @@ class Ok < Formula
     end
     on_arm do
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v4.3.0/ok_4.3.0_linux_arm64.tar.gz"
-        sha256 "c71546304423ca1b40bd8ca8df58c965f270c4fc25a92d7dd5b3a9da8b5c44e2"
+        url "https://github.com/oslokommune/ok/releases/download/v4.3.1/ok_4.3.1_linux_arm64.tar.gz"
+        sha256 "c028605303b372971cbee9dc26e9c167f305df967ca257b0bf66447ee973eca2"
 
         def install
           bin.install "ok"

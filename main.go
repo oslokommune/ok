@@ -14,6 +14,7 @@ var (
 )
 
 func main() {
+
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 
 	cmd.VersionData = cmd.Version{

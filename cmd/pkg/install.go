@@ -28,10 +28,10 @@ If no arguments are used, the command installs all the packages specified in the
 If one or more output folders are specified, the command installs only the packages whose OutputFolder matches the specified folders. (OutputFolder is a field in the package manifest file.)
 
 Set the environment variable BASE_URL to specify where package templates are downloaded from.
-
-Examples:
-ok install networking
-ok install networking my-app
+`,
+	Example: `ok pkg install networking
+ok pkg install networking my-app
+BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 `,
 	ValidArgsFunction: installTabCompletion,
 	SilenceErrors:     true,
@@ -51,16 +51,13 @@ ok install networking my-app
 		switch {
 		case len(outputFolders) > 0:
 			// Use output folders to determine which packages to install
-			packages, err = install.FindPackagesFromOutputFolders(manifest.Packages, outputFolders)
-			if err != nil {
-				return fmt.Errorf("installing packages: %w", err)
-			}
+			packages = install.FindPackagesFromOutputFolders(manifest.Packages, outputFolders)
 
 		case flagInstallInteractive:
 			// Use interactive mode to determine which packages to install
 			packages, err = interactive.SelectPackagesToInstall(manifest)
 			if err != nil {
-				return fmt.Errorf("selecting package: %w", err)
+				return fmt.Errorf("selecting packages: %w", err)
 			}
 
 			if len(packages) == 0 {

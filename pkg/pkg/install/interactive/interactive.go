@@ -32,7 +32,7 @@ func SelectPackagesToInstall(manifest common.PackageManifest) ([]common.Package,
 		Limit(4).
 		Value(&selectedPackageKeys)
 
-	err = huh.NewForm(huh.NewGroup(s)).Run()
+	err := huh.NewForm(huh.NewGroup(s)).Run()
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return []common.Package{}, nil

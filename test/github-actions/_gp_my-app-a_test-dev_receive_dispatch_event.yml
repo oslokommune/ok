@@ -1,0 +1,89 @@
+# DO NOT EDIT: Changes here will be overwritten by Boilerplate; NEVER EDIT MANUALLY
+# This file is part of the Golden Path. You can find the exact version in .boilerplate/_template_<name>.json.
+name: my-app-a - test-dev - Receive dispatch event and commit image tag 🛬
+run-name: my-app-a - test-dev - Received Docker image update dispatch event 🛬
+
+permissions: {}
+
+on:
+  repository_dispatch:
+    types: [test-dev-my-app-a-image-tag-update]
+
+concurrency:
+  group: avoid-git-push-conflicts
+  cancel-in-progress: false
+
+jobs:
+  update-app-image-tag:
+    name: Update image tag and commit to main (or PR)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: stacks/prod/app-my-app-a
+
+    steps:
+
+
+      - name: Import okctl-bot GPG key
+        id: gpg
+        uses: crazy-max/ghaction-import-gpg@01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4 # v6.1.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY_FOR_MACHINE_USER }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE_FOR_MACHINE_USER }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_config_global: true
+
+      - name: Checkout
+        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+        with:
+          token: ${{ secrets.PAT_ON_MACHINE_USER_FOR_IMAGE_UPDATE }}
+          persist-credentials: true
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stacks/prod/app-my-app-a/__gp_config_app_image.auto.tfvars.json
+          show-progress: 'false'
+
+
+      - name: Write receive summary
+        env:
+          SENDER_REPOSITORY: ${{ github.event.client_payload.sender_repository }}
+          SENDER_RUN_ID: ${{ github.event.client_payload.sender_run_id }}
+          SENDER_BEFORE_SHA: ${{ github.event.client_payload.sender_before_sha }}
+          SENDER_AFTER_SHA: ${{ github.event.client_payload.sender_after_sha }}
+        run: |
+          echo "Workflow dispatch event received from [\`${SENDER_REPOSITORY}\`](https://github.com/${SENDER_REPOSITORY}/actions/runs/${SENDER_RUN_ID}) ([compare changes](https://github.com/${SENDER_REPOSITORY}/compare/${SENDER_BEFORE_SHA}..${SENDER_AFTER_SHA}))." >> "$GITHUB_STEP_SUMMARY"
+
+
+      - name: Update image tag
+        env:
+          IMAGE_TAG: ${{ github.event.client_payload.image_version }}
+          IMAGE_DIGEST: ${{ github.event.client_payload.image_digest }}
+        run: |
+          jq ".main_container_image_tag = \"$IMAGE_TAG\" | .main_container_image_digest = \"$IMAGE_DIGEST\"" __gp_config_app_image.auto.tfvars.json > t.json
+          mv t.json __gp_config_app_image.auto.tfvars.json
+
+      - name: Commit and push changes
+        env:
+          COMMIT_MESSAGE: "feat: Update app my-app-a image tag in test-dev"
+          IMAGE_METADATA_FILE: __gp_config_app_image.auto.tfvars.json
+          MAX_ATTEMPTS: 3
+        run: |
+          git add "$IMAGE_METADATA_FILE"
+          git commit --gpg-sign -m "$COMMIT_MESSAGE"
+
+          for ((attempt=1; attempt<=$MAX_ATTEMPTS; attempt++)); do
+            echo "Attempt $attempt of $MAX_ATTEMPTS"
+            if git push; then
+              echo "Push successful"
+              exit 0
+            else
+              echo "Push failed. Retrying..."
+              git pull --rebase
+            fi
+          done
+
+          echo "Max attempts reached. Push failed." >&2
+          exit 1

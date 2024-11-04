@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"strings"
 )
 
 type PackageManifest struct {
@@ -47,4 +48,9 @@ func (pm *PackageManifest) PackageOutputFolder(outputFolder string) string {
 
 func (p Package) String() string {
 	return fmt.Sprintf("%s (%s)", p.OutputFolder, p.Ref)
+}
+
+// Key returns a unique key for the package
+func (p Package) Key() string {
+	return fmt.Sprintf("outputFolder:%s___Template:%s___Ref:%s___VarFiles:%s", p.OutputFolder, p.Template, p.Ref, strings.Join(p.VarFiles, ","))
 }

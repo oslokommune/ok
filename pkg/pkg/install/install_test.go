@@ -13,9 +13,9 @@ func TestInstall(t *testing.T) {
 	testCases := []struct {
 		testName                  string
 		packageManifestFilename   string
-		expectBoilerplateCommands []*exec.Cmd
-		outputFolders             []string
+		selectedPackages          []common.Package
 		baseUrl                   string
+		expectBoilerplateCommands []*exec.Cmd
 	}{
 		{
 			testName:                "Should install all packages from packages.yml",
@@ -53,7 +53,8 @@ func TestInstall(t *testing.T) {
 					"--var-file", "config/app-hello.yml",
 				),
 			},
-		}, {
+		},
+		{
 			testName:                "Should support file path in BASE_URL",
 			packageManifestFilename: "package.yml",
 			baseUrl:                 "..",
@@ -71,7 +72,14 @@ func TestInstall(t *testing.T) {
 		{
 			testName:                "Should install package with specified output folder",
 			packageManifestFilename: "packages.yml",
-			outputFolders:           []string{"out/app-hello"},
+			selectedPackages: []common.Package{
+				{
+					OutputFolder: "out/app-hello",
+					Template:     "app",
+					Ref:          "app-v6.1.1",
+					VarFiles:     []string{"config/common-config.yml", "config/app-hello.yml"},
+				},
+			},
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
@@ -107,8 +115,21 @@ func TestInstall(t *testing.T) {
 			inputFile, err := common.GetTestdataFilepath(tc.packageManifestFilename)
 			require.Nil(t, err)
 
+			manifest, err := common.LoadPackageManifest(inputFile)
+			require.Nil(t, err)
+
+			var packages []common.Package
+			if len(tc.selectedPackages) > 0 {
+				packages = tc.selectedPackages
+			} else {
+				packages = manifest.Packages
+			}
+
 			// When
-			cmds, err := CreateBoilerplateCommands(inputFile, tc.outputFolders, tc.baseUrl)
+			cmds, err := CreateBoilerplateCommands(packages, CreateBoilerPlateCommandsOpts{
+				PackagePathPrefix: manifest.PackagePrefix(),
+				BaseUrlOrPath:     tc.baseUrl,
+			})
 
 			// Then
 			assert.Nil(t, err)
@@ -116,8 +137,9 @@ func TestInstall(t *testing.T) {
 			for i, cmd := range cmds {
 				assert.Equal(t, cmd.Path, tc.expectBoilerplateCommands[i].Path)
 				assert.Equal(t,
+					strings.Join(tc.expectBoilerplateCommands[i].Args, ","),
 					strings.Join(cmd.Args, ","),
-					strings.Join(tc.expectBoilerplateCommands[i].Args, ","))
+				)
 			}
 
 			assert.Equal(t, len(cmds), len(tc.expectBoilerplateCommands))
@@ -161,65 +183,6 @@ func TestIsUrl(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := isUrl(tt.input)
-			require.Equal(t, tt.expected, result)
-		})
-	}
-}
-
-func TestFilterPackages(t *testing.T) {
-	tests := []struct {
-		name          string
-		packages      []common.Package
-		outputFolders []string
-		expected      []common.Package
-	}{
-		{
-			name: "no output folders specified",
-			packages: []common.Package{
-				{OutputFolder: "out/folder1"},
-				{OutputFolder: "out/folder2"},
-			},
-			outputFolders: []string{},
-			expected:      []common.Package{},
-		},
-		{
-			name: "single output folder specified",
-			packages: []common.Package{
-				{OutputFolder: "out/folder1"},
-				{OutputFolder: "out/folder2"},
-			},
-			outputFolders: []string{"out/folder1"},
-			expected: []common.Package{
-				{OutputFolder: "out/folder1"},
-			},
-		},
-		{
-			name: "multiple output folders specified",
-			packages: []common.Package{
-				{OutputFolder: "out/folder1"},
-				{OutputFolder: "out/folder2"},
-				{OutputFolder: "out/folder3"},
-			},
-			outputFolders: []string{"out/folder1", "out/folder3"},
-			expected: []common.Package{
-				{OutputFolder: "out/folder1"},
-				{OutputFolder: "out/folder3"},
-			},
-		},
-		{
-			name: "no matching output folders",
-			packages: []common.Package{
-				{OutputFolder: "out/folder1"},
-				{OutputFolder: "out/folder2"},
-			},
-			outputFolders: []string{"out/folder3"},
-			expected:      []common.Package{},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := filterPackages(tt.packages, tt.outputFolders)
 			require.Equal(t, tt.expected, result)
 		})
 	}

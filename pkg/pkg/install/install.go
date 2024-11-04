@@ -10,10 +10,13 @@ import (
 	"strings"
 )
 
-func Run(pkgManifestFilename string, outputFolders []string) error {
-	baseUrlOrPath := os.Getenv("BASE_URL")
+// Run runs Boilerplate for the specified packages.
+func Run(manifest common.PackageManifest, packages []common.Package) error {
+	cmds, err := CreateBoilerplateCommands(packages, CreateBoilerPlateCommandsOpts{
+		PackagePathPrefix: manifest.PackagePrefix(),
+		BaseUrlOrPath:     os.Getenv("BASE_URL"),
+	})
 
-	cmds, err := CreateBoilerplateCommands(pkgManifestFilename, outputFolders, baseUrlOrPath)
 	if err != nil {
 		return fmt.Errorf("creating boilerplate command: %w", err)
 	}
@@ -59,63 +62,23 @@ func createPrettyCmdString(cmd *exec.Cmd) string {
 	return cmdString
 }
 
-func CreateBoilerplateCommands(pkgManifestFilename string, outputFolders []string, baseUrlOrPath string) ([]*exec.Cmd, error) {
-	fmt.Println("Installing packages...")
-
-	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
-	if err != nil {
-		return nil, fmt.Errorf("loading package manifest: %w", err)
-	}
-
-	// Filter packages based on output folders
-	packagesToInstall := make([]common.Package, 0)
-	if len(outputFolders) == 0 {
-		packagesToInstall = manifest.Packages
-	} else {
-		packagesToInstall = filterPackages(manifest.Packages, outputFolders)
-	}
-
-	// Install packages
-	cmds, err := createBoilerPlateCommands(packagesToInstall, manifest.PackagePrefix(), baseUrlOrPath)
-	if err != nil {
-		return nil, fmt.Errorf("creating boilerplate commands: %w", err)
-	}
-
-	return cmds, nil
-}
-
-func filterPackages(packages []common.Package, outputFolders []string) []common.Package {
-	result := make([]common.Package, 0)
+// CreateBoilerplateCommands create Boilerplate commands for the specified packages.
+func CreateBoilerplateCommands(packages []common.Package, opts CreateBoilerPlateCommandsOpts) ([]*exec.Cmd, error) {
+	var cmds []*exec.Cmd
 
 	for _, pkg := range packages {
-		for _, outputFolder := range outputFolders {
-
-			if pkg.OutputFolder == outputFolder {
-				result = append(result, pkg)
-				break
-			}
-
-		}
-	}
-
-	return result
-}
-
-func createBoilerPlateCommands(packagesToInstall []common.Package, packagePathPrefix string, baseUrlOrPath string) ([]*exec.Cmd, error) {
-	var cmds []*exec.Cmd
-	for _, pkg := range packagesToInstall {
-		if baseUrlOrPath == "" {
-			baseUrlOrPath = common.DefaultBaseUrl
+		if opts.BaseUrlOrPath == "" {
+			opts.BaseUrlOrPath = common.DefaultBaseUrl
 		}
 
 		var templateURL string
-		if isUrl(baseUrlOrPath) {
+		if isUrl(opts.BaseUrlOrPath) {
 			pathz := strings.Join(
-				[]string{packagePathPrefix, pkg.Template}, "/")
+				[]string{opts.PackagePathPrefix, pkg.Template}, "/")
 
-			templateURL = fmt.Sprintf("%s%s?ref=%s", baseUrlOrPath, pathz, pkg.Ref)
+			templateURL = fmt.Sprintf("%s%s?ref=%s", opts.BaseUrlOrPath, pathz, pkg.Ref)
 		} else {
-			templateURL = path.Join(baseUrlOrPath, packagePathPrefix, pkg.Template)
+			templateURL = path.Join(opts.BaseUrlOrPath, opts.PackagePathPrefix, pkg.Template)
 		}
 
 		cmdArgs := []string{
@@ -139,4 +102,9 @@ func isUrl(str string) bool {
 	return strings.HasPrefix(str, "http://") ||
 		strings.HasPrefix(str, "https://") ||
 		strings.HasPrefix(str, "git@")
+}
+
+type CreateBoilerPlateCommandsOpts struct {
+	PackagePathPrefix string
+	BaseUrlOrPath     string
 }

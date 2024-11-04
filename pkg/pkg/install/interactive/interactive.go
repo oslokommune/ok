@@ -7,34 +7,53 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/common"
 )
 
-func SelectPackagesToInstall(pkgManifestFilename string) ([]string, error) {
-	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
-	if err != nil {
-		return []string{}, fmt.Errorf("loading package manifest: %w", err)
-	}
+const (
+	outputFolderWidth = 45
+	templateWidth     = 40
+	varFilesWidth     = 80
+)
 
+func SelectPackagesToInstall(manifest common.PackageManifest) ([]common.Package, error) {
 	options := make([]huh.Option[string], 0)
+	packageMap := make(map[string]common.Package)
 
-	for _, p := range manifest.Packages {
-		options = append(options, huh.NewOption(p.OutputFolder, p.OutputFolder))
+	for _, pkg := range manifest.Packages {
+		displayText := createDisplayText(pkg)
+
+		options = append(options, huh.NewOption[string](displayText, pkg.Key()))
+		packageMap[pkg.Key()] = pkg
 	}
 
-	var packages []string
+	var selectedPackageKeys []string
 
 	s := huh.NewMultiSelect[string]().
 		Options(options...).
 		Title("Select package(s) to install").
 		Limit(4).
-		Value(&packages)
+		Value(&selectedPackageKeys)
 
 	err = huh.NewForm(huh.NewGroup(s)).Run()
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
-			return []string{}, nil
+			return []common.Package{}, nil
 		} else {
-			return []string{}, fmt.Errorf("running multi select form: %w", err)
+			return []common.Package{}, fmt.Errorf("running multi select form: %w", err)
 		}
 	}
 
-	return packages, nil
+	var selectedPackages []common.Package
+	for _, key := range selectedPackageKeys {
+		pkg := packageMap[key]
+		selectedPackages = append(selectedPackages, pkg)
+	}
+
+	return selectedPackages, nil
+}
+
+func createDisplayText(pkg common.Package) string {
+	outputFolder := fmt.Sprintf("%-*.*s", outputFolderWidth, outputFolderWidth, pkg.OutputFolder)
+	template := fmt.Sprintf("%-*.*s", templateWidth, templateWidth, pkg.Template)
+	varFiles := fmt.Sprintf("%-*.*s", varFilesWidth, varFilesWidth, fmt.Sprint(pkg.VarFiles))
+
+	return fmt.Sprintf("%s %s %s", outputFolder, template, varFiles)
 }

@@ -28,10 +28,10 @@ If no arguments are used, the command installs all the packages specified in the
 If one or more output folders are specified, the command installs only the packages whose OutputFolder matches the specified folders. (OutputFolder is a field in the package manifest file.)
 
 Set the environment variable BASE_URL to specify where package templates are downloaded from.
-`,
-	Example: `ok pkg install networking
-ok pkg install networking my-app
-BASE_URL=../boilerplate/terraform ok pkg install networking my-app
+
+Examples:
+ok install networking
+ok install networking my-app
 `,
 	ValidArgsFunction: installTabCompletion,
 	SilenceErrors:     true,
@@ -40,21 +40,39 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 			return fmt.Errorf("cannot use both --interactive and outputFolder arguments")
 		}
 
-		if flagInstallInteractive {
-			selectedOutputFolders, err := interactive.SelectPackagesToInstall(common.PackagesManifestFilename)
+		var packages []common.Package
+		var err error
+
+		manifest, err := common.LoadPackageManifest(common.PackagesManifestFilename)
+		if err != nil {
+			return fmt.Errorf("loading package manifest: %w", err)
+		}
+
+		switch {
+		case len(outputFolders) > 0:
+			// Use output folders to determine which packages to install
+			packages, err = install.FindPackagesFromOutputFolders(manifest.Packages, outputFolders)
+			if err != nil {
+				return fmt.Errorf("installing packages: %w", err)
+			}
+
+		case flagInstallInteractive:
+			// Use interactive mode to determine which packages to install
+			packages, err = interactive.SelectPackagesToInstall(manifest)
 			if err != nil {
 				return fmt.Errorf("selecting package: %w", err)
 			}
 
-			if len(selectedOutputFolders) == 0 {
+			if len(packages) == 0 {
 				fmt.Println("No packages selected. Remember to use space (or x) to select package(s) to install.")
 				return nil
 			}
 
-			outputFolders = selectedOutputFolders
+		default:
+			packages = manifest.Packages
 		}
 
-		err := install.Run(common.PackagesManifestFilename, outputFolders)
+		err = install.Run(manifest, packages)
 		if err != nil {
 			return fmt.Errorf("installing packages: %w", err)
 		}

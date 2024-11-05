@@ -11,3 +11,9 @@ Packages:
     VarFiles:
       - "config/common-config.yml"
       - "config/networking.yml"
+  - Template: "networking"
+    Ref: "main"
+    OutputFolder: "out/networking2"
+    VarFiles:
+      - "config/common-config.yml"
+      - "config/networking.yml"

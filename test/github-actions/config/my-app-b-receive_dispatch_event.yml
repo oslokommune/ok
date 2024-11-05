@@ -1,0 +1,5 @@
+AppName: "my-app-b"
+CreatePr: false
+GpgSign: true
+WorkingDirectory: "stacks/prod/app-{{ .AppName }}"
+ImageMetadataFile: "__gp_config_app_image.auto.tfvars.json"

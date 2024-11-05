@@ -13,11 +13,10 @@ var EcsExecCommand = &cobra.Command{
 	Short: "Get a shell to a running ECS task",
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cluster, err := aws.Exec()
+		_, err := aws.Exec()
 		if err != nil {
 			return fmt.Errorf("list clusters: %w", err)
 		}
-		fmt.Println("Selected cluster: ", cluster)
 		return nil
 	},
 }

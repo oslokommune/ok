@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.4.1](https://github.com/oslokommune/ok/compare/v4.4.0...v4.4.1) (2024-11-05)
+
+
+### Bug Fixes
+
+* output command to connect to ECS task instead of trying to execute it in go-code ([#288](https://github.com/oslokommune/ok/issues/288)) ([a4b1bcf](https://github.com/oslokommune/ok/commit/a4b1bcfd5a8d8effa4e01877d29f259a015a2dad))
+
 ## [4.4.0](https://github.com/oslokommune/ok/compare/v4.3.1...v4.4.0) (2024-11-05)
 
 

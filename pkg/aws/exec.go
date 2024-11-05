@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
@@ -90,27 +88,14 @@ func getTaskDetails(clusterName, taskId string) (*types.Task, error) {
 	return &result.Tasks[0], nil
 }
 
-func executeCommand(clusterName, taskId, containerName string) error {
-	cfg, err := config.LoadDefaultConfig(context.Background())
-	if err != nil {
-		return fmt.Errorf("error loading configuration: %w", err)
-	}
-
-	ecsSvc := ecs.NewFromConfig(cfg)
-
-	input := &ecs.ExecuteCommandInput{
-		Cluster:     &clusterName,
-		Task:        &taskId,
-		Container:   &containerName,
-		Interactive: true,
-		Command:     aws.String("/bin/sh"),
-	}
-
-	_, err = ecsSvc.ExecuteCommand(context.TODO(), input)
-	if err != nil {
-		return fmt.Errorf("error executing command: %w", err)
-	}
-
+func outputExecuteCommand(clusterName, taskId, containerName string) error {
+	fmt.Printf(">> To execute command on the container, run the following:\n\n")
+	fmt.Printf("aws ecs execute-command ")
+	fmt.Printf("--cluster %s ", clusterName)
+	fmt.Printf("--task %s ", taskId)
+	fmt.Printf("--container %s ", containerName)
+	fmt.Printf("--command \"/bin/sh\" ")
+	fmt.Print("--interactive\n")
 	return nil
 }
 
@@ -160,6 +145,7 @@ func Exec() (string, error) {
 		Value(&service)
 
 	err = huh.NewForm(huh.NewGroup(serviceSelect)).Run()
+
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
@@ -216,11 +202,6 @@ func Exec() (string, error) {
 		}
 	}
 
-	fmt.Println("Executing command. Press Ctrl+C to exit.")
-	err = executeCommand(cluster, task, container)
-	if err != nil {
-		return "", fmt.Errorf("executing command: %w", err)
-	}
-
-	return fmt.Sprintf("Command executed on Cluster: %s, Task: %s, Container: %s", cluster, task, container), nil
+	outputExecuteCommand(cluster, task, container)
+	return "", nil
 }

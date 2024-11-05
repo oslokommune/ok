@@ -8,6 +8,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/magefile/mage/sh"
+	"strings"
 )
 
 func listClusters() ([]string, error) {
@@ -89,13 +92,22 @@ func getTaskDetails(clusterName, taskId string) (*types.Task, error) {
 }
 
 func outputExecuteCommand(clusterName, taskId, containerName string) error {
-	fmt.Printf(">> To execute command on the container, run the following:\n\n")
-	fmt.Printf("aws ecs execute-command ")
-	fmt.Printf("--cluster %s ", clusterName)
-	fmt.Printf("--task %s ", taskId)
-	fmt.Printf("--container %s ", containerName)
-	fmt.Printf("--command \"/bin/sh\" ")
-	fmt.Print("--interactive\n")
+	combinedArgs := []string{
+		"ecs",
+		"execute-command",
+		"--cluster", clusterName,
+		"--task", taskId,
+		"--container", containerName,
+		"--command", "/bin/sh",
+		"--interactive",
+	}
+	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+	fmt.Println("------------------------------------------------------------------------------------------")
+	fmt.Println("Running aws command:")
+	fmt.Println(green.Render("aws " + strings.Join(combinedArgs, " ")))
+	fmt.Println("------------------------------------------------------------------------------------------")
+
+	_ = sh.RunV("aws", combinedArgs...)
 	return nil
 }
 

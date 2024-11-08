@@ -25,7 +25,7 @@ func Run(pkgManifestFilename string, packages []common.Package, updateSchemaConf
 		return fmt.Errorf("failed getting latest github releases: %w", err)
 	}
 
-	updatedPackages, err := updatePackages(packages, latestReleases)
+	updatedPackages, err := updatePackages(packages, latestReleases, manifest)
 	if err != nil {
 		return fmt.Errorf("updating packages: %w", err)
 	}
@@ -36,7 +36,7 @@ func Run(pkgManifestFilename string, packages []common.Package, updateSchemaConf
 	}
 
 	if updateSchemaConfig {
-		err = updateSchemaConfig(context.Background(), updatedPackages, manifest, latestReleases)
+		err = updateSchemaConfiguration(context.Background(), updatedPackages, manifest, latestReleases)
 		if err != nil {
 			return err
 		}
@@ -45,27 +45,41 @@ func Run(pkgManifestFilename string, packages []common.Package, updateSchemaConf
 	return nil
 }
 
-func updatePackages(packages []common.Package, latestReleases map[string]string) ([]common.Package, error) {
-	updatedPackages := make([]common.Package, 0, len(packages))
+// TODO: move to common place.
+func containsPackage(packages []common.Package, pkg common.Package) bool {
+	for _, p := range packages {
+		if p.Key() == pkg.Key() {
+			return true
+		}
+	}
+	return false
+}
 
-	for _, pkg := range packages {
-		latestRelease, ok := latestReleases[pkg.Template]
-		if !ok {
-			return nil, fmt.Errorf("no latest release found for package: %s", pkg.Template)
+func updatePackages(packagestoUpdate []common.Package, latestReleases map[string]string, manifest common.PackageManifest) ([]common.Package, error) {
+	updatedPackages := make([]common.Package, 0, len(packagestoUpdate))
+
+	for _, manifestPkg := range manifest.Packages {
+		if !containsPackage(packagestoUpdate, manifestPkg) {
+			continue
 		}
 
-		newRef := fmt.Sprintf("%s-%s", pkg.Template, latestRelease)
+		latestRelease, ok := latestReleases[manifestPkg.Template] // e.g. v2.1.3
+		if !ok {
+			return nil, fmt.Errorf("no latest release found for package: %s", manifestPkg.Template)
+		}
 
-		if pkg.Ref != newRef {
-			pkg.Ref = newRef
-			updatedPackages = append(updatedPackages, pkg)
+		newRef := fmt.Sprintf("%s-%s", manifestPkg.Template, latestRelease) // e.g. app-v2.1.3
+
+		if manifestPkg.Ref != newRef {
+			manifestPkg.Ref = newRef
+			updatedPackages = append(updatedPackages, manifestPkg)
 		}
 	}
 
 	return updatedPackages, nil
 }
 
-func updateSchemaConfig(ctx context.Context, updatedPackages []common.Package, manifest common.PackageManifest, latestReleases map[string]string) error {
+func updateSchemaConfiguration(ctx context.Context, updatedPackages []common.Package, manifest common.PackageManifest, latestReleases map[string]string) error {
 	gh, err := githubreleases.GetGitHubClient()
 	if err != nil {
 		return fmt.Errorf("getting GitHub client: %w", err)

@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/install"
+	"os"
 	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
@@ -21,19 +23,38 @@ If no package name is provided, all packages will be updated.`,
   ok pkg update my-package`,
 	Args:              cobra.MaximumNArgs(1),
 	ValidArgsFunction: updateTabCompletion,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		var packageName string
-		if len(args) == 1 {
-			packageName = args[0]
-		}
+	RunE: func(cmd *cobra.Command, outputFolders []string) error {
+		var packages []common.Package
+		var err error
 
-		err := update.Run(common.PackagesManifestFilename, packageName, flagUpdateCommandUpdateSchema)
+		manifest, err := common.LoadPackageManifest(common.PackagesManifestFilename)
 		if err != nil {
-			return err
+			return fmt.Errorf("loading package manifest: %w", err)
 		}
 
-		if packageName != "" {
-			fmt.Printf("Updated package: %s\n", packageName)
+		// Select packages
+		switch {
+		case len(outputFolders) > 0:
+			// Use output folders to determine which packages to install
+			pkg, err := install.FindPackageFromOutputFolders(manifest.Packages, outputFolders)
+			if err != nil {
+				_, _ = fmt.Fprintln(os.Stderr, "No package found")
+				os.Exit(1)
+			}
+
+			packages = []common.Package{pkg}
+
+		default:
+			packages = manifest.Packages
+		}
+
+		err = update.Run(common.PackagesManifestFilename, packages, flagUpdateCommandUpdateSchema)
+		if err != nil {
+			return fmt.Errorf("updating packages: %w", err)
+		}
+
+		if len(packages) == 1 {
+			fmt.Printf("Updated package: %s\n", packages[0].OutputFolder)
 		} else {
 			fmt.Println("Updated all packages")
 		}

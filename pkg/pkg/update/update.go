@@ -11,7 +11,7 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
-func Run(pkgManifestFilename string, packageName string, updateConfigSchema bool) error {
+func Run(pkgManifestFilename string, packages []common.Package, updateSchemaConfig bool) error {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
 		return fmt.Errorf("loading package manifest: %w", err)
@@ -25,9 +25,9 @@ func Run(pkgManifestFilename string, packageName string, updateConfigSchema bool
 		return fmt.Errorf("failed getting latest github releases: %w", err)
 	}
 
-	updatedPackagesList, err := updatedPackages(manifest, packageName, latestReleases)
+	updatedPackages, err := updatePackages(packages, latestReleases)
 	if err != nil {
-		return err
+		return fmt.Errorf("updating packages: %w", err)
 	}
 
 	err = common.SavePackageManifest(pkgManifestFilename, manifest)
@@ -35,8 +35,8 @@ func Run(pkgManifestFilename string, packageName string, updateConfigSchema bool
 		return fmt.Errorf("saving package manifest: %w", err)
 	}
 
-	if updateConfigSchema {
-		err = updateSchemaConfig(context.Background(), updatedPackagesList, manifest, latestReleases)
+	if updateSchemaConfig {
+		err = updateSchemaConfig(context.Background(), updatedPackages, manifest, latestReleases)
 		if err != nil {
 			return err
 		}
@@ -45,55 +45,24 @@ func Run(pkgManifestFilename string, packageName string, updateConfigSchema bool
 	return nil
 }
 
-func updatedPackages(manifest common.PackageManifest, packageName string, latestReleases map[string]string) ([]common.Package, error) {
-	updatedPackagesList := make([]common.Package, 0, len(manifest.Packages))
+func updatePackages(packages []common.Package, latestReleases map[string]string) ([]common.Package, error) {
+	updatedPackages := make([]common.Package, 0, len(packages))
 
-	if packageName != "" {
-		updated, err := updateSpecificPackage(manifest, packageName, latestReleases, &updatedPackagesList)
-		if err != nil {
-			return nil, err
+	for _, pkg := range packages {
+		latestRelease, ok := latestReleases[pkg.Template]
+		if !ok {
+			return nil, fmt.Errorf("no latest release found for package: %s", pkg.Template)
 		}
-		if !updated {
-			return nil, fmt.Errorf("package not found: %s", packageName)
-		}
-	} else {
-		for i, pkg := range manifest.Packages {
-			latestRelease, ok := latestReleases[pkg.Template]
-			if !ok {
-				return nil, fmt.Errorf("no latest release found for package: %s", pkg.Template)
-			}
-			newRef := fmt.Sprintf("%s-%s", pkg.Template, latestRelease)
-			if manifest.Packages[i].Ref != newRef {
-				manifest.Packages[i].Ref = newRef
-				updatedPackagesList = append(updatedPackagesList, manifest.Packages[i])
-			}
+
+		newRef := fmt.Sprintf("%s-%s", pkg.Template, latestRelease)
+
+		if pkg.Ref != newRef {
+			pkg.Ref = newRef
+			updatedPackages = append(updatedPackages, pkg)
 		}
 	}
 
-	return updatedPackagesList, nil
-}
-
-func updateSpecificPackage(manifest common.PackageManifest, packageName string, latestReleases map[string]string, updatedPackages *[]common.Package) (bool, error) {
-	updated := false
-	for i, pkg := range manifest.Packages {
-		if pkg.OutputFolder == packageName {
-			latestRelease, ok := latestReleases[pkg.Template]
-			if !ok {
-				return false, fmt.Errorf("no latest release found for package: %s", packageName)
-			}
-			newRef := fmt.Sprintf("%s-%s", pkg.Template, latestRelease)
-			if manifest.Packages[i].Ref != newRef {
-				manifest.Packages[i].Ref = newRef
-				*updatedPackages = append(*updatedPackages, manifest.Packages[i])
-			}
-			updated = true
-
-			if manifest.PackagePrefix() != common.BoilerplatePackageGitHubActionsPath {
-				break
-			}
-		}
-	}
-	return updated, nil
+	return updatedPackages, nil
 }
 
 func updateSchemaConfig(ctx context.Context, updatedPackages []common.Package, manifest common.PackageManifest, latestReleases map[string]string) error {

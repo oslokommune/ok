@@ -48,10 +48,11 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 			return fmt.Errorf("loading package manifest: %w", err)
 		}
 
+		// Select packages
 		switch {
 		case len(outputFolders) > 0:
 			// Use output folders to determine which packages to install
-			packages = install.FindPackagesFromOutputFolders(manifest.Packages, outputFolders)
+			packages = install.FindPackageFromOutputFolders(manifest.Packages, outputFolders)
 
 		case flagInstallInteractive:
 			// Use interactive mode to determine which packages to install

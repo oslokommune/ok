@@ -85,7 +85,7 @@ func TestUpdatedPackages(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := updatedPackages(tt.manifest, tt.packageName, tt.latestReleases)
+			result, err := updatePackages(tt.manifest, tt.packageName, tt.latestReleases)
 			if tt.expectError {
 				require.Error(t, err)
 			} else {
@@ -160,7 +160,7 @@ func TestUpdateSpecificPackage(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			updatedPackages := []common.Package{}
-			updated, err := updateSpecificPackage(tt.manifest, tt.packageName, tt.latestReleases, &updatedPackages)
+			updated, err := updatePackage(tt.manifest, tt.packageName, tt.latestReleases, &updatedPackages)
 			if tt.expectError {
 				require.Error(t, err)
 			} else {

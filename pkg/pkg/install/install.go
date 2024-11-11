@@ -11,8 +11,8 @@ import (
 )
 
 // Run runs Boilerplate for the specified packages.
-func Run(manifest common.PackageManifest, packages []common.Package) error {
-	cmds, err := CreateBoilerplateCommands(packages, CreateBoilerPlateCommandsOpts{
+func Run(packagesToInstall []common.Package, manifest common.PackageManifest) error {
+	cmds, err := CreateBoilerplateCommands(packagesToInstall, CreateBoilerPlateCommandsOpts{
 		PackagePathPrefix: manifest.PackagePrefix(),
 		BaseUrlOrPath:     os.Getenv("BASE_URL"),
 	})
@@ -32,6 +32,8 @@ func Run(manifest common.PackageManifest, packages []common.Package) error {
 			return fmt.Errorf("running boilerplate command: %w", err)
 		}
 	}
+
+	common.PrintProcessedPackages(packagesToInstall, "installed")
 
 	return nil
 }

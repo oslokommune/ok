@@ -42,6 +42,8 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, updateSc
 		}
 	}
 
+	common.PrintProcessedPackages(packagesToUpdate, "updated")
+
 	return nil
 }
 
@@ -83,8 +85,10 @@ func updateSchemaConfiguration(ctx context.Context, updatedPackages []common.Pac
 		if !ok {
 			continue
 		}
+
 		downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, newRef)
 		stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), pkg.Template)
+
 		generatedSchema, err := schema.GenerateJsonSchemaForApp(ctx, downloader, stackPath, newRef)
 		if err != nil {
 			return fmt.Errorf("generating json schema for app: %w", err)

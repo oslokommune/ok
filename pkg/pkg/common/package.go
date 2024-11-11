@@ -5,6 +5,12 @@ import (
 	"strings"
 )
 
+const (
+	outputFolderWidth = 45
+	templateWidth     = 40
+	varFilesWidth     = 80
+)
+
 type Package struct {
 	OutputFolder string   `yaml:"OutputFolder"`
 	Template     string   `yaml:"Template"`
@@ -13,7 +19,11 @@ type Package struct {
 }
 
 func (p Package) String() string {
-	return fmt.Sprintf("%s (%s)", p.OutputFolder, p.Ref)
+	outputFolder := fmt.Sprintf("%-*.*s", outputFolderWidth, outputFolderWidth, p.OutputFolder)
+	template := fmt.Sprintf("%-*.*s", templateWidth, templateWidth, p.Template)
+	varFiles := fmt.Sprintf("%-*.*s", varFilesWidth, varFilesWidth, fmt.Sprint(p.VarFiles))
+
+	return fmt.Sprintf("%s %s %s", outputFolder, template, varFiles)
 }
 
 // Key returns a unique key for the package
@@ -27,5 +37,6 @@ func ContainsPackage(packages []Package, pkg Package) bool {
 			return true
 		}
 	}
+
 	return false
 }

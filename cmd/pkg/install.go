@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -52,7 +53,15 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 		switch {
 		case len(outputFolders) > 0:
 			// Use output folders to determine which packages to install
-			packages = install.FindPackageFromOutputFolders(manifest.Packages, outputFolders)
+			p, err := install.FindPackageFromOutputFolders(manifest.Packages, outputFolders)
+			if err != nil && errors.Is(err, install.ErrPackageNotFound) {
+				fmt.Println("No packages found for the specified output folder(s).")
+				return nil
+			} else if err != nil {
+				return fmt.Errorf("finding package: %w", err)
+			}
+
+			packages = []common.Package{p}
 
 		case flagInstallInteractive:
 			// Use interactive mode to determine which packages to install

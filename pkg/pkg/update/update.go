@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/schema"
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config"
 	"os"
 	"strings"
 
@@ -34,6 +35,9 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, updateSc
 	if err != nil {
 		return fmt.Errorf("saving package manifest: %w", err)
 	}
+
+	// TODO feature flag?
+	migrate_config.UpdatePackageConfig(packagesToUpdate)
 
 	if updateSchemaConfig {
 		err = updateSchemaConfiguration(context.Background(), updatedPackages, manifest, latestReleases)

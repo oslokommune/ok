@@ -3,7 +3,6 @@ package pkg
 import (
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/install"
-	"os"
 	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
@@ -36,13 +35,7 @@ If no package name is provided, all packages will be updated.`,
 		switch {
 		case len(outputFolders) > 0:
 			// Use output folders to determine which packages to install
-			pkg, err := install.FindPackageFromOutputFolders(manifest.Packages, outputFolders)
-			if err != nil {
-				_, _ = fmt.Fprintln(os.Stderr, "No package found")
-				os.Exit(1)
-			}
-
-			packages = []common.Package{pkg}
+			packages = install.FindPackagesFromOutputFolders(manifest.Packages, outputFolders)
 
 		default:
 			packages = manifest.Packages

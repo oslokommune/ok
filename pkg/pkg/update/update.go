@@ -11,7 +11,7 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
-func Run(pkgManifestFilename string, packages []common.Package, updateSchemaConfig bool) error {
+func Run(pkgManifestFilename string, packagesToUpdate []common.Package, updateSchemaConfig bool) error {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
 		return fmt.Errorf("loading package manifest: %w", err)
@@ -20,12 +20,12 @@ func Run(pkgManifestFilename string, packages []common.Package, updateSchemaConf
 	latestReleases, err := githubreleases.GetLatestReleases()
 	if err != nil {
 		if strings.Contains(err.Error(), "secret not found in keyring") {
-			fmt.Fprintf(os.Stderr, "%s\n\n", githubreleases.AuthErrorHelpMessage)
+			_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", githubreleases.AuthErrorHelpMessage)
 		}
 		return fmt.Errorf("failed getting latest github releases: %w", err)
 	}
 
-	updatedPackages, err := updatePackages(packages, latestReleases, manifest)
+	updatedPackages, err := updatePackages(packagesToUpdate, latestReleases, manifest)
 	if err != nil {
 		return fmt.Errorf("updating packages: %w", err)
 	}
@@ -45,21 +45,11 @@ func Run(pkgManifestFilename string, packages []common.Package, updateSchemaConf
 	return nil
 }
 
-// TODO: move to common place.
-func containsPackage(packages []common.Package, pkg common.Package) bool {
-	for _, p := range packages {
-		if p.Key() == pkg.Key() {
-			return true
-		}
-	}
-	return false
-}
-
 func updatePackages(packagestoUpdate []common.Package, latestReleases map[string]string, manifest common.PackageManifest) ([]common.Package, error) {
 	updatedPackages := make([]common.Package, 0, len(packagestoUpdate))
 
 	for _, manifestPkg := range manifest.Packages {
-		if !containsPackage(packagestoUpdate, manifestPkg) {
+		if !common.ContainsPackage(packagestoUpdate, manifestPkg) {
 			continue
 		}
 

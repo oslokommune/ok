@@ -9,12 +9,12 @@ import (
 
 func TestUpdatedPackages(t *testing.T) {
 	tests := []struct {
-		name           string
-		manifest       common.PackageManifest
-		packageName    string
-		latestReleases map[string]string
-		expected       []common.Package
-		expectError    bool
+		name             string
+		manifest         common.PackageManifest
+		packagesToUpdate []common.Package
+		latestReleases   map[string]string
+		expected         []common.Package
+		expectError      bool
 	}{
 		{
 			name: "update all packages",
@@ -24,7 +24,10 @@ func TestUpdatedPackages(t *testing.T) {
 					{Template: "template2", Ref: "template2-v1.0.0", OutputFolder: "folder2"},
 				},
 			},
-			packageName: "",
+			packagesToUpdate: []common.Package{
+				{Template: "template1", Ref: "template1-v1.0.0", OutputFolder: "folder1"},
+				{Template: "template2", Ref: "template2-v1.0.0", OutputFolder: "folder2"},
+			},
 			latestReleases: map[string]string{
 				"template1": "v1.1.0",
 				"template2": "v1.2.0",
@@ -43,7 +46,9 @@ func TestUpdatedPackages(t *testing.T) {
 					{Template: "template2", Ref: "template2-v1.0.0", OutputFolder: "folder2"},
 				},
 			},
-			packageName: "folder1",
+			packagesToUpdate: []common.Package{
+				{Template: "template1", Ref: "template1-v1.0.0", OutputFolder: "folder1"},
+			},
 			latestReleases: map[string]string{
 				"template1": "v1.1.0",
 				"template2": "v1.2.0",
@@ -54,27 +59,16 @@ func TestUpdatedPackages(t *testing.T) {
 			expectError: false,
 		},
 		{
-			name: "package not found",
-			manifest: common.PackageManifest{
-				Packages: []common.Package{
-					{Template: "template1", Ref: "template1-v1.0.0", OutputFolder: "folder1"},
-				},
-			},
-			packageName: "folder2",
-			latestReleases: map[string]string{
-				"template1": "v1.1.0",
-			},
-			expected:    nil,
-			expectError: true,
-		},
-		{
 			name: "no latest release found",
 			manifest: common.PackageManifest{
 				Packages: []common.Package{
 					{Template: "template1", Ref: "template1-v1.0.0", OutputFolder: "folder1"},
 				},
 			},
-			packageName: "",
+			packagesToUpdate: []common.Package{
+				{Template: "template1", Ref: "template1-v1.0.0", OutputFolder: "folder1"},
+				{Template: "template2", Ref: "template2-v1.0.0", OutputFolder: "folder2"},
+			},
 			latestReleases: map[string]string{
 				"template2": "v1.2.0",
 			},
@@ -85,7 +79,7 @@ func TestUpdatedPackages(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := updatePackages(tc.manifest.Packages, tc.latestReleases, tc.manifest)
+			result, err := updatePackages(tc.packagesToUpdate, tc.latestReleases, tc.manifest)
 
 			if tc.expectError {
 				require.Error(t, err)

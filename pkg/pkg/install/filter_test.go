@@ -1,66 +1,49 @@
 package install
 
 import (
-	"github.com/oslokommune/ok/pkg/pkg/common"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/oslokommune/ok/pkg/pkg/common"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestFilterPackages(t *testing.T) {
+func TestFindPackagesFromOutputFolders(t *testing.T) {
+	packages := []common.Package{
+		{OutputFolder: "out/app-hello"},
+		{OutputFolder: "out/networking"},
+	}
+
 	tests := []struct {
 		name          string
-		packages      []common.Package
 		outputFolders []string
-		expected      []common.Package
+		expectedPkgs  []common.Package
 	}{
 		{
-			name: "no output folders specified",
-			packages: []common.Package{
-				{OutputFolder: "out/folder1"},
-				{OutputFolder: "out/folder2"},
-			},
-			outputFolders: []string{},
-			expected:      []common.Package{},
+			name:          "Package found",
+			outputFolders: []string{"out/app-hello"},
+			expectedPkgs:  []common.Package{packages[0]},
 		},
 		{
-			name: "single output folder specified",
-			packages: []common.Package{
-				{OutputFolder: "out/folder1"},
-				{OutputFolder: "out/folder2"},
-			},
-			outputFolders: []string{"out/folder1"},
-			expected: []common.Package{
-				{OutputFolder: "out/folder1"},
-			},
+			name:          "Package not found",
+			outputFolders: []string{"out/unknown"},
+			expectedPkgs:  []common.Package{},
 		},
 		{
-			name: "multiple output folders specified",
-			packages: []common.Package{
-				{OutputFolder: "out/folder1"},
-				{OutputFolder: "out/folder2"},
-				{OutputFolder: "out/folder3"},
-			},
-			outputFolders: []string{"out/folder1", "out/folder3"},
-			expected: []common.Package{
-				{OutputFolder: "out/folder1"},
-				{OutputFolder: "out/folder3"},
-			},
+			name:          "Multiple output folders, package found",
+			outputFolders: []string{"out/unknown", "out/networking"},
+			expectedPkgs:  []common.Package{packages[1]},
 		},
 		{
-			name: "no matching output folders",
-			packages: []common.Package{
-				{OutputFolder: "out/folder1"},
-				{OutputFolder: "out/folder2"},
-			},
-			outputFolders: []string{"out/folder3"},
-			expected:      []common.Package{},
+			name:          "Multiple output folders, package not found",
+			outputFolders: []string{"out/unknown1", "out/unknown2"},
+			expectedPkgs:  []common.Package{},
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			result := FindPackageFromOutputFolders(tc.packages, tc.outputFolders)
-			require.Equal(t, tc.expected, result)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pkgs := FindPackagesFromOutputFolders(packages, tt.outputFolders)
+			assert.Equal(t, tt.expectedPkgs, pkgs)
 		})
 	}
 }

@@ -5,18 +5,15 @@ import (
 )
 
 func FindPackagesFromOutputFolders(packages []common.Package, outputFolders []string) []common.Package {
-	result := make([]common.Package, 0)
+	packagesFound := []common.Package{}
 
 	for _, pkg := range packages {
 		for _, outputFolder := range outputFolders {
-
 			if pkg.OutputFolder == outputFolder {
-				result = append(result, pkg)
-				break
+				packagesFound = append(packagesFound, pkg)
 			}
-
 		}
 	}
 
-	return result
+	return packagesFound
 }

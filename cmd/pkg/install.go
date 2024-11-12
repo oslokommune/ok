@@ -11,11 +11,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var flagInstallInteractive bool
-
 func init() {
-	InstallCommand.Flags().BoolVarP(&flagInstallInteractive,
-		"interactive", "i", false, "Select package(s) to install interactively")
+	InstallCommand.Flags().BoolVarP(&flagInteractive,
+		FlagInteractiveName, FlagInteractiveShorthand, false, FlagInteractiveUsage)
 }
 
 var InstallCommand = &cobra.Command{
@@ -36,7 +34,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 	ValidArgsFunction: installTabCompletion,
 	SilenceErrors:     true,
 	RunE: func(cmd *cobra.Command, outputFolders []string) error {
-		if flagInstallInteractive && len(outputFolders) > 0 {
+		if flagInteractive && len(outputFolders) > 0 {
 			return fmt.Errorf("cannot use both --interactive and outputFolder arguments")
 		}
 
@@ -48,14 +46,15 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 			return fmt.Errorf("loading package manifest: %w", err)
 		}
 
+		// Select packages
 		switch {
 		case len(outputFolders) > 0:
 			// Use output folders to determine which packages to install
 			packages = install.FindPackagesFromOutputFolders(manifest.Packages, outputFolders)
 
-		case flagInstallInteractive:
+		case flagInteractive:
 			// Use interactive mode to determine which packages to install
-			packages, err = interactive.SelectPackagesToInstall(manifest)
+			packages, err = interactive.SelectPackages(manifest, "install")
 			if err != nil {
 				return fmt.Errorf("selecting packages: %w", err)
 			}
@@ -69,7 +68,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 			packages = manifest.Packages
 		}
 
-		err = install.Run(manifest, packages)
+		err = install.Run(packages, manifest)
 		if err != nil {
 			return fmt.Errorf("installing packages: %w", err)
 		}
@@ -94,5 +93,6 @@ func installTabCompletion(cmd *cobra.Command, args []string, toComplete string) 
 			completions = append(completions, p.OutputFolder)
 		}
 	}
+
 	return completions, cobra.ShellCompDirectiveNoFileComp
 }

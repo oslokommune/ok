@@ -10,3 +10,9 @@ func argsContainsElement[T comparable](arr []T, element T) bool {
 	}
 	return false
 }
+
+const FlagInteractiveName = "interactive"
+const FlagInteractiveShorthand = "i"
+const FlagInteractiveUsage = "Select package(s) to install interactively"
+
+var flagInteractive bool

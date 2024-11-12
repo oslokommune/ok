@@ -25,3 +25,12 @@ func ConfigFile(prefix, configName string) string {
 	}
 	return fmt.Sprintf("%s/%s.yml", prefix, configName)
 }
+
+func PrintProcessedPackages(update []Package, action string) {
+	fmt.Println()
+	fmt.Printf("✅ Successfully %s packages:\n", action)
+
+	for _, pkg := range update {
+		fmt.Printf("  - %s\n", pkg.String())
+	}
+}

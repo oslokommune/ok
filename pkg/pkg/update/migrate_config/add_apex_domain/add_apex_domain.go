@@ -60,20 +60,20 @@ func update(varFile string) error {
 	args := []string{
 		"-i",
 		`
-		.AlbHostRouting = {
-			"Enable": .AlbHostRouting.Enable,
-			"Internal": .AlbHostRouting.Internal,
-			"Subdomain": {
-				"Enable": .AlbHostRouting.Enable,
-				"TargetGroupTargetStickiness": .AlbHostRouting.TargetGroupTargetStickiness
-			},
-			"Apex": {
-				"Enable": false,
-				"TargetGroupTargetStickiness": false
-			}
-		} |
-		del(.AlbHostRouting.TargetGroupTargetStickiness)
-		`,
+    .AlbHostRouting = {
+        "Enable": (.AlbHostRouting.Enable // false),
+        "Internal": (.AlbHostRouting.Internal // false),
+        "Subdomain": {
+            "Enable": (.AlbHostRouting.Enable // false),
+            "TargetGroupTargetStickiness": (.AlbHostRouting.TargetGroupTargetStickiness // false)
+        },
+        "Apex": {
+            "Enable": false,
+            "TargetGroupTargetStickiness": false
+        }
+    } |
+	del(.AlbHostRouting.TargetGroupTargetStickiness)
+    `,
 		varFile,
 	}
 

@@ -5,6 +5,7 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/add_apex_domain"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
+	"log/slog"
 )
 
 func UpdatePackageConfig(packagesToUpdate []common.Package) error {
@@ -19,6 +20,8 @@ func UpdatePackageConfig(packagesToUpdate []common.Package) error {
 }
 
 func updateVarFile(varFile string) error {
+	slog.Debug("updating var file", slog.String("varFile", varFile))
+
 	firstLine, err := readFirstLine(varFile)
 	if err != nil {
 		return fmt.Errorf("reading first line from %s: %w", varFile, err)

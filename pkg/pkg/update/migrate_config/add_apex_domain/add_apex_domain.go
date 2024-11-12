@@ -3,6 +3,7 @@ package add_apex_domain
 import (
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
+	"log/slog"
 	"strconv"
 	"strings"
 
@@ -10,7 +11,10 @@ import (
 )
 
 func AddApexDomainSupport(varFile string, metadata metadata.VarFileMetadata) error {
+	slog.Debug("adding apex support", slog.String("varFile", varFile), slog.Any("metadata", metadata))
+
 	if metadata.Template != "app" {
+		slog.Debug("not updating, template is not app", slog.String("varFile", varFile))
 		return nil
 	}
 
@@ -20,6 +24,7 @@ func AddApexDomainSupport(varFile string, metadata metadata.VarFileMetadata) err
 	}
 
 	if isTransformed {
+		slog.Debug("not updating, is already transformed")
 		return nil
 	}
 

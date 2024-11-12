@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=.schemas/app-v8.0.5.schema.json
+AppEcsExec: false
+AppReadOnlyRootFileSystem: false
+ExampleImage:
+  Enable: false
+ServiceConnect:
+  Enable: false
+AlbHostRouting:
+  Enable: false
+  Internal: false
+  Subdomain:
+    Enable: false
+    TargetGroupTargetStickiness: false
+  Apex:
+    Enable: false
+    TargetGroupTargetStickiness: false
+DatabaseConnectivity:
+  Enable: true
+OpenTelemetrySidecar:
+  Enable: false
+VpcEndpoints:
+  Enable: false
+Xray:
+  Enable: false
+DailyShutdown:
+  Enable: false
+IamForCicd:
+  Enable: true
+  AppGitHubRepo: my-app
+  IacGitHubRepo: my-iac
+  AssumableCdRole: false
+IncludeLockFile: false

@@ -44,3 +44,5 @@ brews:
       bash_completion.install "completions/ok.bash" => "ok"
       zsh_completion.install "completions/ok.zsh" => "_ok"
       fish_completion.install "completions/ok.fish"
+    dependencies:
+      - name: yq

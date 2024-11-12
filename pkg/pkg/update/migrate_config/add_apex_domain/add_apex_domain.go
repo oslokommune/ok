@@ -2,13 +2,18 @@ package add_apex_domain
 
 import (
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
 	"strconv"
 	"strings"
 
 	"github.com/magefile/mage/sh"
 )
 
-func AddApexDomainSupport(varFile string) error {
+func AddApexDomainSupport(varFile string, metadata metadata.VarFileMetadata) error {
+	if metadata.Template != "app" {
+		return nil
+	}
+
 	isTransformed, err := isTransformed(varFile)
 	if err != nil {
 		return fmt.Errorf("checking if YAML already is transformed: %w", err)
@@ -44,7 +49,7 @@ func isTransformed(varFile string) (bool, error) {
 }
 
 func update(varFile string) error {
-	fmt.Printf("Transforming %s to add support for Apex domain routing\n", varFile)
+	fmt.Printf("Transforming configuration to add support for Apex domain routing. File: %s\n", varFile)
 
 	// Proceed with the transformation
 	args := []string{

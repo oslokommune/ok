@@ -1,6 +1,7 @@
 package add_apex_domain
 
 import (
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
 	"os"
 	"path/filepath"
 	"testing"
@@ -17,16 +18,25 @@ func TestAddApexDomainSupport(t *testing.T) {
 		name         string
 		inputFile    string
 		expectedFile string
+		metadata     metadata.VarFileMetadata
 	}{
 		{
 			name:         "Basic transformation",
 			inputFile:    "app-hello.yml",
 			expectedFile: "app-hello-expected.yml",
+			metadata:     metadata.VarFileMetadata{Template: "app"},
 		},
 		{
 			name:         "Values in app-hello.yml are false",
 			inputFile:    "app-hello-false.yml",
 			expectedFile: "app-hello-false-expected.yml",
+			metadata:     metadata.VarFileMetadata{Template: "app"},
+		},
+		{
+			name:         "Should not transform if the template is not 'app'",
+			inputFile:    "app-hello.yml",
+			expectedFile: "app-hello.yml",
+			metadata:     metadata.VarFileMetadata{Template: "scaffold"},
 		},
 	}
 
@@ -46,7 +56,7 @@ func TestAddApexDomainSupport(t *testing.T) {
 			assert.NoError(t, err)
 
 			// When
-			err = AddApexDomainSupport(tempInputFile)
+			err = AddApexDomainSupport(tempInputFile, tc.metadata)
 			assert.NoError(t, err)
 
 			// Then

@@ -1,16 +1,17 @@
+# yaml-language-server: $schema=.schemas/app-v8.3.9.schema.json
 StackName: "app-hello"
 app-data.StackName: "app-hello-data"
-
 AppName: "hello"
 AppEcsExec: true
 AppReadOnlyRootFileSystem: true
-
 ExampleImage:
   Enable: true
 ServiceConnect:
   Enable: true
 AlbHostRouting:
-  Enable: true
+  Apex:
+    Enable: false
+    TargetGroupTargetStickiness: false
 DatabaseConnectivity:
   Enable: true
 OpenTelemetrySidecar:

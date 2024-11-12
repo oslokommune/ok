@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/add_apex_domain"
-	"github.com/rogpeppe/go-internal/semver"
 	"os"
 	"regexp"
 	"strings"
@@ -31,19 +30,27 @@ func updateVarFile(varFile string) error {
 	// If the varFile has a schema line, get the template and version from it. It makes the update process more robust.
 	// If not, attempt to update the varFile anyway.
 
+	metadata := VarFileMetadata{
+		HasVersion: false,
+		Template:   "",
+		Version:    "",
+	}
+
 	if strings.HasPrefix(firstLine, "# yaml-language-server: $schema=") {
 		template, version, err := processSchemaLine(firstLine, varFile)
 		if err != nil {
 			return fmt.Errorf("processing schema line: %w", err)
 		}
 
-		err = update(template, version, varFile)
-		if err != nil {
-			return fmt.Errorf("updating varFile %s: %w", varFile, err)
-		}
+		metadata.HasVersion = true
+		metadata.Template = template
+		metadata.Version = version
 	}
 
-	return updateNoVersion(varFile)
+	err = update(varFile, metadata)
+	if err != nil {
+		return fmt.Errorf("updating varFile %s: %w", varFile, err)
+	}
 }
 
 func readFirstLine(filename string) (string, error) {
@@ -75,14 +82,13 @@ func processSchemaLine(line, varFile string) (string, string, error) {
 	return template, version, nil
 }
 
-func update(template string, version string, varFile string) error {
-	if template == "app" && semver.Compare(version, "9.0.0") > 9 {
-		return add_apex_domain.AddApexDomainSupport(varFile)
+// TODO: The below functionality should reside in the respective package (apex, and future update packages)
+
+func update(varFile string, metadata VarFileMetadata) error {
+	err := add_apex_domain.AddApexDomainSupport(varFile, metadata)
+	if err != nil {
+		return err
 	}
 
 	return nil
-}
-
-func updateNoVersion(varFile string) error {
-	return add_apex_domain.AddApexDomainSupport(varFile)
 }

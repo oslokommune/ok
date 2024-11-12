@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,16 +18,25 @@ func TestAddApexDomainSupport(t *testing.T) {
 		name         string
 		inputFile    string
 		expectedFile string
+		metadata     migrate_config.VarFileMetadata
 	}{
+		{
+			name:         "Should not run on ",
+			inputFile:    "app-hello.yml",
+			expectedFile: "app-hello-expected.yml",
+			metadata:     migrate_config.VarFileMetadata{HasVersion: true, Template: "app", Version: "8.0.0"},
+		},
 		{
 			name:         "Basic transformation",
 			inputFile:    "app-hello.yml",
 			expectedFile: "app-hello-expected.yml",
+			metadata:     migrate_config.VarFileMetadata{HasVersion: true, Template: "app", Version: "8.0.0"},
 		},
 		{
 			name:         "Values in app-hello.yml are false",
 			inputFile:    "app-hello-false.yml",
 			expectedFile: "app-hello-false-expected.yml",
+			metadata:     migrate_config.VarFileMetadata{HasVersion: true, Template: "app", Version: "8.0.0"},
 		},
 		// Add more test cases here if needed
 	}
@@ -46,19 +56,17 @@ func TestAddApexDomainSupport(t *testing.T) {
 			err = copyFile(inputFile, tempInputFile)
 			assert.NoError(t, err)
 
-			// Call the function
-			err = AddApexDomainSupport(tempInputFile)
+			// When
+			err = AddApexDomainSupport(tempInputFile, tc.metadata)
 			assert.NoError(t, err)
 
-			// Read the modified file
+			// Then
 			modifiedContent, err := os.ReadFile(tempInputFile)
 			assert.NoError(t, err)
 
-			// Read the expected output file
 			expectedContent, err := os.ReadFile(expectedFile)
 			assert.NoError(t, err)
 
-			// Compare the results
 			assert.Equal(t, string(expectedContent), string(modifiedContent))
 		})
 	}

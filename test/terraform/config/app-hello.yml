@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=.schemas/app-v8.3.9.schema.json
 StackName: "app-hello"
 app-data.StackName: "app-hello-data"
 AppName: "hello"
@@ -9,9 +8,7 @@ ExampleImage:
 ServiceConnect:
   Enable: true
 AlbHostRouting:
-  Apex:
-    Enable: false
-    TargetGroupTargetStickiness: false
+  Enable: true
 DatabaseConnectivity:
   Enable: true
 OpenTelemetrySidecar:

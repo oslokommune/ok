@@ -2,7 +2,3 @@ AccountId: "123456789012"
 Region: "eu-west-1"
 Team: "kjoremiljo"
 Environment: "test-dev"
-AlbHostRouting:
-  Apex:
-    Enable: false
-    TargetGroupTargetStickiness: false

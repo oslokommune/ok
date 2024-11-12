@@ -12,11 +12,6 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
-type Options struct {
-	MigrateConfig      bool
-	UpdateSchemaConfig bool
-}
-
 func Run(pkgManifestFilename string, packagesToUpdate []common.Package, opts Options) error {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
@@ -121,4 +116,9 @@ func getLastConfigFile(pkg common.Package) (string, bool) {
 		return pkg.VarFiles[len(pkg.VarFiles)-1], true
 	}
 	return "", false
+}
+
+type Options struct {
+	MigrateConfig      bool
+	UpdateSchemaConfig bool
 }

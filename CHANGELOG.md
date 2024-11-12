@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.0](https://github.com/oslokommune/ok/compare/v4.4.1...v4.5.0) (2024-11-12)
+
+
+### Features
+
+* Make install and update behave similarly ([#295](https://github.com/oslokommune/ok/issues/295)) ([d976508](https://github.com/oslokommune/ok/commit/d9765086c375cf09a56aae32661a71dafc128768))
+
 ## [4.4.1](https://github.com/oslokommune/ok/compare/v4.4.0...v4.4.1) (2024-11-05)
 
 

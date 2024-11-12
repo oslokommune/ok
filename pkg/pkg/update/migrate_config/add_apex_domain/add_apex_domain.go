@@ -18,12 +18,12 @@ func AddApexDomainSupport(varFile string, metadata metadata.VarFileMetadata) err
 		return nil
 	}
 
-	isTransformed, err := isTransformed(varFile)
+	transformed, err := isTransformed(varFile)
 	if err != nil {
 		return fmt.Errorf("checking if YAML already is transformed: %w", err)
 	}
 
-	if isTransformed {
+	if transformed {
 		slog.Debug("not updating, is already transformed")
 		return nil
 	}

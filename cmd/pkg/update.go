@@ -78,7 +78,12 @@ ok pkg update my-package
 			packages = manifest.Packages
 		}
 
-		err = update.Run(common.PackagesManifestFilename, packages, flagUpdateCommandUpdateSchema)
+		opts := update.Options{
+			MigrateConfig:      flagMigrateConfig,
+			UpdateSchemaConfig: flagUpdateCommandUpdateSchema,
+		}
+
+		err = update.Run(common.PackagesManifestFilename, packages, opts)
 		if err != nil {
 			return fmt.Errorf("updating packages: %w", err)
 		}

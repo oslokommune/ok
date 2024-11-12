@@ -37,7 +37,10 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, updateSc
 	}
 
 	// TODO feature flag?
-	migrate_config.UpdatePackageConfig(packagesToUpdate)
+	err = migrate_config.UpdatePackageConfig(packagesToUpdate)
+	if err != nil {
+		return fmt.Errorf("migrating config: %w", err)
+	}
 
 	if updateSchemaConfig {
 		err = updateSchemaConfiguration(context.Background(), updatedPackages, manifest, latestReleases)

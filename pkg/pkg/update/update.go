@@ -41,6 +41,8 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, opts Opt
 		if err != nil {
 			return fmt.Errorf("migrating package config: %w", err)
 		}
+	} else {
+		fmt.Println("Not migrating package configuration files.")
 	}
 
 	if opts.UpdateSchemaConfig {

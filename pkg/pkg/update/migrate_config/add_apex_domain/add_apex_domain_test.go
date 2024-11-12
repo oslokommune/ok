@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,27 +17,17 @@ func TestAddApexDomainSupport(t *testing.T) {
 		name         string
 		inputFile    string
 		expectedFile string
-		metadata     migrate_config.VarFileMetadata
 	}{
-		{
-			name:         "Should not run on ",
-			inputFile:    "app-hello.yml",
-			expectedFile: "app-hello-expected.yml",
-			metadata:     migrate_config.VarFileMetadata{HasVersion: true, Template: "app", Version: "8.0.0"},
-		},
 		{
 			name:         "Basic transformation",
 			inputFile:    "app-hello.yml",
 			expectedFile: "app-hello-expected.yml",
-			metadata:     migrate_config.VarFileMetadata{HasVersion: true, Template: "app", Version: "8.0.0"},
 		},
 		{
 			name:         "Values in app-hello.yml are false",
 			inputFile:    "app-hello-false.yml",
 			expectedFile: "app-hello-false-expected.yml",
-			metadata:     migrate_config.VarFileMetadata{HasVersion: true, Template: "app", Version: "8.0.0"},
 		},
-		// Add more test cases here if needed
 	}
 
 	for _, tc := range testCases {
@@ -57,7 +46,7 @@ func TestAddApexDomainSupport(t *testing.T) {
 			assert.NoError(t, err)
 
 			// When
-			err = AddApexDomainSupport(tempInputFile, tc.metadata)
+			err = AddApexDomainSupport(tempInputFile)
 			assert.NoError(t, err)
 
 			// Then
@@ -68,6 +57,48 @@ func TestAddApexDomainSupport(t *testing.T) {
 			assert.NoError(t, err)
 
 			assert.Equal(t, string(expectedContent), string(modifiedContent))
+		})
+	}
+}
+
+func TestIsTransformed(t *testing.T) {
+	// Get the current working directory
+	cwd, err := os.Getwd()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name                  string
+		inputFile             string
+		expectedIsTransformed bool
+	}{
+		{
+			name:                  "File with Subdomain and Apex set",
+			inputFile:             "app-hello-with-subdomain-and-apex.yml",
+			expectedIsTransformed: true,
+		},
+		{
+			name:                  "File with only Subdomain set",
+			inputFile:             "app-hello-with-subdomain.yml",
+			expectedIsTransformed: true,
+		},
+		{
+			name:                  "File with neither Subdomain or Apex set",
+			inputFile:             "app-hello.yml",
+			expectedIsTransformed: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Given
+			inputFile := filepath.Join(cwd, "testdata", tc.inputFile)
+
+			// When
+			result, err := isTransformed(inputFile)
+			assert.NoError(t, err)
+
+			// Then
+			assert.Equal(t, tc.expectedIsTransformed, result)
 		})
 	}
 }

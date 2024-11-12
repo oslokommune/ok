@@ -12,7 +12,12 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
-func Run(pkgManifestFilename string, packagesToUpdate []common.Package, updateSchemaConfig bool) error {
+type Options struct {
+	MigrateConfig      bool
+	UpdateSchemaConfig bool
+}
+
+func Run(pkgManifestFilename string, packagesToUpdate []common.Package, opts Options) error {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
 		return fmt.Errorf("loading package manifest: %w", err)
@@ -36,13 +41,14 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, updateSc
 		return fmt.Errorf("saving package manifest: %w", err)
 	}
 
-	// TODO feature flag?
-	err = migrate_config.UpdatePackageConfig(packagesToUpdate)
-	if err != nil {
-		return fmt.Errorf("migrating config: %w", err)
+	if opts.MigrateConfig {
+		err = migrate_config.MigratePackageConfig(packagesToUpdate)
+		if err != nil {
+			return fmt.Errorf("migrating config: %w", err)
+		}
 	}
 
-	if updateSchemaConfig {
+	if opts.UpdateSchemaConfig {
 		err = updateSchemaConfiguration(context.Background(), updatedPackages, manifest, latestReleases)
 		if err != nil {
 			return err

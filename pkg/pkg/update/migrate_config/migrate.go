@@ -8,7 +8,7 @@ import (
 	"log/slog"
 )
 
-func UpdatePackageConfig(packagesToUpdate []common.Package) error {
+func MigratePackageConfig(packagesToUpdate []common.Package) error {
 	for _, pkg := range packagesToUpdate {
 		for _, varFile := range pkg.VarFiles {
 			if err := updateVarFile(varFile); err != nil {

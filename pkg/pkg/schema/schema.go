@@ -290,7 +290,7 @@ func mapVariableObjectToProperties(variable config.BoilerplateVariable) map[stri
 		propertyName := k
 		schemaType, ok := mapGoTypeToSchemaType(v)
 		if !ok && v != nil {
-			slog.Warn("could not transform default map type to schema type", slog.String("variable", propertyName), slog.Any("defaultValue", v))
+			slog.Debug("could not transform default map type to schema type", slog.String("variable", propertyName), slog.Any("defaultValue", v))
 		}
 		properties[propertyName] = jsonschema.Property{
 			Type:    schemaType,
@@ -312,7 +312,7 @@ func mapVariableObjectToFlatProperties(namespace string, variable config.Boilerp
 		propertyName := JoinNamespaces(namespace, k)
 		schemaType, ok := mapGoTypeToSchemaType(v)
 		if !ok {
-			slog.Warn("could not transform default map type to schema type", slog.String("variable", propertyName))
+			slog.Debug("could not transform default map type to schema type", slog.String("variable", propertyName))
 		}
 		properties[propertyName] = jsonschema.Property{
 			Type:        schemaType,

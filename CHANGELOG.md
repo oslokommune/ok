@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.0](https://github.com/oslokommune/ok/compare/v4.6.0...v4.7.0) (2024-11-13)
+
+
+### Features
+
+* Add auto migration of package configs for `ok pkg update` ([#297](https://github.com/oslokommune/ok/issues/297)) ([ee227db](https://github.com/oslokommune/ok/commit/ee227db715e1c42b0944a0f5631e385c5d15f6a0))
+
 ## [4.6.0](https://github.com/oslokommune/ok/compare/v4.5.1...v4.6.0) (2024-11-13)
 
 

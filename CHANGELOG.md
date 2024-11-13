@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.1](https://github.com/oslokommune/ok/compare/v4.7.0...v4.7.1) (2024-11-13)
+
+
+### Dependency Updates
+
+* bump the gomod-all group across 1 directory with 4 updates ([#304](https://github.com/oslokommune/ok/issues/304)) ([dc50279](https://github.com/oslokommune/ok/commit/dc502793b6a38e3799efee3a77c07629934ab4dd))
+
 ## [4.7.0](https://github.com/oslokommune/ok/compare/v4.6.0...v4.7.0) (2024-11-13)
 
 

@@ -14,7 +14,7 @@ AlbHostRouting:
   Subdomain:
     Enable: true
     TargetGroupTargetStickiness: true
-  Apex:
+  ApexDomain:
     Enable: false
     TargetGroupTargetStickiness: false
 DatabaseConnectivity:

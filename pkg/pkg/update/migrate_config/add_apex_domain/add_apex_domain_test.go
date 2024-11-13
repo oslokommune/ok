@@ -2,6 +2,7 @@ package add_apex_domain
 
 import (
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
+	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"testing"
@@ -38,6 +39,18 @@ func TestAddApexDomainSupport(t *testing.T) {
 			expectedFile: "app-hello.yml",
 			metadata:     metadata.VarFileMetadata{Template: "scaffold"},
 		},
+		{
+			name:         "Should not transform if the var file already contains Subdomain",
+			inputFile:    "app-hello-subdomain.yml",
+			expectedFile: "app-hello-subdomain.yml",
+			metadata:     metadata.VarFileMetadata{Template: "app"},
+		},
+		{
+			name:         "Should not transform if the var file already contains ApexDomain",
+			inputFile:    "app-hello-apexdomain.yml",
+			expectedFile: "app-hello-apexdomain.yml",
+			metadata:     metadata.VarFileMetadata{Template: "app"},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -49,7 +62,12 @@ func TestAddApexDomainSupport(t *testing.T) {
 			// Create a temporary copy of the input file
 			tempDir, err := os.MkdirTemp("", "test_add_apex_domain_support")
 			assert.NoError(t, err)
-			defer os.RemoveAll(tempDir)
+			defer func(path string) {
+				err := os.RemoveAll(path)
+				if err != nil {
+					require.NoError(t, err)
+				}
+			}(tempDir)
 
 			tempInputFile := filepath.Join(tempDir, tc.inputFile)
 			err = copyFile(inputFile, tempInputFile)

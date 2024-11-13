@@ -36,7 +36,7 @@ func AddApexDomainSupport(varFile string, metadata metadata.VarFileMetadata) err
 func isTransformed(varFile string) (bool, error) {
 	args := []string{
 		"eval",
-		".AlbHostRouting.Subdomain != null or .AlbHostRouting.Apex != null",
+		".AlbHostRouting.Subdomain != null or .AlbHostRouting.ApexDomain != null",
 		varFile,
 	}
 
@@ -67,7 +67,7 @@ func update(varFile string) error {
             "Enable": (.AlbHostRouting.Enable // false),
             "TargetGroupTargetStickiness": (.AlbHostRouting.TargetGroupTargetStickiness // false)
         },
-        "Apex": {
+        "ApexDomain": {
             "Enable": false,
             "TargetGroupTargetStickiness": false
         }

@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/add_apex_domain"
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
 	"io"
+	"log/slog"
 	"os"
 )
 
@@ -17,7 +19,7 @@ func MigratePackageConfig(packagesToUpdate []common.Package) error {
 				return fmt.Errorf("getting file hash: %w", err)
 			}
 
-			err = migrate(varFile, pkg)
+			err = migrateVarFile(varFile)
 			if err != nil {
 				err = tryToGracefullyHandleError(varFile, fileHash, err)
 				if err != nil {
@@ -30,7 +32,34 @@ func MigratePackageConfig(packagesToUpdate []common.Package) error {
 	return nil
 }
 
-func migrate(varFile string, pkg common.Package) error {
+func migrateVarFile(varFile string) error {
+	slog.Debug("updating var file", slog.String("varFile", varFile))
+
+	firstLine, err := readFirstLine(varFile)
+	if err != nil {
+		return fmt.Errorf("reading first line from %s: %w", varFile, err)
+	}
+
+	varFileMetadata, err := metadata.ParseMetadata(firstLine)
+	if err != nil {
+		slog.Debug("not updating, could not parse metadata",
+			slog.String("firstLine", firstLine),
+			slog.Any("error", err),
+		)
+
+		// Don't attempt to update the file if we can't parse the metadata.
+		return nil
+	}
+
+	err = update(varFile, varFileMetadata)
+	if err != nil {
+		return fmt.Errorf("updating varFile %s: %w", varFile, err)
+	}
+
+	return nil
+}
+
+func update(varFile string, jsonSchema metadata.JsonSchema) error {
 	// NOTE: Be careful with the order of the functions here. In general:
 	// - Always append function calls to new updates at the end of this function.
 	// - Do not change the order of the functions.
@@ -38,7 +67,7 @@ func migrate(varFile string, pkg common.Package) error {
 	// This is to ensure that previously executed migrations/updates do not get messed up somehow, because of
 	// dependencies between them. Of course, if you know what you are doing, go ahead.
 
-	err := add_apex_domain.AddApexDomainSupport(varFile, pkg)
+	err := add_apex_domain.AddApexDomainSupport(varFile, jsonSchema)
 	if err != nil {
 		return err
 	}

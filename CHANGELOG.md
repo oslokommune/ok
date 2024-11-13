@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.5.1](https://github.com/oslokommune/ok/compare/v4.5.0...v4.5.1) (2024-11-13)
+
+
+### Bug Fixes
+
+* Use pointer for manifestPkg ([5759c9f](https://github.com/oslokommune/ok/commit/5759c9f4288f501a508442073e942c9852501d5f))
+
 ## [4.5.0](https://github.com/oslokommune/ok/compare/v4.4.1...v4.5.0) (2024-11-12)
 
 

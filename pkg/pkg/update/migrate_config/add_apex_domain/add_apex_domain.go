@@ -2,7 +2,8 @@ package add_apex_domain
 
 import (
 	"fmt"
-	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
+	"github.com/Masterminds/semver"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"log/slog"
 	"strconv"
 	"strings"
@@ -10,11 +11,29 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-func AddApexDomainSupport(varFile string, metadata metadata.VarFileMetadata) error {
-	slog.Debug("adding apex support", slog.String("varFile", varFile), slog.Any("metadata", metadata))
+func AddApexDomainSupport(varFile string, pkg common.Package) error {
+	slog.Debug("adding apex support", slog.String("varFile", varFile), slog.Any("pkg", pkg))
 
-	if metadata.Template != "app" {
+	if pkg.Template != "app" {
 		slog.Debug("not updating, template is not app", slog.String("varFile", varFile))
+		return nil
+	}
+
+	// https://github.com/oslokommune/golden-path-boilerplate/releases/tag/app-v9.0.0
+	versionOfApexDomainSupport, err := semver.NewVersion("9.0.0")
+	if err != nil {
+		return fmt.Errorf("creating semver: %w", err)
+	}
+
+	pkgVersion, err := pkg.PackageVersion()
+	if err != nil {
+		return err
+	}
+
+	if pkgVersion.LessThan(versionOfApexDomainSupport) {
+		slog.Debug("not updating, package less than required version",
+			slog.String("requiredVersion", versionOfApexDomainSupport.String()),
+			slog.String("varFile", varFile))
 		return nil
 	}
 

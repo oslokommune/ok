@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/add_apex_domain"
-	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
 	"io"
-	"log/slog"
 	"os"
 )
 
@@ -19,7 +17,7 @@ func MigratePackageConfig(packagesToUpdate []common.Package) error {
 				return fmt.Errorf("getting file hash: %w", err)
 			}
 
-			err = updateVarFile(varFile)
+			err = update(varFile, pkg)
 			if err != nil {
 				err = tryToGracefullyHandleError(varFile, fileHash, err)
 				if err != nil {
@@ -32,28 +30,7 @@ func MigratePackageConfig(packagesToUpdate []common.Package) error {
 	return nil
 }
 
-func updateVarFile(varFile string) error {
-	slog.Debug("updating var file", slog.String("varFile", varFile))
-
-	firstLine, err := readFirstLine(varFile)
-	if err != nil {
-		return fmt.Errorf("reading first line from %s: %w", varFile, err)
-	}
-
-	varFileMetadata, err := metadata.ParseMetadata(firstLine)
-	if err != nil {
-		return fmt.Errorf("getting metadata from var file %s: %w", varFile, err)
-	}
-
-	err = update(varFile, varFileMetadata)
-	if err != nil {
-		return fmt.Errorf("updating varFile %s: %w", varFile, err)
-	}
-
-	return nil
-}
-
-func update(varFile string, metadata metadata.VarFileMetadata) error {
+func update(varFile string, pkg common.Package) error {
 	// NOTE: Be careful with the order of the functions here. In general:
 	// - Always append function calls to new updates at the end of this function.
 	// - Do not change the order of the functions.
@@ -61,7 +38,7 @@ func update(varFile string, metadata metadata.VarFileMetadata) error {
 	// This is to ensure that previously executed migrations/updates do not get messed up somehow, because of
 	// dependencies between them. Of course, if you know what you are doing, go ahead.
 
-	err := add_apex_domain.AddApexDomainSupport(varFile, metadata)
+	err := add_apex_domain.AddApexDomainSupport(varFile, pkg)
 	if err != nil {
 		return err
 	}

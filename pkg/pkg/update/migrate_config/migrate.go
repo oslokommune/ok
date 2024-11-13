@@ -54,6 +54,13 @@ func updateVarFile(varFile string) error {
 }
 
 func update(varFile string, metadata metadata.VarFileMetadata) error {
+	// NOTE: Be careful with the order of the functions here. In general:
+	// - Always append function calls to new updates at the end of this function.
+	// - Do not change the order of the functions.
+	//
+	// This is to ensure that previously executed migrations/updates do not get messed up somehow, because of
+	// dependencies between them. Of course, if you know what you are doing, go ahead.
+
 	err := add_apex_domain.AddApexDomainSupport(varFile, metadata)
 	if err != nil {
 		return err

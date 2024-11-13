@@ -12,22 +12,35 @@ import (
 )
 
 var flagUpdateCommandUpdateSchema bool
+var flagMigrateConfig bool
 
 func init() {
 	UpdateCommand.Flags().BoolVarP(&flagInteractive,
 		FlagInteractiveName, FlagInteractiveShorthand, false, FlagInteractiveUsage)
+
 	UpdateCommand.Flags().BoolVar(&flagUpdateCommandUpdateSchema,
 		"update-schema", true, "Update the JSON schema for affected packages")
+
+	UpdateCommand.Flags().BoolVar(&flagMigrateConfig,
+		"migrate-config",
+		true,
+		"Automatically migrate package configuration files to the latest version, if possible")
 }
 
 var UpdateCommand = &cobra.Command{
-	Use:   "update [package-name]",
-	Short: "Update Boilerplate package manifest",
-	Long: `Update Boilerplate package manifest.
-If a package name is provided, only that package will be updated.
-If no package name is provided, all packages will be updated.`,
-	Example: `  ok pkg update
-  ok pkg update my-package`,
+	Use:   "update [outputFolder ...]",
+	Short: "Update Boilerplate package manifest and package configuration files",
+	Long: `Update Boilerplate package manifest and package configuration files.
+
+If no arguments are used, the command updates all the packages specified in the package manifest file.
+
+If one or more output folders are specified, the command updates only the packages whose OutputFolder matches the specified folders. (OutputFolder is a field in the package manifest file.)
+
+See subcommand 'install' for usage of the BASE_URL environment variable.
+`,
+	Example: `ok pkg update
+ok pkg update my-package
+`,
 	Args:              cobra.MaximumNArgs(1),
 	ValidArgsFunction: updateTabCompletion,
 	RunE: func(cmd *cobra.Command, outputFolders []string) error {
@@ -65,7 +78,12 @@ If no package name is provided, all packages will be updated.`,
 			packages = manifest.Packages
 		}
 
-		err = update.Run(common.PackagesManifestFilename, packages, flagUpdateCommandUpdateSchema)
+		opts := update.Options{
+			MigrateConfig:      flagMigrateConfig,
+			UpdateSchemaConfig: flagUpdateCommandUpdateSchema,
+		}
+
+		err = update.Run(common.PackagesManifestFilename, packages, opts)
 		if err != nil {
 			return fmt.Errorf("updating packages: %w", err)
 		}

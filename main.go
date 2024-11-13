@@ -2,9 +2,6 @@ package main
 
 import (
 	"github.com/oslokommune/ok/cmd"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-	"os"
 )
 
 var (
@@ -15,7 +12,7 @@ var (
 
 func main() {
 
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+	// slog.SetLogLoggerLevel(slog.LevelDebug)
 
 	cmd.VersionData = cmd.Version{
 		Version: version,

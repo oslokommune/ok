@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/schema"
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config"
 	"os"
 	"strings"
 
@@ -11,7 +12,7 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
-func Run(pkgManifestFilename string, packagesToUpdate []common.Package, updateSchemaConfig bool) error {
+func Run(pkgManifestFilename string, packagesToUpdate []common.Package, opts Options) error {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
 		return fmt.Errorf("loading package manifest: %w", err)
@@ -35,11 +36,20 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, updateSc
 		return fmt.Errorf("saving package manifest: %w", err)
 	}
 
-	if updateSchemaConfig {
+	if opts.UpdateSchemaConfig {
 		err = updateSchemaConfiguration(context.Background(), updatedPackages, manifest, latestReleases)
 		if err != nil {
 			return err
 		}
+	}
+
+	if opts.MigrateConfig {
+		err = migrate_config.MigratePackageConfig(packagesToUpdate)
+		if err != nil {
+			return fmt.Errorf("migrating package config: %w", err)
+		}
+	} else {
+		fmt.Println("Not migrating package configuration files.")
 	}
 
 	common.PrintProcessedPackages(packagesToUpdate, "updated")
@@ -110,4 +120,9 @@ func getLastConfigFile(pkg common.Package) (string, bool) {
 		return pkg.VarFiles[len(pkg.VarFiles)-1], true
 	}
 	return "", false
+}
+
+type Options struct {
+	MigrateConfig      bool
+	UpdateSchemaConfig bool
 }

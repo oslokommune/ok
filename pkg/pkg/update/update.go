@@ -36,6 +36,13 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, opts Opt
 		return fmt.Errorf("saving package manifest: %w", err)
 	}
 
+	if opts.UpdateSchemaConfig {
+		err = updateSchemaConfiguration(context.Background(), updatedPackages, manifest, latestReleases)
+		if err != nil {
+			return err
+		}
+	}
+
 	if opts.MigrateConfig {
 		err = migrate_config.MigratePackageConfig(packagesToUpdate)
 		if err != nil {
@@ -43,13 +50,6 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, opts Opt
 		}
 	} else {
 		fmt.Println("Not migrating package configuration files.")
-	}
-
-	if opts.UpdateSchemaConfig {
-		err = updateSchemaConfiguration(context.Background(), updatedPackages, manifest, latestReleases)
-		if err != nil {
-			return err
-		}
 	}
 
 	common.PrintProcessedPackages(packagesToUpdate, "updated")

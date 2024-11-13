@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.6.0](https://github.com/oslokommune/ok/compare/v4.5.1...v4.6.0) (2024-11-13)
+
+
+### Features
+
+* Change transform warning to debug ([#299](https://github.com/oslokommune/ok/issues/299)) ([a731bc6](https://github.com/oslokommune/ok/commit/a731bc60da3cdf10f79003c1f7c54ed69e600a38))
+
 ## [4.5.1](https://github.com/oslokommune/ok/compare/v4.5.0...v4.5.1) (2024-11-13)
 
 

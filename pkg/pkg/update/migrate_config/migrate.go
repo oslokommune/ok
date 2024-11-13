@@ -17,7 +17,7 @@ func MigratePackageConfig(packagesToUpdate []common.Package) error {
 				return fmt.Errorf("getting file hash: %w", err)
 			}
 
-			err = update(varFile, pkg)
+			err = migrate(varFile, pkg)
 			if err != nil {
 				err = tryToGracefullyHandleError(varFile, fileHash, err)
 				if err != nil {
@@ -30,7 +30,7 @@ func MigratePackageConfig(packagesToUpdate []common.Package) error {
 	return nil
 }
 
-func update(varFile string, pkg common.Package) error {
+func migrate(varFile string, pkg common.Package) error {
 	// NOTE: Be careful with the order of the functions here. In general:
 	// - Always append function calls to new updates at the end of this function.
 	// - Do not change the order of the functions.

@@ -89,7 +89,7 @@ func tryToGracefullyHandleError(varFile string, oldHash string, cause error) err
 	}
 
 	fmt.Printf("WARNING: Auto migrating package config failed. "+
-		"However, as the config file has not changed, we're ignoring it. Config file: %s. Error:%s\n", varFile, cause)
+		"However, as the config file has not changed, we're ignoring this error. Config file: %s. Error:%s\n", varFile, cause)
 
 	return nil
 }

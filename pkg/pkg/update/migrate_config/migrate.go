@@ -21,7 +21,7 @@ func MigratePackageConfig(packagesToUpdate []common.Package) error {
 
 			err = updateVarFile(varFile)
 			if err != nil {
-				err = tryToGracefulltHandleError(varFile, fileHash, err)
+				err = tryToGracefullyHandleError(varFile, fileHash, err)
 				if err != nil {
 					return err
 				}
@@ -78,7 +78,7 @@ func getFileHash(filePath string) (string, error) {
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil
 }
 
-func tryToGracefulltHandleError(varFile string, oldHash string, cause error) error {
+func tryToGracefullyHandleError(varFile string, oldHash string, cause error) error {
 	fileHash, err := getFileHash(varFile)
 	if err != nil {
 		return fmt.Errorf("getting file hash from file %s: %w", varFile, err)

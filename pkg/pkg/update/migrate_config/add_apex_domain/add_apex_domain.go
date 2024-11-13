@@ -82,7 +82,5 @@ func update(varFile string) error {
 		return fmt.Errorf("error transforming YAML: %w", err)
 	}
 
-	fmt.Println("Transformation complete")
-
 	return nil
 }

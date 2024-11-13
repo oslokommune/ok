@@ -50,8 +50,10 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, updateSc
 func updatePackages(packagestoUpdate []common.Package, latestReleases map[string]string, manifest common.PackageManifest) ([]common.Package, error) {
 	updatedPackages := make([]common.Package, 0, len(packagestoUpdate))
 
-	for _, manifestPkg := range manifest.Packages {
-		if !common.ContainsPackage(packagestoUpdate, manifestPkg) {
+	for i := range manifest.Packages {
+		manifestPkg := &manifest.Packages[i]
+
+		if !common.ContainsPackage(packagestoUpdate, *manifestPkg) {
 			continue
 		}
 
@@ -64,7 +66,7 @@ func updatePackages(packagestoUpdate []common.Package, latestReleases map[string
 
 		if manifestPkg.Ref != newRef {
 			manifestPkg.Ref = newRef
-			updatedPackages = append(updatedPackages, manifestPkg)
+			updatedPackages = append(updatedPackages, *manifestPkg)
 		}
 	}
 

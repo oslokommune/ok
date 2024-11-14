@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.3](https://github.com/oslokommune/ok/compare/v4.7.2...v4.7.3) (2024-11-14)
+
+
+### Bug Fixes
+
+* Type s/subcommand/sub command/ ([c892419](https://github.com/oslokommune/ok/commit/c89241977377eb7585e9d5c7915564aa8e998861))
+
 ## [4.7.2](https://github.com/oslokommune/ok/compare/v4.7.1...v4.7.2) (2024-11-14)
 
 

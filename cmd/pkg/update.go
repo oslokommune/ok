@@ -32,12 +32,7 @@ var UpdateCommand = &cobra.Command{
 	Short: "Update Boilerplate package manifest and package configuration files",
 	Long: `Update Boilerplate package manifest and package configuration files.
 
-If no arguments are used, the command updates all the packages specified in the package manifest file.
-
-If one or more output folders are specified, the command updates only the packages whose OutputFolder matches the specified folders. (OutputFolder is a field in the package manifest file.)
-
-See subcommand 'install' for usage of the BASE_URL environment variable.
-`,
+` + InstallUpdateArgumentDescription,
 	Example: `ok pkg update
 ok pkg update my-package
 `,

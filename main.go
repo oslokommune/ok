@@ -12,7 +12,7 @@ var (
 
 func main() {
 
-	// slog.SetLogLoggerLevel(slog.LevelDebug)
+	//slog.SetLogLoggerLevel(slog.LevelDebug)
 
 	cmd.VersionData = cmd.Version{
 		Version: version,

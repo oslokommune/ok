@@ -21,12 +21,7 @@ var InstallCommand = &cobra.Command{
 	Short: "Install or update Boilerplate packages.",
 	Long: `Install or update Boilerplate packages.
 
-If no arguments are used, the command installs all the packages specified in the package manifest file.
-
-If one or more output folders are specified, the command installs only the packages whose OutputFolder matches the specified folders. (OutputFolder is a field in the package manifest file.)
-
-Set the environment variable BASE_URL to specify where package templates are downloaded from.
-`,
+` + InstallUpdateArgumentDescription,
 	Example: `ok pkg install networking
 ok pkg install networking my-app
 BASE_URL=../boilerplate/terraform ok pkg install networking my-app

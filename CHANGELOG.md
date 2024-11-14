@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.2](https://github.com/oslokommune/ok/compare/v4.7.1...v4.7.2) (2024-11-14)
+
+
+### Bug Fixes
+
+* Check package version ([#306](https://github.com/oslokommune/ok/issues/306)) ([f05facb](https://github.com/oslokommune/ok/commit/f05facba8745060dc9895f313a897c5c9726221a))
+
 ## [4.7.1](https://github.com/oslokommune/ok/compare/v4.7.0...v4.7.1) (2024-11-13)
 
 

@@ -19,7 +19,7 @@ func MigratePackageConfig(packagesToUpdate []common.Package) error {
 				return fmt.Errorf("getting file hash: %w", err)
 			}
 
-			err = updateVarFile(varFile)
+			err = migrateVarFile(varFile)
 			if err != nil {
 				err = tryToGracefullyHandleError(varFile, fileHash, err)
 				if err != nil {
@@ -32,7 +32,7 @@ func MigratePackageConfig(packagesToUpdate []common.Package) error {
 	return nil
 }
 
-func updateVarFile(varFile string) error {
+func migrateVarFile(varFile string) error {
 	slog.Debug("updating var file", slog.String("varFile", varFile))
 
 	firstLine, err := readFirstLine(varFile)
@@ -42,7 +42,13 @@ func updateVarFile(varFile string) error {
 
 	varFileMetadata, err := metadata.ParseMetadata(firstLine)
 	if err != nil {
-		return fmt.Errorf("getting metadata from var file %s: %w", varFile, err)
+		slog.Debug("not updating, could not parse metadata",
+			slog.String("firstLine", firstLine),
+			slog.Any("error", err),
+		)
+
+		// Don't attempt to update the file if we can't parse the metadata.
+		return nil
 	}
 
 	err = update(varFile, varFileMetadata)
@@ -53,7 +59,7 @@ func updateVarFile(varFile string) error {
 	return nil
 }
 
-func update(varFile string, metadata metadata.VarFileMetadata) error {
+func update(varFile string, jsonSchema metadata.JsonSchema) error {
 	// NOTE: Be careful with the order of the functions here. In general:
 	// - Always append function calls to new updates at the end of this function.
 	// - Do not change the order of the functions.
@@ -61,7 +67,7 @@ func update(varFile string, metadata metadata.VarFileMetadata) error {
 	// This is to ensure that previously executed migrations/updates do not get messed up somehow, because of
 	// dependencies between them. Of course, if you know what you are doing, go ahead.
 
-	err := add_apex_domain.AddApexDomainSupport(varFile, metadata)
+	err := add_apex_domain.AddApexDomainSupport(varFile, jsonSchema)
 	if err != nil {
 		return err
 	}

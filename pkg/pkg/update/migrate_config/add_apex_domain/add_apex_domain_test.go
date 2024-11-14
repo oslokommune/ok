@@ -1,6 +1,7 @@
 package add_apex_domain
 
 import (
+	"github.com/Masterminds/semver"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -19,37 +20,43 @@ func TestAddApexDomainSupport(t *testing.T) {
 		name         string
 		inputFile    string
 		expectedFile string
-		metadata     metadata.VarFileMetadata
+		jsonSchema   metadata.JsonSchema
 	}{
 		{
 			name:         "Basic transformation",
 			inputFile:    "app-hello.yml",
 			expectedFile: "app-hello-expected.yml",
-			metadata:     metadata.VarFileMetadata{Template: "app"},
+			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse("9.0.0")},
 		},
 		{
 			name:         "Values in app-hello.yml are false",
 			inputFile:    "app-hello-false.yml",
 			expectedFile: "app-hello-false-expected.yml",
-			metadata:     metadata.VarFileMetadata{Template: "app"},
+			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse("9.0.0")},
 		},
 		{
-			name:         "Should not transform if the template is not 'app'",
+			name:         "Should not transform when the template is not 'app'",
 			inputFile:    "app-hello.yml",
 			expectedFile: "app-hello.yml",
-			metadata:     metadata.VarFileMetadata{Template: "scaffold"},
+			jsonSchema:   metadata.JsonSchema{Template: "scaffold", Version: semver.MustParse("9.0.0")},
 		},
 		{
-			name:         "Should not transform if the var file already contains Subdomain",
+			name:         "Should not transform when the package version is less than 9.0.0",
+			inputFile:    "app-hello.yml",
+			expectedFile: "app-hello.yml",
+			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse("8.9.0")},
+		},
+		{
+			name:         "Should not transform when the var file already contains Subdomain",
 			inputFile:    "app-hello-subdomain.yml",
 			expectedFile: "app-hello-subdomain.yml",
-			metadata:     metadata.VarFileMetadata{Template: "app"},
+			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse("9.0.0")},
 		},
 		{
 			name:         "Should not transform if the var file already contains ApexDomain",
 			inputFile:    "app-hello-apexdomain.yml",
 			expectedFile: "app-hello-apexdomain.yml",
-			metadata:     metadata.VarFileMetadata{Template: "app"},
+			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse("9.0.0")},
 		},
 	}
 
@@ -74,7 +81,7 @@ func TestAddApexDomainSupport(t *testing.T) {
 			assert.NoError(t, err)
 
 			// When
-			err = AddApexDomainSupport(tempInputFile, tc.metadata)
+			err = AddApexDomainSupport(tempInputFile, tc.jsonSchema)
 			assert.NoError(t, err)
 
 			// Then
@@ -122,7 +129,7 @@ func TestIsTransformed(t *testing.T) {
 			inputFile := filepath.Join(cwd, "testdata", tc.inputFile)
 
 			// When
-			result, err := isTransformed(inputFile)
+			result, err := isMigrated(inputFile)
 			assert.NoError(t, err)
 
 			// Then

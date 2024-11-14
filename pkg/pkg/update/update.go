@@ -12,7 +12,7 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
-func Run(pkgManifestFilename string, packagesToUpdate []common.Package, opts Options) error {
+func Run(pkgManifestFilename string, packages []common.Package, opts Options) error {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
 		return fmt.Errorf("loading package manifest: %w", err)
@@ -26,7 +26,7 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, opts Opt
 		return fmt.Errorf("failed getting latest github releases: %w", err)
 	}
 
-	updatedPackages, err := updatePackages(packagesToUpdate, latestReleases, manifest)
+	updatedPackages, err := updatePackages(packages, latestReleases, manifest)
 	if err != nil {
 		return fmt.Errorf("updating packages: %w", err)
 	}
@@ -44,7 +44,7 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, opts Opt
 	}
 
 	if opts.MigrateConfig {
-		err = migrate_config.MigratePackageConfig(packagesToUpdate)
+		err = migrate_config.MigratePackageConfig(updatedPackages)
 		if err != nil {
 			return fmt.Errorf("migrating package config: %w", err)
 		}
@@ -52,7 +52,7 @@ func Run(pkgManifestFilename string, packagesToUpdate []common.Package, opts Opt
 		fmt.Println("Not migrating package configuration files.")
 	}
 
-	common.PrintProcessedPackages(packagesToUpdate, "updated")
+	common.PrintProcessedPackages(packages, "updated")
 
 	return nil
 }

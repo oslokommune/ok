@@ -46,3 +46,4 @@ brews:
       fish_completion.install "completions/ok.fish"
     dependencies:
       - name: yq
+      - name: boilerplate

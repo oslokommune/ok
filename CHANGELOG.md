@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.7.4](https://github.com/oslokommune/ok/compare/v4.7.3...v4.7.4) (2024-11-15)
+
+
+### Bug Fixes
+
+* let the user if no packages was installed or updated ([#312](https://github.com/oslokommune/ok/issues/312)) ([5ab5ae1](https://github.com/oslokommune/ok/commit/5ab5ae17c811f945d840b00bd61370df389132f8))
+
 ## [4.7.3](https://github.com/oslokommune/ok/compare/v4.7.2...v4.7.3) (2024-11-14)
 
 

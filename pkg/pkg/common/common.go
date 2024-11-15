@@ -28,6 +28,10 @@ func ConfigFile(prefix, configName string) string {
 
 func PrintProcessedPackages(update []Package, action string) {
 	fmt.Println()
+	if len(update) == 0 {
+		fmt.Printf("No packages were %s.\n", action)
+		return
+	}
 	fmt.Printf("✅ Successfully %s packages:\n", action)
 
 	for _, pkg := range update {

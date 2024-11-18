@@ -3,7 +3,8 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 ![Homebrew](https://img.shields.io/badge/Homebrew-blue)
 ![Go](https://img.shields.io/badge/Go-teal)
-[![OS packages](https://github.com/oslokommune/ok/actions/workflows/test_installation.yml/badge.svg)](https://github.com/oslokommune/ok/actions/workflows/test_installation.yml)
+[![Brew packages](https://github.com/oslokommune/ok/actions/workflows/release.yml/badge.svg)](https://github.com/oslokommune/ok/actions/workflows/release.yml)
+[![OS packages](https://github.com/oslokommune/ok/actions/workflows/release.yml/badge.svg)](https://github.com/oslokommune/ok/actions/workflows/release.yml)
 
 
 <p align="center">

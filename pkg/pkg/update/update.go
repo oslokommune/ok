@@ -63,6 +63,7 @@ func updatePackages(packagestoUpdate []common.Package, latestReleases map[string
 	for i := range manifest.Packages {
 		manifestPkg := &manifest.Packages[i]
 
+
 		if !common.ContainsPackage(packagestoUpdate, *manifestPkg) {
 			continue
 		}
@@ -89,9 +90,17 @@ func updateSchemaConfiguration(ctx context.Context, updatedPackages []common.Pac
 		return fmt.Errorf("getting GitHub client: %w", err)
 	}
 
+	fmt.Printf("Updating schema configuration files: ")
+
 	for i, pkg := range updatedPackages {
 		newRef := fmt.Sprintf("%s-%s", pkg.Template, latestReleases[pkg.Template])
 		manifest.Packages[i].Ref = newRef
+
+		if i > 0 {
+			fmt.Printf(", %s", pkg.OutputFolder)
+		} else {
+			fmt.Printf("%s", pkg.OutputFolder)
+		}
 
 		configFile, ok := getLastConfigFile(pkg)
 		if !ok {
@@ -111,6 +120,8 @@ func updateSchemaConfiguration(ctx context.Context, updatedPackages []common.Pac
 			return fmt.Errorf("creating or updating configuration file: %w", err)
 		}
 	}
+
+	fmt.Println()
 
 	return nil
 }

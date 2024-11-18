@@ -92,7 +92,6 @@ func updateSchemaConfiguration(ctx context.Context, updatedPackages []common.Pac
 
 	fmt.Printf("Updating schema configuration files: ")
 
-
 	for i, pkg := range updatedPackages {
 		newRef := fmt.Sprintf("%s-%s", pkg.Template, latestReleases[pkg.Template])
 		manifest.Packages[i].Ref = newRef
@@ -102,7 +101,6 @@ func updateSchemaConfiguration(ctx context.Context, updatedPackages []common.Pac
 		} else {
 			fmt.Printf("%s", pkg.OutputFolder)
 		}
-
 
 		configFile, ok := getLastConfigFile(pkg)
 		if !ok {

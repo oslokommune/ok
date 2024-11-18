@@ -4,7 +4,6 @@
 ![Homebrew](https://img.shields.io/badge/Homebrew-blue)
 ![Go](https://img.shields.io/badge/Go-teal)
 [![Brew packages](https://github.com/oslokommune/ok/actions/workflows/release.yml/badge.svg)](https://github.com/oslokommune/ok/actions/workflows/release.yml)
-[![OS packages](https://github.com/oslokommune/ok/actions/workflows/release.yml/badge.svg)](https://github.com/oslokommune/ok/actions/workflows/release.yml)
 
 
 <p align="center">

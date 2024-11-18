@@ -4,8 +4,6 @@ on:
   workflow_call:
   workflow_dispatch:
   release:
-    types:
-      - edited
 
 jobs:
 

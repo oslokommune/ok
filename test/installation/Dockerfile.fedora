@@ -1,6 +1,6 @@
 FROM fedora:latest
 
-RUN dnf install -y dnf5-plugins && \
+RUN dnf install -y dnf5-plugins git && \
     dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo && \
     dnf install -y gh --repo gh-cli
 

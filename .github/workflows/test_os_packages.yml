@@ -3,7 +3,6 @@ name: Test OS packages
 on:
   workflow_call:
   workflow_dispatch:
-  release:
 
 jobs:
 

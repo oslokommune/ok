@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.0](https://github.com/oslokommune/ok/compare/v4.7.5...v4.8.0) (2024-11-18)
+
+
+### Features
+
+* Output progress of schema update ([#317](https://github.com/oslokommune/ok/issues/317)) ([f9c32da](https://github.com/oslokommune/ok/commit/f9c32da419c0a2ee0dbc52474be07cbc538514a4))
+
 ## [4.7.5](https://github.com/oslokommune/ok/compare/v4.7.4...v4.7.5) (2024-11-18)
 
 

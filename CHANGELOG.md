@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.8.1](https://github.com/oslokommune/ok/compare/v4.8.0...v4.8.1) (2024-11-19)
+
+
+### Dependency Updates
+
+* bump cross-spawn from 7.0.3 to 7.0.5 in /docs-optimizer ([#316](https://github.com/oslokommune/ok/issues/316)) ([a40214c](https://github.com/oslokommune/ok/commit/a40214c362d9809f28143aa62a61f8527d68ecc9))
+
 ## [4.8.0](https://github.com/oslokommune/ok/compare/v4.7.5...v4.8.0) (2024-11-18)
 
 

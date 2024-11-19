@@ -35,4 +35,4 @@ updates:
         patterns:
           - "*"
     commit-message:
-      prefix: deps
+      prefix: ci(deps)

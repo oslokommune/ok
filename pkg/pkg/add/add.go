@@ -135,8 +135,17 @@ func createConfigFromBoilerplate(ctx context.Context, downloader config.FileDown
 
 	ignore_fields := []string{"AccountId", "Team", "Environment", "TemplateVersion", "TerraformVersion", "AwsProviderVersion", "Region"}
 
+	var prefix string
 	for _, module := range modules {
+		fmt.Println(module.Namespace)
+		if module.Namespace != "" {
+			prefix = module.Namespace + "."
+		} else {
+			prefix = ""
+		}
 		for _, variable := range module.Variables {
+
+			fmt.Println(variable.Name, variable)
 			if slices.Contains(ignore_fields, variable.Name) {
 				continue
 			}
@@ -144,13 +153,24 @@ func createConfigFromBoilerplate(ctx context.Context, downloader config.FileDown
 			//fmt.Println(variable)
 			
 			if variable.Default == nil {
-				if variable.Name == "StackName" || variable.Name == "AppName" {
-					variables[variable.Name] = stackName
+				if variable.Name == "StackName" || variable.Name == "AppName"  {
+					value := stackName
+					var valuePostfix string
+
+					if variable.Name == "AppName" {
+						value = strings.TrimPrefix(stackName, "app-")
+					}
+
+					if strings.Contains(prefix, "data") {
+						valuePostfix = "-data"
+					} 
+
+					variables[prefix + variable.Name] = value + valuePostfix
 				} else {
-					variables[variable.Name] = "<fill this in>"
+					variables[prefix + variable.Name] = "<fill this in>"
 				}
 			} else {
-				variables[variable.Name] = variable.Default
+				variables[prefix + variable.Name] = variable.Default
 			}
 		}
 	}

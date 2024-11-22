@@ -122,22 +122,14 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 	return newPackage, nil
 }
 
-type (
-	BPConfigVariable struct {
-		Name        string `yaml:"name"`
-		Default     string `yaml:"default,omitempty"`
-	}
-)
-
 func createConfigFromBoilerplate(ctx context.Context, downloader config.FileDownloader, stackPath, gitRef string, stackName string) ([]byte, error) {
 	stacks, err := config.DownloadBoilerplateStacksWithDependencies(ctx, downloader, stackPath)
 	if err != nil {
 		return []byte(""), fmt.Errorf("downloading boilerplate stacks: %w", err)
 	}
-	fmt.Println(ctx, downloader, stackPath, gitRef, stacks[0])
+	//fmt.Println(ctx, downloader, stackPath, gitRef, stacks[0])
 
 	modules := schema.BuildModuleVariables(stacks)
-	fmt.Println(modules)
 
 	variables := make(map[string]interface{}, 0)
 
@@ -149,8 +141,8 @@ func createConfigFromBoilerplate(ctx context.Context, downloader config.FileDown
 				continue
 			}
 
-			fmt.Println(variable)
-			//variables = append(variables, BPConfigVariable{ Name: variable.Name, Default: "default" })
+			//fmt.Println(variable)
+			
 			if variable.Default == nil {
 				if variable.Name == "StackName" || variable.Name == "AppName" {
 					variables[variable.Name] = stackName
@@ -180,13 +172,14 @@ func createDefaultConfig(ctx context.Context, gh *github.Client, manifest common
 	}
 	configFile := common.ConfigFile(manifest.PackageConfigPrefix(), outputFolder)
 
-	fmt.Println("Creating or updating configuration file: ", configFile)
-
 	if _, err := os.Stat(configFile); err == nil {
 		return nil
 	}
 
-	//Write to file
+	if err := os.MkdirAll(manifest.PackageConfigPrefix(), 0755); err != nil {
+		return fmt.Errorf("creating folder: %w", err)
+	}
+
 	err = os.WriteFile(configFile, defaultConfig, 0644)
 	if err != nil {
 		return fmt.Errorf("writing to file: %w", err)
@@ -194,11 +187,6 @@ func createDefaultConfig(ctx context.Context, gh *github.Client, manifest common
 
 	fmt.Println("Created configuration file: ", configFile)
 
-
-	// _, err = schema.CreateOrUpdateConfigurationFile(configFile, gitRef, generatedSchema)
-	// if err != nil {
-	// 	return fmt.Errorf("creating or updating configuration file: %w", err)
-	// }
 	return nil
 }
 

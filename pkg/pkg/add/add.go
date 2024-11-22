@@ -144,6 +144,9 @@ func createConfigFromBoilerplate(ctx context.Context, downloader config.FileDown
 			prefix = ""
 		}
 		for _, variable := range module.Variables {
+			if module.Namespace != "" && variable.Name != "StackName" {
+				continue
+			}
 
 			fmt.Println(variable.Name, variable)
 			if slices.Contains(ignore_fields, variable.Name) {

@@ -5,7 +5,6 @@
 ![Go](https://img.shields.io/badge/Go-teal)
 [![Brew packages](https://github.com/oslokommune/ok/actions/workflows/release.yml/badge.svg)](https://github.com/oslokommune/ok/actions/workflows/release.yml)
 
-
 <p align="center">
   <img width="200" src="https://github.com/oslokommune/ok/assets/1691190/7c705072-4971-4b48-811d-ee31550dea82">
 </p>
@@ -90,9 +89,9 @@ Use "ok [command] --help" for more information about a command.
 
 `ok` comes bundled with tab completions, but you may need to instruct your terminal to load them!
 
-When installing from Brew many programs are bundled with their own completions, you can make sure your terminal loads these completions by default.
+When installing programs using Brew, many are bundled with their own completions. You can make sure your terminal loads these completions by default.
 
-See the full description here: https://docs.brew.sh/Shell-Completion
+See the full description here: <https://docs.brew.sh/Shell-Completion>
 
 ### Using zsh with oh-my-zsh
 

@@ -12,24 +12,24 @@ func TestFindConfigFromPath(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
-		configs  []*config.BoilerplateStack
-		expected *config.BoilerplateStack
+		configs  []*config.BoilerplateTemplate
+		expected *config.BoilerplateTemplate
 		found    bool
 	}{
 		{
 			name: "config found",
 			path: "path1",
-			configs: []*config.BoilerplateStack{
+			configs: []*config.BoilerplateTemplate{
 				{Path: "path1"},
 				{Path: "path2"},
 			},
-			expected: &config.BoilerplateStack{Path: "path1"},
+			expected: &config.BoilerplateTemplate{Path: "path1"},
 			found:    true,
 		},
 		{
 			name: "config not found",
 			path: "path3",
-			configs: []*config.BoilerplateStack{
+			configs: []*config.BoilerplateTemplate{
 				{Path: "path1"},
 				{Path: "path2"},
 			},

@@ -118,15 +118,19 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 func updateSchemaConfig(ctx context.Context, gh *github.Client, manifest common.PackageManifest, templateName, gitRef, outputFolder string) error {
 	downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, gitRef)
 	stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), templateName)
+
 	generatedSchema, err := schema.GenerateJsonSchemaForApp(ctx, downloader, stackPath, gitRef)
 	if err != nil {
 		return fmt.Errorf("generating json schema for app: %w", err)
 	}
+
 	configFile := common.ConfigFile(manifest.PackageConfigPrefix(), outputFolder)
+
 	_, err = schema.CreateOrUpdateConfigurationFile(configFile, gitRef, generatedSchema)
 	if err != nil {
 		return fmt.Errorf("creating or updating configuration file: %w", err)
 	}
+
 	return nil
 }
 

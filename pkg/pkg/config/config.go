@@ -27,7 +27,7 @@ type (
 		Variables    []BoilerplateVariable   `yaml:"variables"`
 		Dependencies []BoilerplateDependency `yaml:"dependencies"`
 	}
-	BoilerplateStack struct {
+	BoilerplateTemplate struct {
 		Path   string
 		Config *BoilerplateConfig
 	}
@@ -44,39 +44,45 @@ type GithubFileReference struct {
 	GitRef       string
 }
 
-func DownloadBoilerplateStacksWithDependencies(ctx context.Context, client FileDownloader, stackPath string) ([]*BoilerplateStack, error) {
-	stacks := make([]*BoilerplateStack, 0)
-	stackPathsToDownload := []string{stackPath}
-	downloadedStacks := make(map[string]bool)
+func DownloadBoilerplateTemplatesWithDependencies(ctx context.Context, client FileDownloader, initialTemplatePath string) ([]*BoilerplateTemplate, error) {
+	templates := make([]*BoilerplateTemplate, 0)
+	// stackPath example: boilerplate/terraform/app
+	// TODO: Add support for: git@github.com:oslokommune/golden-path-boilerplate//boilerplate/terraform/versions?ref=versions-v3.0.6
+	templatePathsOrUrisToDownload := []string{initialTemplatePath}
+	downloadedTemplates := make(map[string]bool)
 
-	for len(stackPathsToDownload) > 0 {
-		stackPath := stackPathsToDownload[0]
-		stackPathsToDownload = stackPathsToDownload[1:]
-		stack, err := DownloadBoilerplateStack(ctx, client, stackPath)
+	for len(templatePathsOrUrisToDownload) > 0 {
+		templatePath := templatePathsOrUrisToDownload[0]
+		templatePathsOrUrisToDownload = templatePathsOrUrisToDownload[1:]
+
+		template, err := DownloadBoilerplateTemplate(ctx, client, templatePath)
 		if err != nil {
 			return nil, fmt.Errorf("download boilerplate stack: %w", err)
 		}
-		stacks = append(stacks, stack)
-		downloadedStacks[stackPath] = true
+
+		templates = append(templates, template)
+		downloadedTemplates[templatePath] = true
+
 		// Add dependencies to download queue if not already downloaded
-		for _, dep := range stack.Config.Dependencies {
-			templateUrl := JoinPath(stackPath, dep.TemplateUrl)
-			if _, ok := downloadedStacks[templateUrl]; !ok {
-				stackPathsToDownload = append(stackPathsToDownload, templateUrl)
+		for _, dep := range template.Config.Dependencies {
+			templateUrl := JoinPath(templatePath, dep.TemplateUrl)
+			if _, ok := downloadedTemplates[templateUrl]; !ok {
+				templatePathsOrUrisToDownload = append(templatePathsOrUrisToDownload, templateUrl)
 			}
 		}
 	}
-	return stacks, nil
+
+	return templates, nil
 }
 
-func DownloadBoilerplateStack(ctx context.Context, client FileDownloader, stackPath string) (*BoilerplateStack, error) {
+func DownloadBoilerplateTemplate(ctx context.Context, client FileDownloader, stackPath string) (*BoilerplateTemplate, error) {
 	boilerplatePath := JoinPath(stackPath, "boilerplate.yml")
 	cfg, err := DownloadBoilerplateConfig(ctx, client, boilerplatePath)
 	if err != nil {
 		return nil, fmt.Errorf("download boilerplate config: %w", err)
 	}
 
-	return &BoilerplateStack{
+	return &BoilerplateTemplate{
 		Path:   stackPath,
 		Config: cfg,
 	}, nil

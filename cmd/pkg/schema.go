@@ -44,10 +44,12 @@ var SchemaDownloadCommand = &cobra.Command{
 
 		templatePath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), templateName)
 		fileDownloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, githubRef)
-		stacks, err := config.DownloadBoilerplateStacksWithDependencies(cmd.Context(), fileDownloader, templatePath)
+
+		stacks, err := config.DownloadBoilerplateTemplatesWithDependencies(cmd.Context(), fileDownloader, templatePath)
 		if err != nil {
 			return fmt.Errorf("downloading boilerplate stacks: %w", err)
 		}
+
 		if len(stacks) == 0 {
 			return fmt.Errorf("no stacks found")
 		}
@@ -73,6 +75,7 @@ var SchemaDownloadCommand = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("writing schema to file: %w", err)
 		}
+
 		slog.Info(fmt.Sprintf("Schema for %s-%s written to %s\n", templateName, templateVersion, outputFile.Name()))
 		return nil
 	},

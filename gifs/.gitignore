@@ -1,0 +1,4 @@
+# Don't commit media files - use drag and drop to README on GitHub manually instead
+*.gif
+*.webm
+*.mp4

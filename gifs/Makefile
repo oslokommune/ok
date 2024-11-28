@@ -1,0 +1,2 @@
+vhs:
+	vhs tape.vhs

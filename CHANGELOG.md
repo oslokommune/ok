@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.9.0](https://github.com/oslokommune/ok/compare/v4.8.1...v4.9.0) (2024-11-28)
+
+
+### Features
+
+* Make it possible to load gh CLI token from the hosts file used by gh ([#327](https://github.com/oslokommune/ok/issues/327)) ([9f30790](https://github.com/oslokommune/ok/commit/9f307906fbc747e98f50a4c94b072b247f37c743))
+
 ## [4.8.1](https://github.com/oslokommune/ok/compare/v4.8.0...v4.8.1) (2024-11-19)
 
 

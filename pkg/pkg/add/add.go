@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"gopkg.in/yaml.v3"
+    "bytes"
 	"slices"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
@@ -122,16 +123,58 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 	return newPackage, nil
 }
 
+type KeyVal struct {
+    Key string
+    Val interface{}
+}
+
+// Define an ordered map
+type OrderedMap []KeyVal
+
+// Implement the json.Marshaler interface
+func (omap OrderedMap) MarshalYAML() ([]byte, error) {
+    var buf bytes.Buffer
+
+    for _, kv := range omap {
+        key, err := yaml.Marshal(kv.Key)
+        if err != nil {
+            return nil, err
+        }
+		newKey := strings.TrimSuffix(string(key),"\n") + ": "
+        buf.WriteString(newKey)
+		
+		val, err := yaml.Marshal(kv.Val)
+        if err != nil {
+            return nil, err
+        }
+		
+
+		if _, ok := kv.Val.(string); ok {
+			buf.Write(val)
+		} else if _, ok := kv.Val.(int); ok {
+			buf.Write(val)
+		} else if _, ok := kv.Val.(bool); ok {
+			buf.Write(val)
+		} else {
+			buf.WriteString(string("\n"))
+			for _, line := range strings.Split(string(val), "\n") {
+				buf.WriteString("    " + line + "\n")
+			}
+		}
+    }
+
+    return buf.Bytes(), nil
+}
+
 func createConfigFromBoilerplate(ctx context.Context, downloader config.FileDownloader, stackPath, gitRef string, stackName string) ([]byte, error) {
 	stacks, err := config.DownloadBoilerplateStacksWithDependencies(ctx, downloader, stackPath)
 	if err != nil {
 		return []byte(""), fmt.Errorf("downloading boilerplate stacks: %w", err)
 	}
-	//fmt.Println(ctx, downloader, stackPath, gitRef, stacks[0])
 
 	modules := schema.BuildModuleVariables(stacks)
 
-	variables := make(map[string]interface{}, 0)
+	var  variables OrderedMap
 
 	ignore_fields := []string{"AccountId", "Team", "Environment", "TemplateVersion", "TerraformVersion", "AwsProviderVersion", "Region"}
 
@@ -143,6 +186,7 @@ func createConfigFromBoilerplate(ctx context.Context, downloader config.FileDown
 		} else {
 			prefix = ""
 		}
+
 		for _, variable := range module.Variables {
 			if module.Namespace != "" && variable.Name != "StackName" {
 				continue
@@ -152,8 +196,6 @@ func createConfigFromBoilerplate(ctx context.Context, downloader config.FileDown
 			if slices.Contains(ignore_fields, variable.Name) {
 				continue
 			}
-
-			//fmt.Println(variable)
 			
 			if variable.Default == nil {
 				if variable.Name == "StackName" || variable.Name == "AppName"  {
@@ -168,17 +210,17 @@ func createConfigFromBoilerplate(ctx context.Context, downloader config.FileDown
 						valuePostfix = "-data"
 					} 
 
-					variables[prefix + variable.Name] = value + valuePostfix
+					variables = append(variables, KeyVal{Key: prefix + variable.Name, Val: value + valuePostfix})
 				} else {
-					variables[prefix + variable.Name] = "<fill this in>"
+					variables = append(variables, KeyVal{Key: prefix + variable.Name, Val: "<fill this in>"})
 				}
 			} else {
-				variables[prefix + variable.Name] = variable.Default
+				variables = append(variables, KeyVal{Key: prefix + variable.Name, Val: variable.Default})
 			}
 		}
 	}
 
-	defaultConfig, err := yaml.Marshal(variables)
+	defaultConfig, err := variables.MarshalYAML()
 	if err != nil {
 		return []byte(""), fmt.Errorf("marshalling modules: %w", err)
 	}

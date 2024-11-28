@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/Masterminds/semver"
 	"github.com/google/go-github/v63/github"
 	"github.com/zalando/go-keyring"
+	"gopkg.in/yaml.v3"
 )
 
 const AuthErrorHelpMessage = `
@@ -32,6 +34,33 @@ Steps to resolve:
 type Release struct {
 	Component string
 	Version   string
+}
+
+// GhConfig represents the structure of the hosts.yml file
+type GhConfig struct {
+	Github struct {
+		OAuthToken string `yaml:"oauth_token,omitempty"`
+	} `yaml:"github.com,omitempty"`
+}
+
+// getGitHubTokenFromHostsFile retrieves the GitHub OAuth token from the gh CLI hosts.yml file
+func getGitHubTokenFromHostsFile() (string, error) {
+	configPath, err := getGhConfigPath()
+	if err != nil {
+		return "", err
+	}
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return "", err
+	}
+
+	var config GhConfig
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return "", err
+	}
+
+	return config.Github.OAuthToken, nil
 }
 
 func GetLatestOkVersion() (*semver.Version, error) {
@@ -91,7 +120,18 @@ func GetGitHubClient() (*github.Client, error) {
 	return github.NewClient(nil).WithAuthToken(token), nil
 }
 
+// getGHConfigPath returns the path to the gh CLI hosts.yml file
+func getGhConfigPath() (string, error) {
+	home := os.Getenv("HOME")
+	if home == "" {
+		return "", fmt.Errorf("$HOME environment variable not set")
+	}
+
+	return filepath.Join(home, ".config", "gh", "hosts.yml"), nil
+}
+
 func getGitHubToken() (string, error) {
+	// Try environment variables first
 	if token := os.Getenv("GH_TOKEN"); token != "" {
 		return token, nil
 	}
@@ -100,12 +140,19 @@ func getGitHubToken() (string, error) {
 		return token, nil
 	}
 
+	// Try system keyring
 	token, err := keyring.Get("gh:github.com", "")
-	if err != nil {
-		return "", err
+	if err == nil {
+		return token, nil
 	}
 
-	return token, nil
+	// Try hosts.yml file
+	token, err = getGitHubTokenFromHostsFile()
+	if err == nil {
+		return token, nil
+	}
+
+	return "", err
 }
 
 func listReleases(client *github.Client) ([]*github.RepositoryRelease, error) {

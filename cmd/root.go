@@ -22,11 +22,7 @@ var (
 
 Key functionalities include:
 
-- Creating and configuring new Terraform environments.
-- Bootstrapping S3 buckets and DynamoDB tables for remote state storage.
-- Managing environment variables and configuration files.
 - Executing AWS-specific commands.
-- Scaffolding new Terraform projects with predefined Boilerplate templates.
 - Managing and updating Boilerplate templates.
 
 Whether you're setting up a new environment or maintaining an existing one, %s simplifies and automates many of the repetitive tasks involved in infrastructure management.`, okString, okString),

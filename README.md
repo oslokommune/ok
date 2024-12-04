@@ -67,15 +67,10 @@ Usage:
 
 Available Commands:
   aws          Group of AWS related commands.
-  bootstrap    Bootstrap code for an S3 bucket and DynamoDB table to store Terraform state.
   completion   Generate the autocompletion script for the specified shell
-  env          Creates a new `env.yml` file with placeholder values.
-  envars       Exports the values in `env.yml` as environment variables.
   forward      Starts a port forwarding session to a database.
-  get          Get a template.
   help         Help about any command
   pkg          Group of package related commands for managing Boilerplate packages.
-  scaffold     Creates a new Terraform project with a `_config.tf`, `_variables.tf`, `_versions.tf`, and `_config.auto.tfvars.json` file based on values configured in `env.yml`.
   version      Prints the version of the `ok` tool and the current latest version available.
 
 Flags:

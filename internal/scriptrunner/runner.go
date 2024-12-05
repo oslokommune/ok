@@ -9,7 +9,7 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-//go:embed ok.sh port-forward.sh
+//go:embed port-forward.sh
 var scripts embed.FS
 
 // Loads a script from the embedded filesystem, writes it to a temp file, and returns the path to the temp file...

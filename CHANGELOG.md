@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.0.0](https://github.com/oslokommune/ok/compare/v4.9.0...v5.0.0) (2024-12-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* Remove deprecated functionality related to templates and setup of environments ([#331](https://github.com/oslokommune/ok/issues/331))
+
+### Features
+
+* Remove deprecated functionality related to templates and setup of environments ([#331](https://github.com/oslokommune/ok/issues/331)) ([c418074](https://github.com/oslokommune/ok/commit/c41807417db27f704092aae72a7b16ec23a5c0a7))
+
 ## [4.9.0](https://github.com/oslokommune/ok/compare/v4.8.1...v4.9.0) (2024-11-28)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.0](https://github.com/oslokommune/ok/compare/v5.0.0...v5.1.0) (2024-12-08)
+
+
+### Features
+
+* Add fzf as brew dependency ([5992caa](https://github.com/oslokommune/ok/commit/5992caa8d53141f2dc119f438cbb87a8dfa31429))
+
 ## [5.0.0](https://github.com/oslokommune/ok/compare/v4.9.0...v5.0.0) (2024-12-05)
 
 

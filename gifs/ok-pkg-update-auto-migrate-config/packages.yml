@@ -1,5 +1,5 @@
 Packages:
-    - OutputFolder: out/app-hello
+    - OutputFolder: app-hello
       Template: app
       Ref: app-v9.3.2
       VarFiles:

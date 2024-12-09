@@ -29,6 +29,8 @@ Sleep 5s
 Enter
 Sleep 10s
 
+Type "q"
+Sleep 1s
 Type "# Done!"
 
 Sleep 3s

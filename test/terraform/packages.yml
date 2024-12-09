@@ -5,15 +5,21 @@ Packages:
       VarFiles:
         - config/common-config.yml
         - config/app-hello.yml
+    - OutputFolder: out/app-common
+      Template: app-common
+      Ref: app-common-v3.0.2
+      VarFiles:
+        - config/common-config.yml
+        - config/app-common.yml
     - OutputFolder: out/networking
       Template: networking
       Ref: main
       VarFiles:
         - config/common-config.yml
         - config/networking.yml
-    - OutputFolder: out/networking2
-      Template: networking
+    - OutputFolder: out/databases
+      Template: databases
       Ref: main
       VarFiles:
         - config/common-config.yml
-        - config/networking.yml
+        - config/databases.yml

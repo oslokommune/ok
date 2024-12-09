@@ -1,15 +1,15 @@
-tape: pre-steps tape.vhs
-	vhs tape.vhs
-	open tape.webm
+main: pre-steps main.vhs
+	vhs main.vhs
+	open ok-pkg-install-interactive.webm
 	$(MAKE) post-steps
 
-version: pre-steps version.vhs
-	vhs version.vhs
+version: pre-steps version.tape
+	vhs version.tape
 	open version.webm
 	$(MAKE) post-steps
 
-interactive: pre-steps interactive.vhs
-	vhs interactive.vhs
+interactive: pre-steps interactive.tape
+	vhs interactive.tape
 	open interactive.webm
 	$(MAKE) post-steps
 

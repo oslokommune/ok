@@ -17,3 +17,5 @@ Sleep 3s
 Source interactive.tape
 
 Type "Done!"
+
+Sleep 3s

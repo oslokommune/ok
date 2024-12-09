@@ -1,0 +1,5 @@
+StackName: "databases"
+
+Serverless:
+  Enable: True
+IncludeLockFile: true

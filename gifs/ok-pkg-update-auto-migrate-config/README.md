@@ -1,18 +1,14 @@
-This directory contains videos demonstrating the command `ok pkg install --interactive`.
+This directory contains videos demonstrating how the command `ok pkg update` automatically migrates the configuration
+file for an application stack.
 
 # Demo
 
-[ok-pkg-install-interactive.webm](https://github.com/user-attachments/assets/e5c50d37-46c6-4364-bafc-f1fdd1432f9a)
 
-# Generate demo videos
+
+# Generate demo video
 
 Create the full video:
 
 ```sh
 make
 ``` 
-
-To create parts of the video, run:
-
-- `make interactive`
-- `make version`

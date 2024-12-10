@@ -2,19 +2,21 @@ Require ok
 
 Output interactive.webm
 
-
-Set Width 1500
-Set Height 600
-
-Set FontSize 15
+Set FontSize 18
+Set Width 1600
+Set Height 900
+Set Framerate 24
 
 Set TypingSpeed 100ms
 
-Type "ok pkg install --interactive"
+Type "eza --tree **.yml config/"
+Sleep 3s
+Enter
 Sleep 3s
 
+Type "ok pkg install --interactive"
+Sleep 3s
 Enter
-
 Sleep 3s
 
 Down@500ms
@@ -36,9 +38,12 @@ Down@1s
 Sleep 1s
 
 Type "x"
-
-Sleep 3s
-
+Sleep 5s
 Enter
 
 Sleep 13s
+
+Type "eza --tree out/"
+Sleep 3s
+Enter
+Sleep 3s

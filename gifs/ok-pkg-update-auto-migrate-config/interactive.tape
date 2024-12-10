@@ -2,11 +2,10 @@ Require ok
 
 Output interactive.webm
 
-
-Set Width 1500
-Set Height 600
-
-Set FontSize 15
+Set FontSize 23
+Set Width 1600
+Set Height 900
+Set Framerate 24
 
 Set TypingSpeed 100ms
 

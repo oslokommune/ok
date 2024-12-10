@@ -2,7 +2,7 @@ Require ok
 
 Output interactive.webm
 
-Set FontSize 18
+Set FontSize 23
 Set Width 1600
 Set Height 900
 Set Framerate 24

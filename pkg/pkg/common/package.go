@@ -7,9 +7,13 @@ import (
 )
 
 const (
-	outputFolderWidth = 45
-	templateWidth     = 40
-	varFilesWidth     = 80
+	outputFolderWidth = 18
+	templateWidth     = 18
+	varFilesWidth     = 50
+
+	//outputFolderWidth = 5
+	//templateWidth     = 5
+	//varFilesWidth     = 5
 )
 
 type Package struct {

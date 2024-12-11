@@ -1,5 +1,5 @@
-main: pre-steps main.vhs
-	vhs main.vhs
+main: pre-steps ok-pkg-install-interactive.vhs
+	vhs ok-pkg-install-interactive.vhs
 	open ok-pkg-install-interactive.webm
 	$(MAKE) post-steps
 
@@ -20,3 +20,4 @@ pre-steps:
 post-steps:
 	rm packages.yml
 	rm -rf config
+	rm -rf out/

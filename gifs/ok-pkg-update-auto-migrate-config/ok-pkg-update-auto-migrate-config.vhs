@@ -1,12 +1,11 @@
 Require ok
 
-Output main.gif
-Output main.webm
+Output ok-pkg-update-auto-migrate-config.webm
 
-Set Width 1500
-Set Height 600
-
-Set FontSize 15
+Set FontSize 23
+Set Width 1600
+Set Height 900
+Set Framerate 24
 
 Set TypingSpeed 100ms
 
@@ -27,10 +26,8 @@ Sleep 10s
 Type "git diff config/app-hello.yml"
 Sleep 5s
 Enter
-Sleep 10s
+Sleep 5s
 
-Type "q"
-Sleep 1s
 Type "# Done!"
 
 Sleep 3s

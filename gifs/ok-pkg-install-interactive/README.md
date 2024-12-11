@@ -2,7 +2,7 @@ This directory contains videos demonstrating the command `ok pkg install --inter
 
 # Demo
 
-[ok-pkg-install-interactive.webm](https://github.com/user-attachments/assets/ec4d89f8-f5bc-475c-9d9f-ba9577c2aa6d)
+[ok-pkg-install-interactive.webm](https://github.com/user-attachments/assets/2745f786-7627-414d-9f37-75b64a0fc467)
 
 # Generate demo videos
 

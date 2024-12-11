@@ -7,13 +7,9 @@ import (
 )
 
 const (
-	outputFolderWidth = 18
-	templateWidth     = 18
-	varFilesWidth     = 50
-
-	//outputFolderWidth = 5
-	//templateWidth     = 5
-	//varFilesWidth     = 5
+	outputFolderWidth = 45
+	templateWidth     = 40
+	varFilesWidth     = 80
 )
 
 type Package struct {
@@ -24,28 +20,10 @@ type Package struct {
 }
 
 func (p Package) String() string {
-	var reversedVarFiles []string
-	for i := len(p.VarFiles) - 1; i >= 0; i-- {
-		reversedVarFiles = append(reversedVarFiles, p.VarFiles[i])
-	}
-
 	outputFolder := fmt.Sprintf("%-*.*s", outputFolderWidth, outputFolderWidth, p.OutputFolder)
-	if len(outputFolder) > outputFolderWidth {
-		outputFolder = fmt.Sprintf("%s...", outputFolder[:outputFolderWidth-3])
-		fmt.Println(outputFolder)
-	}
-
 	template := fmt.Sprintf("%-*.*s", templateWidth, templateWidth, p.Template)
-	if len(template) > templateWidth {
-		template = fmt.Sprintf("%s...", template[:templateWidth-3])
-	}
+	varFiles := fmt.Sprintf("%-*.*s", varFilesWidth, varFilesWidth, fmt.Sprint(p.VarFiles))
 
-	varFiles := fmt.Sprintf("%-*.*s", varFilesWidth, varFilesWidth, fmt.Sprint(reversedVarFiles))
-	if len(varFiles) > varFilesWidth {
-		varFiles = fmt.Sprintf("%s...", varFiles[:varFilesWidth-3])
-	}
-
-	//return fmt.Sprintf("OutputFolder:%s\n\tTemplate: %s\n\tVarFiles: %s", outputFolder, template, varFiles)
 	return fmt.Sprintf("%s %s %s", outputFolder, template, varFiles)
 }
 

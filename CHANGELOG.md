@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.2.0](https://github.com/oslokommune/ok/compare/v5.1.0...v5.2.0) (2024-12-13)
+
+
+### Features
+
+* Add more details about ForbiddenException ([#338](https://github.com/oslokommune/ok/issues/338)) ([5b18c20](https://github.com/oslokommune/ok/commit/5b18c201930631c9f1c5ac761f57dfb8ee637973))
+
 ## [5.1.0](https://github.com/oslokommune/ok/compare/v5.0.0...v5.1.0) (2024-12-08)
 
 

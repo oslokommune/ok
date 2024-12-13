@@ -64,7 +64,16 @@ func StartAdminSession(startShell bool) error {
 	printDivider()
 	if err != nil {
 		fmt.Print("\n", red.Render("Blaah!! You don't have the correct rights!"), "\n")
-		return cleanupAndQuit(awsProfile)
+		err := cleanupAndQuit(awsProfile)
+		if err != nil {
+			return err
+		}
+		fmt.Print("\n", green.Render("Tip!"), "\n")
+		fmt.Print("If you got a ForbiddenException, most probably the group membership wasn't still synced properly.\n")
+		fmt.Print("Try to re-authenticate towards AWS. That should hopefully help.\n\n")
+		fmt.Print("First set your environment: ", yellow.Render("export AWS_PROFILE="+awsProfile), "\n\n")
+		fmt.Print("Then try to re-authenticate: ", yellow.Render("aws sso logout && aws sso login"), "\n")
+		return nil
 	}
 
 	fmt.Print("\n", green.Render("Great! Access granted"), "\n\n")

@@ -29,12 +29,12 @@ func Run(pkgManifestFilename string, packages []common.Package, opts Options) er
 	}
 
 	if !opts.DisableManifestUpdate {
-		err = updatePackages(packages, latestReleases, manifest)
+		updatedManifest, err := updatePackages(packages, latestReleases, manifest)
 		if err != nil {
 			return fmt.Errorf("updating packages: %w", err)
 		}
 
-		err = common.SavePackageManifest(pkgManifestFilename, manifest)
+		err = common.SavePackageManifest(pkgManifestFilename, updatedManifest)
 		if err != nil {
 			return fmt.Errorf("saving package manifest: %w", err)
 		}
@@ -61,28 +61,27 @@ func Run(pkgManifestFilename string, packages []common.Package, opts Options) er
 	return nil
 }
 
-func updatePackages(packagestoUpdate []common.Package, latestReleases map[string]string, manifest common.PackageManifest) error {
+func updatePackages(packagestoUpdate []common.Package, latestReleases map[string]string, manifest common.PackageManifest) (common.PackageManifest, error) {
+	updatedManifest := manifest // This works as long as the manifest do not contain any pointers.
+	updatedPackages := make([]common.Package, 0, len(packagestoUpdate))
 
-	for i := range manifest.Packages {
-		manifestPkg := &manifest.Packages[i]
-
-		if !common.ContainsPackage(packagestoUpdate, *manifestPkg) {
-			continue
-		}
-
-		latestRelease, ok := latestReleases[manifestPkg.Template] // e.g. v2.1.3
+	for _, pkg := range packagestoUpdate {
+		latestRelease, ok := latestReleases[pkg.Template] // e.g. v2.1.3
 		if !ok {
-			return fmt.Errorf("no latest release found for package: %s", manifestPkg.Template)
+			return common.PackageManifest{}, fmt.Errorf("no latest release found for package: %s", pkg.Template)
 		}
 
-		newRef := fmt.Sprintf("%s-%s", manifestPkg.Template, latestRelease) // e.g. app-v2.1.3
+		newRef := fmt.Sprintf("%s-%s", pkg.Template, latestRelease) // e.g. app-v2.1.3
 
-		if manifestPkg.Ref != newRef {
-			manifestPkg.Ref = newRef
+		if pkg.Ref != newRef {
+			pkg.Ref = newRef
+			updatedPackages = append(updatedPackages, pkg)
 		}
 	}
 
-	return nil
+	updatedManifest.Packages = updatedPackages
+
+	return updatedManifest, nil
 }
 
 func updateSchemaConfiguration(ctx context.Context, packages []common.Package, manifest common.PackageManifest, latestReleases map[string]string) error {

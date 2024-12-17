@@ -12,6 +12,7 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
+// Run updates the package manifest with the latest releases.
 func Run(pkgManifestFilename string, packages []common.Package, opts Options) error {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
@@ -23,28 +24,31 @@ func Run(pkgManifestFilename string, packages []common.Package, opts Options) er
 		if strings.Contains(err.Error(), "secret not found in keyring") {
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", githubreleases.AuthErrorHelpMessage)
 		}
+
 		return fmt.Errorf("failed getting latest github releases: %w", err)
 	}
 
-	updatedPackages, err := updatePackages(packages, latestReleases, manifest)
-	if err != nil {
-		return fmt.Errorf("updating packages: %w", err)
-	}
+	if !opts.DisableManifestUpdate {
+		err = updatePackages(packages, latestReleases, manifest)
+		if err != nil {
+			return fmt.Errorf("updating packages: %w", err)
+		}
 
-	err = common.SavePackageManifest(pkgManifestFilename, manifest)
-	if err != nil {
-		return fmt.Errorf("saving package manifest: %w", err)
+		err = common.SavePackageManifest(pkgManifestFilename, manifest)
+		if err != nil {
+			return fmt.Errorf("saving package manifest: %w", err)
+		}
 	}
 
 	if opts.UpdateSchemaConfig {
-		err = updateSchemaConfiguration(context.Background(), updatedPackages, manifest, latestReleases)
+		err = updateSchemaConfiguration(context.Background(), packages, manifest, latestReleases)
 		if err != nil {
 			return err
 		}
 	}
 
 	if opts.MigrateConfig {
-		err = migrate_config.MigratePackageConfig(updatedPackages)
+		err = migrate_config.MigratePackageConfig(packages)
 		if err != nil {
 			return fmt.Errorf("migrating package config: %w", err)
 		}
@@ -57,12 +61,10 @@ func Run(pkgManifestFilename string, packages []common.Package, opts Options) er
 	return nil
 }
 
-func updatePackages(packagestoUpdate []common.Package, latestReleases map[string]string, manifest common.PackageManifest) ([]common.Package, error) {
-	updatedPackages := make([]common.Package, 0, len(packagestoUpdate))
+func updatePackages(packagestoUpdate []common.Package, latestReleases map[string]string, manifest common.PackageManifest) error {
 
 	for i := range manifest.Packages {
 		manifestPkg := &manifest.Packages[i]
-
 
 		if !common.ContainsPackage(packagestoUpdate, *manifestPkg) {
 			continue
@@ -70,18 +72,17 @@ func updatePackages(packagestoUpdate []common.Package, latestReleases map[string
 
 		latestRelease, ok := latestReleases[manifestPkg.Template] // e.g. v2.1.3
 		if !ok {
-			return nil, fmt.Errorf("no latest release found for package: %s", manifestPkg.Template)
+			return fmt.Errorf("no latest release found for package: %s", manifestPkg.Template)
 		}
 
 		newRef := fmt.Sprintf("%s-%s", manifestPkg.Template, latestRelease) // e.g. app-v2.1.3
 
 		if manifestPkg.Ref != newRef {
 			manifestPkg.Ref = newRef
-			updatedPackages = append(updatedPackages, *manifestPkg)
 		}
 	}
 
-	return updatedPackages, nil
+	return nil
 }
 
 func updateSchemaConfiguration(ctx context.Context, updatedPackages []common.Package, manifest common.PackageManifest, latestReleases map[string]string) error {
@@ -134,6 +135,7 @@ func getLastConfigFile(pkg common.Package) (string, bool) {
 }
 
 type Options struct {
-	MigrateConfig      bool
-	UpdateSchemaConfig bool
+	DisableManifestUpdate bool
+	MigrateConfig         bool
+	UpdateSchemaConfig    bool
 }

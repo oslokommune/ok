@@ -85,7 +85,7 @@ func updatePackages(packagestoUpdate []common.Package, latestReleases map[string
 	return nil
 }
 
-func updateSchemaConfiguration(ctx context.Context, updatedPackages []common.Package, manifest common.PackageManifest, latestReleases map[string]string) error {
+func updateSchemaConfiguration(ctx context.Context, packages []common.Package, manifest common.PackageManifest, latestReleases map[string]string) error {
 	gh, err := githubreleases.GetGitHubClient()
 	if err != nil {
 		return fmt.Errorf("getting GitHub client: %w", err)
@@ -93,8 +93,12 @@ func updateSchemaConfiguration(ctx context.Context, updatedPackages []common.Pac
 
 	fmt.Printf("Updating schema configuration files: ")
 
-	for i, pkg := range updatedPackages {
+	for i, pkg := range packages {
 		newRef := fmt.Sprintf("%s-%s", pkg.Template, latestReleases[pkg.Template])
+		if manifest.Packages[i].Ref == newRef {
+			continue
+		}
+
 		manifest.Packages[i].Ref = newRef
 
 		if i > 0 {

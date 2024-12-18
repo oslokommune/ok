@@ -2,9 +2,12 @@ package update
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/Masterminds/semver"
 	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config"
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
 	"os"
 	"strings"
 
@@ -14,41 +17,37 @@ import (
 
 // Run updates the package manifest with the latest releases.
 func Run(pkgManifestFilename string, selectedPackages []common.Package, opts Options) error {
-	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
-	if err != nil {
-		return fmt.Errorf("loading package manifest: %w", err)
-	}
-
-	latestReleases, err := githubreleases.GetLatestReleases()
-	if err != nil {
-		if strings.Contains(err.Error(), "secret not found in keyring") {
-			_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", githubreleases.AuthErrorHelpMessage)
+	var manifest common.PackageManifest
+	{
+		currentManifest, err := common.LoadPackageManifest(pkgManifestFilename)
+		if err != nil {
+			return fmt.Errorf("loading package manifest: %w", err)
 		}
 
-		return fmt.Errorf("failed getting latest github releases: %w", err)
-	}
+		if opts.DisableManifestUpdate {
+			manifest = currentManifest
+		} else {
+			manifest, err = updateManifest(currentManifest, selectedPackages)
+			if err != nil {
+				return fmt.Errorf("updating package manifest: %w", err)
+			}
 
-	if !opts.DisableManifestUpdate {
-		updatedManifest, err := updatePackages(manifest, selectedPackages, latestReleases)
-		if err != nil {
-			return fmt.Errorf("updating packages: %w", err)
-		}
-
-		err = common.SavePackageManifest(pkgManifestFilename, updatedManifest)
-		if err != nil {
-			return fmt.Errorf("saving package manifest: %w", err)
+			err = common.SavePackageManifest(pkgManifestFilename, manifest)
+			if err != nil {
+				return fmt.Errorf("saving package manifest: %w", err)
+			}
 		}
 	}
 
 	if opts.UpdateSchemaConfig {
-		err = updateSchemaConfiguration(context.Background(), manifest, selectedPackages, latestReleases)
+		err := updateSchemaConfiguration(context.Background(), manifest, selectedPackages)
 		if err != nil {
 			return err
 		}
 	}
 
 	if opts.MigrateConfig {
-		err = migrate_config.MigratePackageConfig(selectedPackages)
+		err := migrate_config.MigratePackageConfig(selectedPackages)
 		if err != nil {
 			return fmt.Errorf("migrating package config: %w", err)
 		}
@@ -59,6 +58,24 @@ func Run(pkgManifestFilename string, selectedPackages []common.Package, opts Opt
 	common.PrintProcessedPackages(selectedPackages, "updated")
 
 	return nil
+}
+
+func updateManifest(manifest common.PackageManifest, selectedPackages []common.Package) (common.PackageManifest, error) {
+	latestReleases, err := githubreleases.GetLatestReleases()
+	if err != nil {
+		if strings.Contains(err.Error(), "secret not found in keyring") {
+			_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", githubreleases.AuthErrorHelpMessage)
+		}
+
+		return common.PackageManifest{}, fmt.Errorf("failed getting latest github releases: %w", err)
+	}
+
+	updatedManifest, err := updatePackages(manifest, selectedPackages, latestReleases)
+	if err != nil {
+		return common.PackageManifest{}, fmt.Errorf("updating packages: %w", err)
+	}
+
+	return updatedManifest, nil
 }
 
 // updatePackages updates the package manifest with the latest releases. It only updates the packages found in packagesToUpdate.
@@ -86,9 +103,9 @@ func updatePackages(manifest common.PackageManifest, packagestoUpdate []common.P
 }
 
 // updateSchemaConfiguration does two things. For each package in the package manifest, that is also in selectedPackages:
-// 1) Download the latest JOSN schema file for each template.
-// 2) Update the stack configuration file header with the new JSON schema. For instance: "# yaml-language-server: $schema=.schemas/app-v8.0.5.schema.json"
-func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManifest, selectedPackages []common.Package, latestReleases map[string]string) error {
+// 1) Download the JSON schema file for each template. The version download is the one found in the package manifest.
+// 2) Update the stack configuration file header with the downloaded JSON schema. For instance: "# yaml-language-server: $schema=.schemas/app-v8.0.5.schema.json"
+func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManifest, selectedPackages []common.Package) error {
 	gh, err := githubreleases.GetGitHubClient()
 	if err != nil {
 		return fmt.Errorf("getting GitHub client: %w", err)
@@ -97,8 +114,16 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 	fmt.Printf("Updating schema configuration files: ")
 
 	for i, pkg := range selectedPackages {
-		newRef := fmt.Sprintf("%s-%s", pkg.Template, latestReleases[pkg.Template])
-		if manifest.Packages[i].Ref == newRef {
+		_, err := pkg.PackageVersion()
+		if err != nil && errors.As(err, &semver.ErrInvalidSemVer) {
+			// pkg.Ref might be "main". Let's skip this package.
+			continue
+		} else if err != nil {
+			return fmt.Errorf("parsing package version: %w", err)
+		}
+
+		varFile, ok := getLastVarFile(pkg)
+		if !ok {
 			continue
 		}
 
@@ -108,20 +133,31 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 			fmt.Printf("%s", pkg.OutputFolder)
 		}
 
-		configFile, ok := getLastConfigFile(pkg)
-		if !ok {
+		// Get current JSON schema for the package
+		jsonSchema, err := metadata.ParseFirstLine(varFile)
+		if err != nil && errors.Is(err, metadata.ErrMissingSchemaDeclaration) {
+			// Proceeed with downloading JSON schema and updating the varFile, so that the JSON schema declaration is
+			// added.
+		} else if err != nil {
+			return fmt.Errorf("parsing first line of file '%s': %w", varFile, err)
+		}
+
+		existingRef := fmt.Sprintf("%s-%s", jsonSchema.Template, jsonSchema.Version)
+		if existingRef == pkg.Ref {
+			// No need to update the varFile with a new JSON schema, as the existing one is up-to-date.
 			continue
 		}
 
-		downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, newRef)
+		// Update the JSON schema, i.e. download it and update the varFile's schema declaration to point to it.
+		downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, pkg.Ref)
 		stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), pkg.Template)
 
-		generatedSchema, err := schema.GenerateJsonSchemaForApp(ctx, downloader, stackPath, newRef)
+		generatedSchema, err := schema.GenerateJsonSchemaForApp(ctx, downloader, stackPath, pkg.Ref)
 		if err != nil {
 			return fmt.Errorf("generating json schema for app: %w", err)
 		}
 
-		_, err = schema.CreateOrUpdateConfigurationFile(configFile, newRef, generatedSchema)
+		_, err = schema.CreateOrUpdateConfigurationFile(varFile, pkg.Ref, generatedSchema)
 		if err != nil {
 			return fmt.Errorf("creating or updating configuration file: %w", err)
 		}
@@ -132,7 +168,7 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 	return nil
 }
 
-func getLastConfigFile(pkg common.Package) (string, bool) {
+func getLastVarFile(pkg common.Package) (string, bool) {
 	if len(pkg.VarFiles) > 0 {
 		return pkg.VarFiles[len(pkg.VarFiles)-1], true
 	}

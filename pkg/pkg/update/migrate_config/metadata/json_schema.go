@@ -1,20 +1,62 @@
 package metadata
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
 	"github.com/Masterminds/semver"
+	"os"
 	"regexp"
 	"strings"
 )
 
+var (
+	ErrMissingSchemaDeclaration = errors.New("missing schema declaration")
+)
+
 type JsonSchema struct {
+	// Template is a Boilerplate template, and can be for instance "app" or "networking"
 	Template string
-	Version  *semver.Version
+
+	// Version is the semantically versioned schema version, for instance 'v1.5.2'
+	Version *semver.Version
 }
 
-func ParseMetadata(firstLine string) (JsonSchema, error) {
+func ParseFirstLine(varFile string) (JsonSchema, error) {
+	firstLine, err := readFirstLine(varFile)
+	if err != nil {
+		return JsonSchema{}, fmt.Errorf("reading first line from %s: %w", varFile, err)
+	}
+
+	varFileMetadata, err := parseMetadata(firstLine)
+	if err != nil {
+		return JsonSchema{}, fmt.Errorf("parsing metadata from line '%s': %w", firstLine, err)
+	}
+
+	return varFileMetadata, nil
+}
+
+func readFirstLine(filename string) (string, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	if !scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			return "", err
+		}
+		return "", fmt.Errorf("file is empty")
+	}
+
+	return scanner.Text(), nil
+}
+
+func parseMetadata(firstLine string) (JsonSchema, error) {
 	if !strings.HasPrefix(firstLine, "# yaml-language-server: $schema=") {
-		return JsonSchema{}, fmt.Errorf("missing schema declaration")
+		return JsonSchema{}, ErrMissingSchemaDeclaration
 	}
 
 	template, version, err := parseSchemaLine(firstLine)

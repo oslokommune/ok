@@ -135,7 +135,7 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 		jsonSchema, err := metadata.ParseFirstLine(varFile)
 		if err != nil && errors.Is(err, metadata.ErrMissingSchemaDeclaration) {
 			// Proceeed with downloading JSON schema and updating the varFile, so that the JSON schema declaration is
-			// added.
+			// added to the varFile. The next time this code is run, the schema declaration will then be found.
 		} else if err != nil {
 			return fmt.Errorf("parsing first line of file '%s': %w", varFile, err)
 		}

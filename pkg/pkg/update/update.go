@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/Masterminds/semver"
 	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
@@ -115,11 +114,9 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 
 	for i, pkg := range selectedPackages {
 		_, err := pkg.PackageVersion()
-		if err != nil && errors.As(err, &semver.ErrInvalidSemVer) {
+		if err != nil {
 			// pkg.Ref might be "main". Let's skip this package.
 			continue
-		} else if err != nil {
-			return fmt.Errorf("parsing package version: %w", err)
 		}
 
 		varFile, ok := getLastVarFile(pkg)

@@ -98,8 +98,6 @@ func updateSchemaConfiguration(ctx context.Context, packages []common.Package, m
 			continue
 		}
 
-		manifest.Packages[i].Ref = newRef
-
 		if i > 0 {
 			fmt.Printf(", %s", pkg.OutputFolder)
 		} else {

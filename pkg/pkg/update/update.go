@@ -59,6 +59,7 @@ func Run(pkgManifestFilename string, selectedPackages []common.Package, opts Opt
 	return nil
 }
 
+// updateManifest updates package versions in the manifest with the latest releases from GitHub
 func updateManifest(manifest common.PackageManifest, selectedPackages []common.Package) (common.PackageManifest, error) {
 	latestReleases, err := githubreleases.GetLatestReleases()
 	if err != nil {

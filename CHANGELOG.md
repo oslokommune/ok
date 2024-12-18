@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.3.0](https://github.com/oslokommune/ok/compare/v5.2.0...v5.3.0) (2024-12-18)
+
+
+### Features
+
+* Add flag for skip manifest update ([#341](https://github.com/oslokommune/ok/issues/341)) ([2b1d887](https://github.com/oslokommune/ok/commit/2b1d887640a905c96e4c7084bd8c665a0b968476))
+
 ## [5.2.0](https://github.com/oslokommune/ok/compare/v5.1.0...v5.2.0) (2024-12-13)
 
 

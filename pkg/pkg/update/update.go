@@ -62,7 +62,7 @@ func Run(pkgManifestFilename string, packages []common.Package, opts Options) er
 }
 
 func updatePackages(packagestoUpdate []common.Package, latestReleases map[string]string, manifest common.PackageManifest) (common.PackageManifest, error) {
-	updatedManifest := manifest // This works as long as the manifest do not contain any pointers.
+	updatedManifest := manifest.Clone()
 	updatedPackages := make([]common.Package, 0, len(packagestoUpdate))
 
 	for _, pkg := range packagestoUpdate {
@@ -84,6 +84,9 @@ func updatePackages(packagestoUpdate []common.Package, latestReleases map[string
 	return updatedManifest, nil
 }
 
+// updateSchemaConfiguration does two things:
+// 1) Downloads the latest JOSN schema file for each template.
+// 2) Updates the stack configuration file header with the new JSON schema. For instance: "# yaml-language-server: $schema=.schemas/app-v8.0.5.schema.json"
 func updateSchemaConfiguration(ctx context.Context, packages []common.Package, manifest common.PackageManifest, latestReleases map[string]string) error {
 	gh, err := githubreleases.GetGitHubClient()
 	if err != nil {

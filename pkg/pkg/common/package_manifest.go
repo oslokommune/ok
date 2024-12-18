@@ -33,3 +33,14 @@ func (pm *PackageManifest) PackageOutputFolder(outputFolder string) string {
 	}
 	return outputFolder
 }
+
+// Clone returns a deep copy of the PackageManifest
+func (pm *PackageManifest) Clone() PackageManifest {
+	packages := make([]Package, len(pm.Packages))
+	copy(packages, pm.Packages)
+
+	return PackageManifest{
+		DefaultPackagePathPrefix: pm.DefaultPackagePathPrefix,
+		Packages:                 packages,
+	}
+}

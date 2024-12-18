@@ -142,7 +142,8 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 
 		existingRef := fmt.Sprintf("%s-%s", jsonSchema.Template, jsonSchema.Version)
 		if existingRef == pkg.Ref {
-			// No need to update the varFile with a new JSON schema, as the existing one is up-to-date.
+			// No need to update the varFile with a new JSON schema, as the existing one is as declared in the pacckage
+			// manifest.
 			continue
 		}
 

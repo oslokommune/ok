@@ -22,7 +22,7 @@ func init() {
 	UpdateCommand.Flags().BoolVar(&flagDisableManifestUpdate,
 		"disable-manifest-update",
 		false,
-		"Disable manifest version updates (useful when using an external dependency manager like Renovate)",
+		"Disable package manifest version updates (useful when using an external dependency manager like Renovate)",
 	)
 
 	UpdateCommand.Flags().BoolVar(&flagUpdateCommandUpdateSchema,

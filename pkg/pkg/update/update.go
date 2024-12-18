@@ -116,7 +116,7 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 	for i, pkg := range selectedPackages {
 		_, err := pkg.PackageVersion()
 		if err != nil {
-			// pkg.Ref might be "main". Let's skip this package.
+			// pkg.Ref might be "main". To keep code simple, we avoid dealing with non-semver versions.
 			continue
 		}
 

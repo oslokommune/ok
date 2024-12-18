@@ -13,7 +13,7 @@ import (
 )
 
 // Run updates the package manifest with the latest releases.
-func Run(pkgManifestFilename string, packages []common.Package, opts Options) error {
+func Run(pkgManifestFilename string, selectedPackages []common.Package, opts Options) error {
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
 		return fmt.Errorf("loading package manifest: %w", err)
@@ -29,7 +29,7 @@ func Run(pkgManifestFilename string, packages []common.Package, opts Options) er
 	}
 
 	if !opts.DisableManifestUpdate {
-		updatedManifest, err := updatePackages(packages, latestReleases, manifest)
+		updatedManifest, err := updatePackages(manifest, selectedPackages, latestReleases)
 		if err != nil {
 			return fmt.Errorf("updating packages: %w", err)
 		}
@@ -41,14 +41,14 @@ func Run(pkgManifestFilename string, packages []common.Package, opts Options) er
 	}
 
 	if opts.UpdateSchemaConfig {
-		err = updateSchemaConfiguration(context.Background(), packages, manifest, latestReleases)
+		err = updateSchemaConfiguration(context.Background(), manifest, selectedPackages, latestReleases)
 		if err != nil {
 			return err
 		}
 	}
 
 	if opts.MigrateConfig {
-		err = migrate_config.MigratePackageConfig(packages)
+		err = migrate_config.MigratePackageConfig(selectedPackages)
 		if err != nil {
 			return fmt.Errorf("migrating package config: %w", err)
 		}
@@ -56,12 +56,13 @@ func Run(pkgManifestFilename string, packages []common.Package, opts Options) er
 		fmt.Println("Not migrating package configuration files.")
 	}
 
-	common.PrintProcessedPackages(packages, "updated")
+	common.PrintProcessedPackages(selectedPackages, "updated")
 
 	return nil
 }
 
-func updatePackages(packagestoUpdate []common.Package, latestReleases map[string]string, manifest common.PackageManifest) (common.PackageManifest, error) {
+// updatePackages updates the package manifest with the latest releases. It only updates the packages found in packagesToUpdate.
+func updatePackages(manifest common.PackageManifest, packagestoUpdate []common.Package, latestReleases map[string]string) (common.PackageManifest, error) {
 	updatedManifest := manifest.Clone()
 	updatedPackages := make([]common.Package, 0, len(packagestoUpdate))
 
@@ -84,10 +85,10 @@ func updatePackages(packagestoUpdate []common.Package, latestReleases map[string
 	return updatedManifest, nil
 }
 
-// updateSchemaConfiguration does two things:
-// 1) Downloads the latest JOSN schema file for each template.
-// 2) Updates the stack configuration file header with the new JSON schema. For instance: "# yaml-language-server: $schema=.schemas/app-v8.0.5.schema.json"
-func updateSchemaConfiguration(ctx context.Context, packages []common.Package, manifest common.PackageManifest, latestReleases map[string]string) error {
+// updateSchemaConfiguration does two things. For each package in the package manifest, that is also in selectedPackages:
+// 1) Download the latest JOSN schema file for each template.
+// 2) Update the stack configuration file header with the new JSON schema. For instance: "# yaml-language-server: $schema=.schemas/app-v8.0.5.schema.json"
+func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManifest, selectedPackages []common.Package, latestReleases map[string]string) error {
 	gh, err := githubreleases.GetGitHubClient()
 	if err != nil {
 		return fmt.Errorf("getting GitHub client: %w", err)
@@ -95,7 +96,7 @@ func updateSchemaConfiguration(ctx context.Context, packages []common.Package, m
 
 	fmt.Printf("Updating schema configuration files: ")
 
-	for i, pkg := range packages {
+	for i, pkg := range selectedPackages {
 		newRef := fmt.Sprintf("%s-%s", pkg.Template, latestReleases[pkg.Template])
 		if manifest.Packages[i].Ref == newRef {
 			continue

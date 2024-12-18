@@ -79,7 +79,7 @@ func TestUpdatedPackages(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			updatedManifest, err := updatePackages(tc.packagesToUpdate, tc.latestReleases, tc.manifest)
+			updatedManifest, err := updatePackages(tc.manifest, tc.packagesToUpdate, tc.latestReleases)
 
 			if tc.expectError {
 				require.Error(t, err)

@@ -79,13 +79,13 @@ func TestUpdatedPackages(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := updatePackages(tc.packagesToUpdate, tc.latestReleases, tc.manifest)
+			updatedManifest, err := updatePackages(tc.manifest, tc.packagesToUpdate, tc.latestReleases)
 
 			if tc.expectError {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, tc.expected, result)
+				require.Equal(t, tc.expected, updatedManifest.Packages)
 			}
 		})
 	}
@@ -126,7 +126,7 @@ func TestGetLastConfigFile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, ok := getLastConfigFile(tt.pkg)
+			result, ok := getLastVarFile(tt.pkg)
 			require.Equal(t, tt.ok, ok)
 			require.Equal(t, tt.expected, result)
 		})

@@ -35,15 +35,10 @@ func MigratePackageConfig(packagesToUpdate []common.Package) error {
 func migrateVarFile(varFile string) error {
 	slog.Debug("updating var file", slog.String("varFile", varFile))
 
-	firstLine, err := readFirstLine(varFile)
-	if err != nil {
-		return fmt.Errorf("reading first line from %s: %w", varFile, err)
-	}
-
-	varFileMetadata, err := metadata.ParseMetadata(firstLine)
+	varFileMetadata, err := metadata.ParseFirstLine(varFile)
 	if err != nil {
 		slog.Debug("not updating, could not parse metadata",
-			slog.String("firstLine", firstLine),
+			slog.String("varFile", varFile),
 			slog.Any("error", err),
 		)
 

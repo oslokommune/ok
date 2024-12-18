@@ -33,6 +33,7 @@ func (p Package) Key() string {
 }
 
 // PackageVersion returns a semver.Version of the package's Ref, or an error if it fails to parse.
+// Example: If Ref is "app-v1.5.0", the returned version will be 1.5.0.
 func (p Package) PackageVersion() (*semver.Version, error) {
 	parts := strings.Split(p.Ref, "-")
 	versionString := parts[len(parts)-1]

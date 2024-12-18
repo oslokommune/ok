@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var flagDisableManifestUpdate bool
 var flagUpdateCommandUpdateSchema bool
 var flagMigrateConfig bool
 
@@ -18,8 +19,16 @@ func init() {
 	UpdateCommand.Flags().BoolVarP(&flagInteractive,
 		FlagInteractiveName, FlagInteractiveShorthand, false, FlagInteractiveUsage)
 
+	UpdateCommand.Flags().BoolVar(&flagDisableManifestUpdate,
+		"disable-manifest-update",
+		false,
+		"Disable package manifest version updates (useful when using an external dependency manager like Renovate)",
+	)
+
 	UpdateCommand.Flags().BoolVar(&flagUpdateCommandUpdateSchema,
-		"update-schema", true, "Update the JSON schema for affected packages")
+		"update-schema",
+		true,
+		"Update the JSON schema for affected packages")
 
 	UpdateCommand.Flags().BoolVar(&flagMigrateConfig,
 		"migrate-config",
@@ -74,8 +83,9 @@ ok pkg update my-package
 		}
 
 		opts := update.Options{
-			MigrateConfig:      flagMigrateConfig,
-			UpdateSchemaConfig: flagUpdateCommandUpdateSchema,
+			DisableManifestUpdate: flagDisableManifestUpdate,
+			MigrateConfig:         flagMigrateConfig,
+			UpdateSchemaConfig:    flagUpdateCommandUpdateSchema,
 		}
 
 		err = update.Run(common.PackagesManifestFilename, packages, opts)

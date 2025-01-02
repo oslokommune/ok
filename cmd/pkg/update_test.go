@@ -1,6 +1,7 @@
 package pkg_test
 
 import (
+	"fmt"
 	"github.com/oslokommune/ok/cmd/pkg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -32,15 +33,24 @@ func TestUpdateCommand(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := os.Chdir("testdata")
+			// Given
+			rootDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 			require.NoError(t, err)
+
+			defer os.RemoveAll(rootDir) // clean up
+
+			fmt.Println(rootDir)
 
 			cmd.SetArgs(tt.args)
 
+			// When
 			err = cmd.Execute()
+
+			// Then
 			if tt.expectedError {
 				assert.Error(t, err)
 			}
+
 		})
 	}
 }

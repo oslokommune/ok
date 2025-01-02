@@ -55,6 +55,7 @@ func TestUpdatedPackages(t *testing.T) {
 			},
 			expected: []common.Package{
 				{Template: "template1", Ref: "template1-v1.1.0", OutputFolder: "folder1"},
+				{Template: "template2", Ref: "template2-v1.0.0", OutputFolder: "folder2"},
 			},
 			expectError: false,
 		},

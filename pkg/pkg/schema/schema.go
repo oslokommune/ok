@@ -54,11 +54,11 @@ func WriteJsonSchemaFile(filePath string, schema *jsonschema.Document) (string, 
 
 const yamlLanguageServerComment = "# yaml-language-server:"
 
-func CreateOrUpdateConfigurationFile(configFilePath string, schemaName string, schema *jsonschema.Document) (string, error) {
-	configDir := filepath.Dir(configFilePath)
-	schemasDir := filepath.Join(configDir, ".schemas")
+func CreateOrUpdateVarFile(configFilePath string, schemaName string, schema *jsonschema.Document) (string, error) {
+	varFileDir := filepath.Dir(configFilePath)
+	schemasDir := filepath.Join(varFileDir, ".schemas")
 
-	if err := os.MkdirAll(configDir, 0755); err != nil {
+	if err := os.MkdirAll(varFileDir, 0755); err != nil {
 		return "", fmt.Errorf("creating output directory: %w", err)
 	}
 	if err := os.MkdirAll(schemasDir, 0755); err != nil {
@@ -67,13 +67,13 @@ func CreateOrUpdateConfigurationFile(configFilePath string, schemaName string, s
 	// write schema to the config dir with the name <schemaName>.schema.json
 	schemaFileName := fmt.Sprintf("%s.schema.json", schemaName)
 	schemaFilePath := filepath.Join(schemasDir, schemaFileName)
-	slog.Debug("writing schema file", slog.String("path", schemaFilePath), slog.String("configDir", configDir), slog.String("schemaDir", schemasDir), slog.String("schemaId", schema.ID))
+	slog.Debug("writing schema file", slog.String("path", schemaFilePath), slog.String("varFileDir", varFileDir), slog.String("schemaDir", schemasDir), slog.String("schemaId", schema.ID))
 	_, err := WriteJsonSchemaFile(schemaFilePath, schema)
 	if err != nil {
 		return "", fmt.Errorf("writing schema file to %s: %w", schemaFilePath, err)
 	}
 
-	relativeSchemaPath, err := filepath.Rel(configDir, schemaFilePath)
+	relativeSchemaPath, err := filepath.Rel(varFileDir, schemaFilePath)
 	if err != nil {
 		return "", fmt.Errorf("getting relative schema path: %w", err)
 	}
@@ -83,9 +83,9 @@ func CreateOrUpdateConfigurationFile(configFilePath string, schemaName string, s
 		return "", fmt.Errorf("reading file: %w", err)
 	}
 	// Find if the first line starts with # yaml-language-server
-	cleanedConfig := stripYamlLanguageServerComment(string(data))
-	newConfig := appendYamlLanguageServerComment(cleanedConfig, relativeSchemaPath)
-	err = os.WriteFile(configFilePath, []byte(newConfig), 0644)
+	cleanedVarFile := stripYamlLanguageServerComment(string(data))
+	newVarFile := appendYamlLanguageServerComment(cleanedVarFile, relativeSchemaPath)
+	err = os.WriteFile(configFilePath, []byte(newVarFile), 0644)
 	if err != nil {
 		return "", fmt.Errorf("overwriting config file %s: %w", configFilePath, err)
 	}

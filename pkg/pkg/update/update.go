@@ -78,26 +78,26 @@ func updateManifest(manifest common.PackageManifest, selectedPackages []common.P
 	return updatedManifest, nil
 }
 
-// updatePackages updates the package manifest with the latest releases. It only updates the packages found in packagesToUpdate.
-func updatePackages(manifest common.PackageManifest, packagestoUpdate []common.Package, latestReleases map[string]string) (common.PackageManifest, error) {
+// updatePackages updates the package manifest with the latest releases. It only updates the packages found in selectedPackages.
+func updatePackages(manifest common.PackageManifest, selectedPackages []common.Package, latestReleases map[string]string) (common.PackageManifest, error) {
 	updatedManifest := manifest.Clone()
-	updatedPackages := make([]common.Package, 0, len(packagestoUpdate))
 
-	for _, pkg := range packagestoUpdate {
+	for i, _ := range manifest.Packages {
+		pkg := &updatedManifest.Packages[i]
+
+		if !common.ContainsPackage(selectedPackages, *pkg) {
+			continue
+		}
+
+		// pkg is a package that is in selectedPackages, i.e. it should be updated
 		latestRelease, ok := latestReleases[pkg.Template] // e.g. v2.1.3
 		if !ok {
 			return common.PackageManifest{}, fmt.Errorf("no latest release found for package: %s", pkg.Template)
 		}
 
 		newRef := fmt.Sprintf("%s-%s", pkg.Template, latestRelease) // e.g. app-v2.1.3
-
-		if pkg.Ref != newRef {
-			pkg.Ref = newRef
-			updatedPackages = append(updatedPackages, pkg)
-		}
+		pkg.Ref = newRef
 	}
-
-	updatedManifest.Packages = updatedPackages
 
 	return updatedManifest, nil
 }
@@ -156,7 +156,7 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 			return fmt.Errorf("generating json schema for app: %w", err)
 		}
 
-		_, err = schema.CreateOrUpdateConfigurationFile(varFile, pkg.Ref, generatedSchema)
+		_, err = schema.CreateOrUpdateVarFile(varFile, pkg.Ref, generatedSchema)
 		if err != nil {
 			return fmt.Errorf("creating or updating configuration file: %w", err)
 		}

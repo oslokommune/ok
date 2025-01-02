@@ -123,7 +123,7 @@ func updateSchemaConfig(ctx context.Context, gh *github.Client, manifest common.
 		return fmt.Errorf("generating json schema for app: %w", err)
 	}
 	configFile := common.ConfigFile(manifest.PackageConfigPrefix(), outputFolder)
-	_, err = schema.CreateOrUpdateConfigurationFile(configFile, gitRef, generatedSchema)
+	_, err = schema.CreateOrUpdateVarFile(configFile, gitRef, generatedSchema)
 	if err != nil {
 		return fmt.Errorf("creating or updating configuration file: %w", err)
 	}

@@ -76,7 +76,7 @@ func parseMetadata(firstLine string) (JsonSchema, error) {
 }
 
 func parseSchemaLine(line string) (string, string, error) {
-	re := regexp.MustCompile(`\.schemas/(\w+)-(\S+)\.schema\.json`)
+	re := regexp.MustCompile(`\.schemas/([\w-]+)-(\S+)\.schema\.json`)
 
 	matches := re.FindStringSubmatch(line)
 	if len(matches) != 3 {

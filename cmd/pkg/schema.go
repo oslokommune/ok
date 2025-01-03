@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	cmdPkgCommon "github.com/oslokommune/ok/cmd/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"log/slog"
@@ -34,7 +35,7 @@ var SchemaDownloadCommand = &cobra.Command{
 		if len(args) < 1 {
 			return fmt.Errorf("missing template name")
 		}
-		manifest, err := common.LoadPackageManifest(common.PackagesManifestFilename)
+		manifest, err := common.LoadPackageManifest(flagPackageFile)
 		if err != nil {
 			return fmt.Errorf("could not load package manifest: %w", err)
 		}
@@ -80,4 +81,5 @@ var SchemaDownloadCommand = &cobra.Command{
 
 func init() {
 	SchemaCommand.AddCommand(SchemaDownloadCommand)
+	cmdPkgCommon.AddPackageFileFlag(SchemaDownloadCommand, &flagPackageFile)
 }

@@ -2,7 +2,6 @@ package common
 
 import "fmt"
 
-const PackagesManifestFilename = "packages.yml"
 const BoilerplateRepoOwner = "oslokommune"
 const BoilerplateRepoName = "golden-path-boilerplate"
 
@@ -18,6 +17,8 @@ const BoilerplatePackageGitHubActionsOutputFolder = "../.."
 const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//"
 const DefaultPackagePathPrefix = BoilerplatePackageTerraformPath
 const DefaultPackageConfigPrefix = BoilerplatePackageTerraformConfigPrefix
+
+const FlagNamePackagesFile = "packages-file"
 
 func ConfigFile(prefix, configName string) string {
 	if prefix == "" {

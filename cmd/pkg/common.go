@@ -22,4 +22,5 @@ If one or more output folders are specified, the command installs only the packa
 Set the environment variable BASE_URL to specify where package templates are downloaded from.
 `
 
+var flagPackageFile string
 var flagInteractive bool

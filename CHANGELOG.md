@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.3.2](https://github.com/oslokommune/ok/compare/v5.3.1...v5.3.2) (2025-01-03)
+
+
+### Bug Fixes
+
+* update templates with slash ([#350](https://github.com/oslokommune/ok/issues/350)) ([33c5f00](https://github.com/oslokommune/ok/commit/33c5f0085a467ff94c299eebcba3ee6539606179))
+
 ## [5.3.1](https://github.com/oslokommune/ok/compare/v5.3.0...v5.3.1) (2025-01-02)
 
 

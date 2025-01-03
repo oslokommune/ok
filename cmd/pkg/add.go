@@ -3,7 +3,6 @@ package pkg
 import (
 	"errors"
 	"fmt"
-	cmdPkgCommon "github.com/oslokommune/ok/cmd/pkg/common"
 	"log/slog"
 	"os"
 	"strings"
@@ -14,6 +13,11 @@ import (
 )
 
 var flagAddCommandUpdateSchema bool
+
+func init() {
+	AddCwdFlag(AddCommand, &flagCwd)
+	AddCommand.Flags().BoolVar(&flagAddCommandUpdateSchema, "update-schema", true, "Update the JSON schema for affected packages")
+}
 
 var AddCommand = &cobra.Command{
 	Use:   "add template [outputFolder]",
@@ -31,12 +35,12 @@ ok pkg add app ecommerce-api
 		templateName := getArg(args, 0, "")
 		outputFolder := getArg(args, 1, templateName)
 
-		result, err := add.Run(flagPackageFile, templateName, outputFolder, flagAddCommandUpdateSchema)
+		result, err := add.Run(flagCwd, templateName, outputFolder, flagAddCommandUpdateSchema)
 		if err != nil {
 			return err
 		}
 
-		slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, flagPackageFile, result.OutputFolder))
+		slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, flagCwd, result.OutputFolder))
 		nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
 		if len(nonExistingConfigFiles) > 0 {
 			slog.Info("\nCreate the following configuration files:\n")
@@ -46,11 +50,6 @@ ok pkg add app ecommerce-api
 		}
 		return nil
 	},
-}
-
-func init() {
-	cmdPkgCommon.AddPackageFileFlag(AddCommand, &flagPackageFile)
-	AddCommand.Flags().BoolVar(&flagAddCommandUpdateSchema, "update-schema", true, "Update the JSON schema for affected packages")
 }
 
 func getArg(args []string, index int, fallback string) string {

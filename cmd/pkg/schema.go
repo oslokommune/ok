@@ -3,7 +3,6 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	cmdPkgCommon "github.com/oslokommune/ok/cmd/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"log/slog"
@@ -13,6 +12,11 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/spf13/cobra"
 )
+
+func init() {
+	SchemaCommand.AddCommand(SchemaDownloadCommand)
+	AddCwdFlag(SchemaDownloadCommand, &flagCwd)
+}
 
 var SchemaCommand = &cobra.Command{
 	Use: "schema",
@@ -35,7 +39,7 @@ var SchemaDownloadCommand = &cobra.Command{
 		if len(args) < 1 {
 			return fmt.Errorf("missing template name")
 		}
-		manifest, err := common.LoadPackageManifest(flagPackageFile)
+		manifest, err := common.LoadPackageManifest(flagCwd)
 		if err != nil {
 			return fmt.Errorf("could not load package manifest: %w", err)
 		}
@@ -77,9 +81,4 @@ var SchemaDownloadCommand = &cobra.Command{
 		slog.Info(fmt.Sprintf("Schema for %s-%s written to %s\n", templateName, templateVersion, outputFile.Name()))
 		return nil
 	},
-}
-
-func init() {
-	SchemaCommand.AddCommand(SchemaDownloadCommand)
-	cmdPkgCommon.AddPackageFileFlag(SchemaDownloadCommand, &flagPackageFile)
 }

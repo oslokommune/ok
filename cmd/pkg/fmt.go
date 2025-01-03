@@ -2,13 +2,12 @@ package pkg
 
 import (
 	"fmt"
-	cmdPkgCommon "github.com/oslokommune/ok/cmd/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/format"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	cmdPkgCommon.AddPackageFileFlag(FmtCommand, &flagPackageFile)
+	AddCwdFlag(FmtCommand, &flagCwd)
 }
 
 var FmtCommand = &cobra.Command{
@@ -18,7 +17,7 @@ var FmtCommand = &cobra.Command{
 	SilenceErrors: true,
 	Args:          cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := format.Run(flagPackageFile)
+		err := format.Run(flagCwd)
 		if err != nil {
 			return fmt.Errorf("formatting package manifest file packages: %w", err)
 		}

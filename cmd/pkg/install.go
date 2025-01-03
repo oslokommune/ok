@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"fmt"
-	cmdPkgCommon "github.com/oslokommune/ok/cmd/pkg/common"
 	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
@@ -13,7 +12,7 @@ import (
 )
 
 func init() {
-	cmdPkgCommon.AddPackageFileFlag(InstallCommand, &flagPackageFile)
+	AddCwdFlag(InstallCommand, &flagCwd)
 
 	InstallCommand.Flags().BoolVarP(&flagInteractive,
 		FlagInteractiveName, FlagInteractiveShorthand, false, FlagInteractiveUsage)
@@ -38,7 +37,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 
 		var packages []common.Package
 
-		manifest, err := common.LoadPackageManifest(flagPackageFile)
+		manifest, err := common.LoadPackageManifest(flagCwd)
 		if err != nil {
 			return fmt.Errorf("loading package manifest: %w", err)
 		}
@@ -75,7 +74,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 }
 
 func installTabCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	manifest, err := common.LoadPackageManifest(flagPackageFile)
+	manifest, err := common.LoadPackageManifest(flagCwd)
 	if err != nil {
 		cmd.PrintErrf("failed to load package manifest: %s\n", err)
 		return nil, cobra.ShellCompDirectiveError

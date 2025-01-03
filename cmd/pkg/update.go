@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"fmt"
-	cmdPkgCommon "github.com/oslokommune/ok/cmd/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/install"
 	"github.com/oslokommune/ok/pkg/pkg/install/interactive"
 	"strings"
@@ -17,7 +16,7 @@ var flagUpdateCommandUpdateSchema bool
 var flagMigrateConfig bool
 
 func init() {
-	cmdPkgCommon.AddPackageFileFlag(UpdateCommand, &flagPackageFile)
+	AddCwdFlag(UpdateCommand, &flagCwd)
 
 	UpdateCommand.Flags().BoolVarP(&flagInteractive,
 		FlagInteractiveName, FlagInteractiveShorthand, false, FlagInteractiveUsage)
@@ -57,7 +56,8 @@ ok pkg update my-package
 
 		var packages []common.Package
 
-		manifest, err := common.LoadPackageManifest(flagPackageFile)
+		packageManifestPath := GetPackageManifestPath(flagCwd)
+		manifest, err := common.LoadPackageManifest(packageManifestPath)
 		if err != nil {
 			return fmt.Errorf("loading package manifest: %w", err)
 		}
@@ -90,7 +90,7 @@ ok pkg update my-package
 			UpdateSchemaConfig:    flagUpdateCommandUpdateSchema,
 		}
 
-		err = update.Run(flagPackageFile, packages, opts)
+		err = update.Run(packageManifestPath, packages, opts)
 		if err != nil {
 			return fmt.Errorf("updating packages: %w", err)
 		}
@@ -105,7 +105,8 @@ func updateTabCompletion(cmd *cobra.Command, args []string, toComplete string) (
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}
 
-	manifest, err := common.LoadPackageManifest(flagPackageFile)
+	packageManifestPath := GetPackageManifestPath(flagCwd)
+	manifest, err := common.LoadPackageManifest(packageManifestPath)
 	if err != nil {
 		cmd.PrintErrf("failed to load package manifest: %s\n", err)
 		return nil, cobra.ShellCompDirectiveError

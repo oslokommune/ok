@@ -111,9 +111,11 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 		return fmt.Errorf("getting GitHub client: %w", err)
 	}
 
-	fmt.Printf("Updating schema configuration files: ")
+	fmt.Println("Updating schema configuration files:")
 
-	for i, pkg := range selectedPackages {
+	for _, pkg := range selectedPackages {
+		fmt.Printf("- %s\n", pkg.OutputFolder)
+
 		_, err := pkg.PackageVersion()
 		if err != nil {
 			// pkg.Ref might be "main". To keep code simple, we avoid dealing with non-semver versions.
@@ -123,12 +125,6 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 		varFile, ok := getLastVarFile(pkg)
 		if !ok {
 			continue
-		}
-
-		if i > 0 {
-			fmt.Printf(", %s", pkg.OutputFolder)
-		} else {
-			fmt.Printf("%s", pkg.OutputFolder)
 		}
 
 		// Get current JSON schema for the package
@@ -161,8 +157,6 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 			return fmt.Errorf("creating or updating configuration file: %w", err)
 		}
 	}
-
-	fmt.Println()
 
 	return nil
 }

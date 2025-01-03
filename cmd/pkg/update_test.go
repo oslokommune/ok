@@ -15,9 +15,11 @@ func TestUpdateCommand(t *testing.T) {
 
 	// Define test cases
 	tests := []struct {
-		name          string
-		args          []string
-		expectedError bool
+		name            string
+		args            []string
+		expectedError   bool
+		packageManifest string
+		configDir       string
 	}{
 		{
 			name:          "Should work with no arguments",
@@ -25,9 +27,11 @@ func TestUpdateCommand(t *testing.T) {
 			expectedError: false,
 		},
 		{
-			name:          "Should work with output folder",
-			args:          []string{"out/app-common"},
-			expectedError: false,
+			name:            "Should work with output folder",
+			args:            []string{"out/app-common"},
+			expectedError:   false,
+			packageManifest: "packages.yml",
+			configDir:       "config",
 		},
 	}
 
@@ -37,7 +41,8 @@ func TestUpdateCommand(t *testing.T) {
 			rootDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 			require.NoError(t, err)
 
-			defer os.RemoveAll(rootDir) // clean up
+			defer os.RemoveAll(rootDir)
+			os.Stat(rootDir)
 
 			fmt.Println(rootDir)
 

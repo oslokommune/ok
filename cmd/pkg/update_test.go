@@ -50,9 +50,13 @@ func TestUpdateCommand(t *testing.T) {
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 			defer os.RemoveAll(tempDir)
 			require.NoError(t, err)
+
 			fmt.Println("tempDir: ", tempDir)
 			copyTestdataToTempDir(t, tt, tempDir)
 			cmd.SetArgs(tt.args)
+
+			err = os.Chdir(tempDir)
+			require.NoError(t, err)
 
 			// When
 			err = cmd.Execute()

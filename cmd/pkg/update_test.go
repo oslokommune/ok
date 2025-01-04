@@ -6,29 +6,38 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
+	"path/filepath"
 	"testing"
 )
+
+func copyFile(src, dst string) error {
+	input, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(dst, input, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type TestData struct {
+	name            string
+	args            []string // []string{"out/app-common"},
+	expectedError   bool
+	packageManifest string
+	configDir       string
+}
 
 func TestUpdateCommand(t *testing.T) {
 	// Initialize the command
 	cmd := pkg.UpdateCommand
 
-	// Define test cases
-	tests := []struct {
-		name            string
-		args            []string
-		expectedError   bool
-		packageManifest string
-		configDir       string
-	}{
+	tests := []TestData{
 		{
-			name:          "Should work with no arguments",
-			args:          []string{},
-			expectedError: false,
-		},
-		{
-			name:            "Should work with output folder",
-			args:            []string{"out/app-common"},
+			name:            "Should work with no arguments",
+			args:            []string{},
 			expectedError:   false,
 			packageManifest: "packages.yml",
 			configDir:       "config",
@@ -38,14 +47,11 @@ func TestUpdateCommand(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Given
-			rootDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
+			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
+			defer os.RemoveAll(tempDir)
 			require.NoError(t, err)
-
-			defer os.RemoveAll(rootDir)
-			os.Stat(rootDir)
-
-			fmt.Println(rootDir)
-
+			fmt.Println("tempDir: ", tempDir)
+			copyTestdataToTempDir(t, tt, tempDir)
 			cmd.SetArgs(tt.args)
 
 			// When
@@ -54,8 +60,27 @@ func TestUpdateCommand(t *testing.T) {
 			// Then
 			if tt.expectedError {
 				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
-
 		})
+	}
+}
+
+func copyTestdataToTempDir(t *testing.T, tt TestData, rootDir string) {
+	if tt.packageManifest != "" {
+		srcPath := filepath.Join("testdata", tt.packageManifest)
+		dstPath := filepath.Join(rootDir, tt.packageManifest)
+
+		err := copyFile(srcPath, dstPath)
+		require.NoError(t, err)
+	}
+
+	if tt.configDir != "" {
+		srcDir := os.DirFS(filepath.Join("testdata", tt.configDir))
+		dstDir := filepath.Join(rootDir, tt.configDir)
+
+		err := os.CopyFS(dstDir, srcDir)
+		require.NoError(t, err)
 	}
 }

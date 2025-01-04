@@ -25,22 +25,21 @@ func copyFile(src, dst string) error {
 type TestData struct {
 	name            string
 	args            []string // []string{"out/app-common"},
-	expectedError   bool
 	packageManifest string
 	configDir       string
+	expectError     bool
 }
 
 func TestUpdateCommand(t *testing.T) {
-	// Initialize the command
 	cmd := pkg.UpdateCommand
 
 	tests := []TestData{
 		{
 			name:            "Should work with no arguments",
 			args:            []string{},
-			expectedError:   false,
 			packageManifest: "packages.yml",
 			configDir:       "config",
+			expectError:     false,
 		},
 	}
 
@@ -62,7 +61,7 @@ func TestUpdateCommand(t *testing.T) {
 			err = cmd.Execute()
 
 			// Then
-			if tt.expectedError {
+			if tt.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)

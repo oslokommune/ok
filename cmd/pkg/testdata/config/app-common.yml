@@ -1,4 +1,0 @@
-# yaml-language-server: $schema=.schemas/app-common-v3.0.2.schema.json
-StackName: "app-common"
-
-IncludeLockFile: true

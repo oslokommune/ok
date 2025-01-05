@@ -10,16 +10,71 @@ import (
 	"testing"
 )
 
-func copyFile(src, dst string) error {
-	input, err := os.ReadFile(src)
-	if err != nil {
-		return err
+func TestUpdateCommand(t *testing.T) {
+	tests := []TestData{
+		{
+			name:            "Should work with no arguments",
+			args:            []string{"app-hello", "load-balancing-alb-main"},
+			packageManifest: "testdata/input/packages.yml",
+			configDir:       "testdata/input/config",
+			expectError:     false,
+			releases: map[string]string{
+				"app":                "v8.0.0",
+				"load-balancing-alb": "v4.0.0",
+			},
+		},
 	}
-	err = os.WriteFile(dst, input, 0644)
-	if err != nil {
-		return err
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Set up dependencies
+			ghReleases := &GitHubReleasesMock{
+				LatestReleases: tt.releases,
+			}
+			cmd := pkg.NewUpdateCommand(ghReleases)
+
+			// More setup code
+			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
+			defer func(path string) {
+				err := os.RemoveAll(path)
+				require.NoError(t, err)
+			}(tempDir)
+
+			require.NoError(t, err)
+
+			fmt.Println("tempDir: ", tempDir)
+			copyTestdataToTempDir(t, tt, tempDir)
+			cmd.SetArgs(tt.args)
+
+			testDir, err := os.Getwd()
+			require.NoError(t, err)
+
+			err = os.Chdir(tempDir)
+			require.NoError(t, err)
+
+			// When
+			err = cmd.Execute()
+
+			// Then
+			if tt.expectError {
+				assert.Error(t, err, "expected an error")
+				return
+			}
+
+			err = os.Chdir(testDir)
+			require.NoError(t, err)
+
+			actualBytes, err := os.ReadFile(filepath.Join(tempDir, "packages.yml"))
+			require.NoError(t, err)
+			actual := string(actualBytes)
+
+			expectedBytes, err := os.ReadFile(filepath.Join("testdata", "expected", "packages.yml"))
+			require.NoError(t, err)
+			expected := string(expectedBytes)
+
+			assert.Equal(t, expected, actual)
+		})
 	}
-	return nil
 }
 
 type TestData struct {
@@ -39,68 +94,34 @@ func (g *GitHubReleasesMock) GetLatestReleases() (map[string]string, error) {
 	return g.LatestReleases, nil
 }
 
-func TestUpdateCommand(t *testing.T) {
-	tests := []TestData{
-		{
-			name:            "Should work with no arguments",
-			args:            []string{"app-hello", "load-balancing-alb-main"},
-			packageManifest: "packages.yml",
-			configDir:       "config",
-			expectError:     false,
-			releases: map[string]string{
-				"app":                "v8.0.0",
-				"load-balancing-alb": "v4.0.0",
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Set up dependencies
-			ghReleases := &GitHubReleasesMock{
-				LatestReleases: tt.releases,
-			}
-			cmd := pkg.NewUpdateCommand(ghReleases)
-
-			// More setup code
-			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
-			defer os.RemoveAll(tempDir)
-			require.NoError(t, err)
-
-			fmt.Println("tempDir: ", tempDir)
-			copyTestdataToTempDir(t, tt, tempDir)
-			cmd.SetArgs(tt.args)
-
-			err = os.Chdir(tempDir)
-			require.NoError(t, err)
-
-			// When
-			err = cmd.Execute()
-
-			// Then
-			if tt.expectError {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-}
-
 func copyTestdataToTempDir(t *testing.T, tt TestData, rootDir string) {
 	if tt.packageManifest != "" {
-		srcPath := filepath.Join("testdata", tt.packageManifest)
-		dstPath := filepath.Join(rootDir, tt.packageManifest)
+		srcPath := tt.packageManifest
+		dstPath := filepath.Join(rootDir, filepath.Base(tt.packageManifest))
 
 		err := copyFile(srcPath, dstPath)
 		require.NoError(t, err)
 	}
 
 	if tt.configDir != "" {
-		srcDir := os.DirFS(filepath.Join("testdata", tt.configDir))
-		dstDir := filepath.Join(rootDir, tt.configDir)
+		srcDir := os.DirFS(tt.configDir)
+		dstDir := filepath.Join(rootDir, filepath.Base(tt.configDir))
 
 		err := os.CopyFS(dstDir, srcDir)
 		require.NoError(t, err)
 	}
+}
+
+func copyFile(src, dst string) error {
+	input, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(dst, input, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

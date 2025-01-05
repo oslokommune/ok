@@ -40,11 +40,11 @@ var SchemaDownloadCommand = &cobra.Command{
 		}
 		templateName := args[0]
 		templateVersion := releases[templateName]
-		githubRef := fmt.Sprintf("%s-%s", templateName, templateVersion)
+		gitRef := fmt.Sprintf("%s-%s", templateName, templateVersion)
 
 		templatePath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), templateName)
-		fileDownloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, githubRef)
-		stacks, err := config.DownloadBoilerplateStacksWithDependencies(cmd.Context(), fileDownloader, templatePath)
+		fileDownloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName)
+		stacks, err := config.DownloadBoilerplateStacksWithDependencies(cmd.Context(), fileDownloader, templatePath, gitRef)
 		if err != nil {
 			return fmt.Errorf("downloading boilerplate stacks: %w", err)
 		}

@@ -34,7 +34,7 @@ type (
 )
 
 type FileDownloader interface {
-	DownloadFile(ctx context.Context, file string) ([]byte, error)
+	DownloadFile(ctx context.Context, file string, gitRef string) ([]byte, error)
 }
 
 type GithubFileReference struct {
@@ -44,7 +44,7 @@ type GithubFileReference struct {
 	GitRef       string
 }
 
-func DownloadBoilerplateStacksWithDependencies(ctx context.Context, client FileDownloader, stackPath string) ([]*BoilerplateStack, error) {
+func DownloadBoilerplateStacksWithDependencies(ctx context.Context, client FileDownloader, stackPath string, gitRef string) ([]*BoilerplateStack, error) {
 	stacks := make([]*BoilerplateStack, 0)
 	stackPathsToDownload := []string{stackPath}
 	downloadedStacks := make(map[string]bool)
@@ -52,7 +52,7 @@ func DownloadBoilerplateStacksWithDependencies(ctx context.Context, client FileD
 	for len(stackPathsToDownload) > 0 {
 		stackPath := stackPathsToDownload[0]
 		stackPathsToDownload = stackPathsToDownload[1:]
-		stack, err := DownloadBoilerplateStack(ctx, client, stackPath)
+		stack, err := DownloadBoilerplateStack(ctx, client, stackPath, gitRef)
 		if err != nil {
 			return nil, fmt.Errorf("download boilerplate stack: %w", err)
 		}
@@ -69,9 +69,9 @@ func DownloadBoilerplateStacksWithDependencies(ctx context.Context, client FileD
 	return stacks, nil
 }
 
-func DownloadBoilerplateStack(ctx context.Context, client FileDownloader, stackPath string) (*BoilerplateStack, error) {
+func DownloadBoilerplateStack(ctx context.Context, client FileDownloader, stackPath string, gitRef string) (*BoilerplateStack, error) {
 	boilerplatePath := JoinPath(stackPath, "boilerplate.yml")
-	cfg, err := DownloadBoilerplateConfig(ctx, client, boilerplatePath)
+	cfg, err := DownloadBoilerplateConfig(ctx, client, boilerplatePath, gitRef)
 	if err != nil {
 		return nil, fmt.Errorf("download boilerplate config: %w", err)
 	}
@@ -82,8 +82,8 @@ func DownloadBoilerplateStack(ctx context.Context, client FileDownloader, stackP
 	}, nil
 }
 
-func DownloadBoilerplateConfig(ctx context.Context, client FileDownloader, filePath string) (*BoilerplateConfig, error) {
-	data, err := client.DownloadFile(ctx, filePath)
+func DownloadBoilerplateConfig(ctx context.Context, client FileDownloader, filePath string, gitRef string) (*BoilerplateConfig, error) {
+	data, err := client.DownloadFile(ctx, filePath, gitRef)
 	if err != nil {
 		return nil, err
 	}

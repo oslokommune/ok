@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/config"
 	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
@@ -16,6 +17,7 @@ import (
 
 type Updater struct {
 	ghReleases GitHubReleases
+	downloader config.FileDownloader
 }
 
 type GitHubReleases interface {
@@ -47,7 +49,7 @@ func (u Updater) Run(pkgManifestFilename string, selectedPackages []common.Packa
 	}
 
 	if opts.UpdateSchemaConfig {
-		err := updateSchemaConfiguration(context.Background(), manifest, selectedPackages)
+		err := updateSchemaConfiguration(context.Background(), manifest, selectedPackages, u.downloader)
 		if err != nil {
 			return err
 		}
@@ -113,12 +115,7 @@ func updatePackages(manifest common.PackageManifest, selectedPackages []common.P
 // updateSchemaConfiguration does two things. For each package in the package manifest, that is also in selectedPackages:
 // 1) Download the JSON schema file for each template. The version download is the one found in the package manifest.
 // 2) Update the stack configuration file header with the downloaded JSON schema. For instance: "# yaml-language-server: $schema=.schemas/app-v8.0.5.schema.json"
-func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManifest, selectedPackages []common.Package) error {
-	gh, err := githubreleases.GetGitHubClient()
-	if err != nil {
-		return fmt.Errorf("getting GitHub client: %w", err)
-	}
-
+func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManifest, selectedPackages []common.Package, downloader config.FileDownloader) error {
 	fmt.Println("Updating schema configuration files:")
 
 	for _, pkg := range selectedPackages {
@@ -152,7 +149,6 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 		}
 
 		// Update the JSON schema, i.e. download it and update the varFile's schema declaration to point to it.
-		downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, pkg.Ref)
 		stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), pkg.Template)
 
 		generatedSchema, err := schema.GenerateJsonSchemaForApp(ctx, downloader, stackPath, pkg.Ref)
@@ -182,8 +178,9 @@ type Options struct {
 	UpdateSchemaConfig    bool
 }
 
-func NewUpdater(ghReleases GitHubReleases) Updater {
+func NewUpdater(ghReleases GitHubReleases, downloader config.FileDownloader) Updater {
 	return Updater{
 		ghReleases: ghReleases,
+		downloader: downloader,
 	}
 }

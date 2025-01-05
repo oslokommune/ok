@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/config"
 	"github.com/oslokommune/ok/pkg/pkg/install"
 	"github.com/oslokommune/ok/pkg/pkg/install/interactive"
 	"strings"
@@ -15,12 +16,12 @@ type GitHubReleases interface {
 	GetLatestReleases() (map[string]string, error)
 }
 
-func NewUpdateCommand(ghReleases GitHubReleases) *cobra.Command {
+func NewUpdateCommand(ghReleases GitHubReleases, downloader config.FileDownloader) *cobra.Command {
 	var flagDisableManifestUpdate bool
 	var flagUpdateCommandUpdateSchema bool
 	var flagMigrateConfig bool
 
-	updater := update.NewUpdater(ghReleases)
+	updater := update.NewUpdater(ghReleases, downloader)
 
 	cmd := &cobra.Command{
 		Use:   "update [outputFolder ...]",

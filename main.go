@@ -20,6 +20,6 @@ func main() {
 		Commit:  commit,
 	}
 
-	cmd.Execute()
+	cmd.Run()
 
 }

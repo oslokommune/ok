@@ -11,26 +11,24 @@ import (
 type FileDownloader struct {
 	client *github.Client
 
-	owner  string
-	repo   string
-	gitref string
+	owner string
+	repo  string
 }
 
-func NewFileDownloader(client *github.Client, owner, repo, gitRef string) *FileDownloader {
+func NewFileDownloader(client *github.Client, owner, repo string) *FileDownloader {
 	return &FileDownloader{
 		client: client,
 		owner:  owner,
 		repo:   repo,
-		gitref: gitRef,
 	}
 }
 
-func (d *FileDownloader) DownloadFile(ctx context.Context, file string) ([]byte, error) {
+func (d *FileDownloader) DownloadFile(ctx context.Context, file string, gitRef string) ([]byte, error) {
 	_, res, err := d.client.Repositories.DownloadContents(ctx, d.owner, d.repo, file, &github.RepositoryContentGetOptions{
-		Ref: d.gitref,
+		Ref: gitRef,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("downloading github file (%s/%s/%s @ %s): %w", d.owner, d.repo, file, d.gitref, err)
+		return nil, fmt.Errorf("downloading github file (%s/%s/%s @ %s): %w", d.owner, d.repo, file, gitRef, err)
 	}
 	defer res.Body.Close()
 

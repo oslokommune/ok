@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"os"
 	"path"
@@ -38,18 +39,23 @@ Whether you're setting up a new environment or maintaining an existing one, %s s
 	defaultConfigPath string
 )
 
-// Execute is the main entry point for our program.
-func Execute() {
-	err := rootCmd.Execute()
+// Run is the main entry point for our program.
+func Run() {
+	err := initRootCmd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
+	err = rootCmd.Execute()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
 
-// init initializes the root command, setting up the configuration file path and flags.
-func init() {
+// initRootCmd initializes the root command, setting up the configuration file path and flags.
+func initRootCmd() error {
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 	defaultConfigPath = path.Join(home, ".config", "ok", "config.yml")
@@ -58,7 +64,14 @@ func init() {
 
 	// Create dependencies
 	ghReleases := &githubreleases.GitHubReleasesImpl{}
-	updateCommand := pkg.NewUpdateCommand(ghReleases)
+
+	gh, err := githubreleases.GetGitHubClient()
+	if err != nil {
+		return fmt.Errorf("getting GitHub client: %w", err)
+	}
+
+	downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName)
+	updateCommand := pkg.NewUpdateCommand(ghReleases, downloader)
 
 	// Add commands
 	rootCmd.AddCommand(pkgCommand)
@@ -73,6 +86,8 @@ func init() {
 	awsCommand.AddCommand(aws.AdminSessionCommand)
 
 	initializeConfiguration()
+
+	return nil
 }
 
 // initializeConfiguration is the function that initializes configuration using viper. It is called at the start of the application.

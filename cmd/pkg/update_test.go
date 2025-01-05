@@ -1,6 +1,7 @@
 package pkg_test
 
 import (
+	"context"
 	"fmt"
 	"github.com/oslokommune/ok/cmd/pkg"
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,8 @@ func TestUpdateCommand(t *testing.T) {
 			ghReleases := &GitHubReleasesMock{
 				LatestReleases: tt.releases,
 			}
-			cmd := pkg.NewUpdateCommand(ghReleases)
+			fileDownloaderMock := &FileDownloaderMock{}
+			cmd := pkg.NewUpdateCommand(ghReleases, fileDownloaderMock)
 
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 			defer func(path string) {
@@ -117,6 +119,19 @@ type GitHubReleasesMock struct {
 
 func (g *GitHubReleasesMock) GetLatestReleases() (map[string]string, error) {
 	return g.LatestReleases, nil
+}
+
+type FileDownloaderMock struct {
+}
+
+func (d *FileDownloaderMock) DownloadFile(ctx context.Context, file string, gitRef string) ([]byte, error) {
+	result := "HELLO WORLD"
+
+	if file == "boilerplate/terraform/app/boilerplate.yml" {
+
+	}
+
+	return []byte(result), nil
 }
 
 func copyTestdataToTempDir(t *testing.T, tt TestData, rootDir string) {

@@ -15,7 +15,7 @@ import (
 )
 
 func GenerateJsonSchemaForApp(ctx context.Context, downloader config.FileDownloader, stackPath, gitRef string) (*jsonschema.Document, error) {
-	stacks, err := config.DownloadBoilerplateStacksWithDependencies(ctx, downloader, stackPath)
+	stacks, err := config.DownloadBoilerplateStacksWithDependencies(ctx, downloader, stackPath, gitRef)
 	if err != nil {
 		return nil, fmt.Errorf("downloading boilerplate stacks: %w", err)
 	}

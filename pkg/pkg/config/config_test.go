@@ -162,7 +162,7 @@ dependencies:
 			downloader := funcDownloader(func() ([]byte, error) {
 				return []byte(tc.input), nil
 			})
-			config, err := DownloadBoilerplateConfig(ctx, downloader, "boilerplate.yml")
+			config, err := DownloadBoilerplateConfig(ctx, downloader, "boilerplate.yml", "")
 			require.NoError(t, err, "expect boil config to parse nicely")
 			require.Equal(t, tc.expect.Dependencies, config.Dependencies, "expect config dependencies to match")
 			require.Equal(t, tc.expect.Variables, config.Variables, "expect config variables to match")

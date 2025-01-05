@@ -116,7 +116,7 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 }
 
 func updateSchemaConfig(ctx context.Context, gh *github.Client, manifest common.PackageManifest, templateName, gitRef, outputFolder string) error {
-	downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, gitRef)
+	downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName)
 	stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), templateName)
 	generatedSchema, err := schema.GenerateJsonSchemaForApp(ctx, downloader, stackPath, gitRef)
 	if err != nil {

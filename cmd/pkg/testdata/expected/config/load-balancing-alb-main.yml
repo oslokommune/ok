@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=.schemas/load-balancing-alb-v4.0.0.schema.json
+StackName: "load-balancing-alb-main"
+load-balancing-alb-data.StackName: "load-balancing-alb-main-data"
+
+Name: "main"
+Internal: false
+Terragrunt:
+  Enable: true
+IncludeLockFile: false

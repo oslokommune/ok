@@ -24,28 +24,45 @@ func copyFile(src, dst string) error {
 
 type TestData struct {
 	name            string
-	args            []string // []string{"out/app-common"},
+	args            []string
 	packageManifest string
 	configDir       string
 	expectError     bool
+	releases        map[string]string
+}
+
+type GitHubReleasesMock struct {
+	LatestReleases map[string]string
+}
+
+func (g *GitHubReleasesMock) GetLatestReleases() (map[string]string, error) {
+	return g.LatestReleases, nil
 }
 
 func TestUpdateCommand(t *testing.T) {
-	cmd := pkg.UpdateCommand
-
 	tests := []TestData{
 		{
 			name:            "Should work with no arguments",
-			args:            []string{},
+			args:            []string{"app-hello", "load-balancing-alb-main"},
 			packageManifest: "packages.yml",
 			configDir:       "config",
 			expectError:     false,
+			releases: map[string]string{
+				"app":                "v8.0.0",
+				"load-balancing-alb": "v4.0.0",
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Given
+			// Set up dependencies
+			ghReleases := &GitHubReleasesMock{
+				LatestReleases: tt.releases,
+			}
+			cmd := pkg.NewUpdateCommand(ghReleases)
+
+			// More setup code
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 			defer os.RemoveAll(tempDir)
 			require.NoError(t, err)

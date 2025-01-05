@@ -13,13 +13,13 @@ import (
 func TestUpdateCommand(t *testing.T) {
 	tests := []TestData{
 		{
-			name:            "Should work with no arguments",
+			name:            "Should bump the Ref field for the specified packages",
 			args:            []string{"app-hello", "load-balancing-alb-main"},
 			packageManifest: "testdata/input/packages.yml",
 			configDir:       "testdata/input/config",
 			expectError:     false,
 			releases: map[string]string{
-				"app":                "v8.0.0",
+				"app":                "v9.0.0",
 				"load-balancing-alb": "v4.0.0",
 			},
 		},
@@ -27,13 +27,12 @@ func TestUpdateCommand(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Set up dependencies
+			// Given
 			ghReleases := &GitHubReleasesMock{
 				LatestReleases: tt.releases,
 			}
 			cmd := pkg.NewUpdateCommand(ghReleases)
 
-			// More setup code
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 			defer func(path string) {
 				err := os.RemoveAll(path)
@@ -49,7 +48,7 @@ func TestUpdateCommand(t *testing.T) {
 			testDir, err := os.Getwd()
 			require.NoError(t, err)
 
-			err = os.Chdir(tempDir)
+			err = os.Chdir(tempDir) // Works, but disables the possibility for parallel tests.
 			require.NoError(t, err)
 
 			// When
@@ -64,6 +63,7 @@ func TestUpdateCommand(t *testing.T) {
 			err = os.Chdir(testDir)
 			require.NoError(t, err)
 
+			// Compare package file
 			actualBytes, err := os.ReadFile(filepath.Join(tempDir, "packages.yml"))
 			require.NoError(t, err)
 			actual := string(actualBytes)

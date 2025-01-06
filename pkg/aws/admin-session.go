@@ -23,14 +23,15 @@ func StartAdminSession(startShell bool) error {
 	printDivider()
 
 	fmt.Print("\nEnable Access Package\n\n")
-	fmt.Print("Open this url in your favorite browser, and request access to an account of your choice:\n")
+	fmt.Print("1. Open this url in your favorite browser, and request access to an account of your choice:\n")
 	fmt.Print(yellow.Render(AccessPackageUrl), "\n\n")
 	err := openURL(AccessPackageUrl)
 	if err != nil {
 		return fmt.Errorf("opening URL: %w", err)
 	}
 	fmt.Print("After requesting access, you should be added to the needed EntraID group (usually within 30-60s).\n\n")
-	pressEnterToContinue("Confirm with ENTER when membership is confirmed on Slack")
+	fmt.Println("2. Wait for membership to be confirmed on on Slack")
+	pressEnterToContinue("3. Press ENTER")
 
 	printDivider()
 

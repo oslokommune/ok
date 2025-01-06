@@ -28,7 +28,7 @@ func TestConfigFile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := ConfigFile(tt.prefix, tt.configName)
+			result := VarFile(tt.prefix, tt.configName)
 			require.Equal(t, tt.expected, result)
 		})
 	}

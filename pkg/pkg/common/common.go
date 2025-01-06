@@ -19,11 +19,11 @@ const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//
 const DefaultPackagePathPrefix = BoilerplatePackageTerraformPath
 const DefaultPackageConfigPrefix = BoilerplatePackageTerraformConfigPrefix
 
-func ConfigFile(prefix, configName string) string {
+func VarFile(prefix, varFileName string) string {
 	if prefix == "" {
-		return fmt.Sprintf("%s.yml", configName)
+		return fmt.Sprintf("%s.yml", varFileName)
 	}
-	return fmt.Sprintf("%s/%s.yml", prefix, configName)
+	return fmt.Sprintf("%s/%s.yml", prefix, varFileName)
 }
 
 func PrintProcessedPackages(update []Package, action string) {

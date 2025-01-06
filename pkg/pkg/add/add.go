@@ -97,8 +97,8 @@ func getTemplateVersion(templateName string) (string, error) {
 }
 
 func createNewPackage(manifest common.PackageManifest, templateName, gitRef, outputFolder string) (common.Package, error) {
-	configFile := common.ConfigFile(manifest.PackageConfigPrefix(), outputFolder)
-	commonConfigFile := common.ConfigFile(manifest.PackageConfigPrefix(), "common-config")
+	configFile := common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
+	commonConfigFile := common.VarFile(manifest.PackageConfigPrefix(), "common-config")
 
 	varFiles := []string{
 		commonConfigFile,
@@ -118,15 +118,19 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 func updateSchemaConfig(ctx context.Context, gh *github.Client, manifest common.PackageManifest, templateName, gitRef, outputFolder string) error {
 	downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, gitRef)
 	stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), templateName)
+
 	generatedSchema, err := schema.GenerateJsonSchemaForApp(ctx, downloader, stackPath, gitRef)
 	if err != nil {
 		return fmt.Errorf("generating json schema for app: %w", err)
 	}
-	configFile := common.ConfigFile(manifest.PackageConfigPrefix(), outputFolder)
-	_, err = schema.CreateOrUpdateVarFile(configFile, gitRef, generatedSchema)
+
+	varFile := common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
+
+	_, err = schema.CreateOrUpdateVarFile(varFile, gitRef, generatedSchema)
 	if err != nil {
 		return fmt.Errorf("creating or updating configuration file: %w", err)
 	}
+
 	return nil
 }
 

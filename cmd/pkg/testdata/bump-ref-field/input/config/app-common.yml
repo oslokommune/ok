@@ -1,0 +1,6 @@
+StackName: "app-common"
+
+Terragrunt:
+  Enable: true
+
+IncludeLockFile: false

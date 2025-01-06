@@ -15,13 +15,26 @@ func TestUpdateCommand(t *testing.T) {
 		{
 			name:            "Should bump the Ref field for the specified packages",
 			args:            []string{"app-hello", "load-balancing-alb-main"},
-			packageManifest: "testdata/input/packages.yml",
-			configDir:       "testdata/input/config",
-			expectError:     false,
+			packageManifest: "testdata/bump-ref-field/input/packages.yml",
+			configDir:       "testdata/bump-ref-field/input/config",
 			releases: map[string]string{
 				"app":                "v9.0.0",
 				"load-balancing-alb": "v4.0.0",
+				"app-common":         "v7.0.0",
 			},
+			expectError:             false,
+			expectedPackageManifest: "testdata/bump-ref-field/expected/packages.yml",
+		},
+		{
+			name:            "Should bump the Ref field only for semver-versione package Refs",
+			args:            []string{},
+			packageManifest: "testdata/bump-ref-field-semver-only/input/packages.yml",
+			configDir:       "testdata/bump-ref-field-semver-only/input/config",
+			releases: map[string]string{
+				"app": "v9.0.0",
+			},
+			expectError:             false,
+			expectedPackageManifest: "testdata/bump-ref-field-semver-only/expected/packages.yml",
 		},
 	}
 
@@ -68,7 +81,7 @@ func TestUpdateCommand(t *testing.T) {
 			require.NoError(t, err)
 			actual := string(actualBytes)
 
-			expectedBytes, err := os.ReadFile(filepath.Join("testdata", "expected", "packages.yml"))
+			expectedBytes, err := os.ReadFile(tt.expectedPackageManifest)
 			require.NoError(t, err)
 			expected := string(expectedBytes)
 
@@ -78,12 +91,13 @@ func TestUpdateCommand(t *testing.T) {
 }
 
 type TestData struct {
-	name            string
-	args            []string
-	packageManifest string
-	configDir       string
-	expectError     bool
-	releases        map[string]string
+	name                    string
+	args                    []string
+	packageManifest         string
+	configDir               string
+	releases                map[string]string
+	expectError             bool
+	expectedPackageManifest string
 }
 
 type GitHubReleasesMock struct {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/Masterminds/semver"
 	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
@@ -84,6 +85,12 @@ func updatePackages(manifest common.PackageManifest, selectedPackages []common.P
 
 	for i, _ := range manifest.Packages {
 		pkg := &updatedManifest.Packages[i]
+
+		_, err := pkg.PackageVersion()
+		if errors.Is(err, semver.ErrInvalidSemVer) {
+			// pkg.Ref is not a semver version, e.g. "main". We don't update these.
+			continue
+		}
 
 		if !common.ContainsPackage(selectedPackages, *pkg) {
 			continue

@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.4.1](https://github.com/oslokommune/ok/compare/v5.4.0...v5.4.1) (2025-01-07)
+
+
+### Bug Fixes
+
+* Don't update non-semvers ([#354](https://github.com/oslokommune/ok/issues/354)) ([cb3fbee](https://github.com/oslokommune/ok/commit/cb3fbeef257c19fe69e426671d029e6f42fd3ffa))
+
 ## [5.4.0](https://github.com/oslokommune/ok/compare/v5.3.2...v5.4.0) (2025-01-06)
 
 

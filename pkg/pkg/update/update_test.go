@@ -76,6 +76,24 @@ func TestUpdatedPackages(t *testing.T) {
 			expected:    nil,
 			expectError: true,
 		},
+		{
+			name: "don't update non-semver package Refs",
+			manifest: common.PackageManifest{
+				Packages: []common.Package{
+					{Template: "app", Ref: "main", OutputFolder: "app-hello"},
+				},
+			},
+			packagesToUpdate: []common.Package{
+				{Template: "app", Ref: "main", OutputFolder: "app-hello"},
+			},
+			latestReleases: map[string]string{
+				"app": "v2.0.0",
+			},
+			expected: []common.Package{
+				{Template: "app", Ref: "main", OutputFolder: "app-hello"},
+			},
+			expectError: false,
+		},
 	}
 
 	for _, tc := range tests {

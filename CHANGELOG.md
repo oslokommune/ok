@@ -1,5 +1,19 @@
 # Changelog
 
+## [5.4.1](https://github.com/oslokommune/ok/compare/v5.4.0...v5.4.1) (2025-01-07)
+
+
+### Bug Fixes
+
+* Don't update non-semvers ([#354](https://github.com/oslokommune/ok/issues/354)) ([cb3fbee](https://github.com/oslokommune/ok/commit/cb3fbeef257c19fe69e426671d029e6f42fd3ffa))
+
+## [5.4.0](https://github.com/oslokommune/ok/compare/v5.3.2...v5.4.0) (2025-01-06)
+
+
+### Features
+
+* Amplify steps needed for admin session ([99e6929](https://github.com/oslokommune/ok/commit/99e6929223c82cbbc932c834e50893e409d7acaf))
+
 ## [5.3.2](https://github.com/oslokommune/ok/compare/v5.3.1...v5.3.2) (2025-01-03)
 
 

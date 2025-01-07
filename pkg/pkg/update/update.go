@@ -23,6 +23,12 @@ type GitHubReleases interface {
 	GetLatestReleases() (map[string]string, error)
 }
 
+func NewUpdater(ghReleases GitHubReleases) Updater {
+	return Updater{
+		ghReleases: ghReleases,
+	}
+}
+
 // Run updates the package manifest with the latest releases.
 func (u Updater) Run(pkgManifestFilename string, selectedPackages []common.Package, opts Options) error {
 	var manifest common.PackageManifest
@@ -187,10 +193,4 @@ type Options struct {
 	DisableManifestUpdate bool
 	MigrateConfig         bool
 	UpdateSchemaConfig    bool
-}
-
-func NewUpdater(ghReleases GitHubReleases) Updater {
-	return Updater{
-		ghReleases: ghReleases,
-	}
 }

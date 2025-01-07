@@ -57,7 +57,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", defaultConfigPath))
 
 	// Create dependencies
-	ghReleases := &githubreleases.GitHubReleasesImpl{}
+	ghReleases := githubreleases.NewGitHubReleases()
 	updateCommand := pkg.NewUpdateCommand(ghReleases)
 
 	// Add commands

@@ -38,6 +38,10 @@ func NewGitHubReleases() GitHubReleasesImpl {
 	return GitHubReleasesImpl{}
 }
 
+func (g GitHubReleasesImpl) GetLatestReleases() (map[string]string, error) {
+	return GetLatestReleases()
+}
+
 type Release struct {
 	Component string
 	Version   string
@@ -89,10 +93,6 @@ func GetLatestOkVersion() (*semver.Version, error) {
 	}
 
 	return versionSemver, nil
-}
-
-func (g GitHubReleasesImpl) GetLatestReleases() (map[string]string, error) {
-	return GetLatestReleases()
 }
 
 func GetLatestReleases() (map[string]string, error) {

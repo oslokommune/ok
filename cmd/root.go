@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"os"
 	"path"
 
@@ -55,10 +56,15 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", defaultConfigPath))
 
+	// Create dependencies
+	ghReleases := githubreleases.NewGitHubReleases()
+	updateCommand := pkg.NewUpdateCommand(ghReleases)
+
+	// Add commands
 	rootCmd.AddCommand(pkgCommand)
 	pkgCommand.AddCommand(pkg.AddCommand)
 	pkgCommand.AddCommand(pkg.InstallCommand)
-	pkgCommand.AddCommand(pkg.UpdateCommand)
+	pkgCommand.AddCommand(updateCommand)
 	pkgCommand.AddCommand(pkg.FmtCommand)
 	pkgCommand.AddCommand(pkg.SchemaCommand)
 

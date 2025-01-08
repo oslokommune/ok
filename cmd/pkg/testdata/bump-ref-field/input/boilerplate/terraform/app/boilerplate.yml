@@ -1,0 +1,243 @@
+variables:
+  - name: TemplateVersion
+    type: string
+    description: Internal tracking of template version - do NOT edit
+    default: 9.7.1
+  - name: AppName
+    description: Application name
+    type: string
+  - name: AppReadOnlyRootFileSystem
+    description: Enable read-only root filesystem.
+    type: bool
+    default: false
+  - name: AppEcsExec
+    description: Enable ECS Exec.
+    type: bool
+    default: false
+  - name: ExampleImage
+    description: Use Nginx example image.
+    type: map
+    default:
+      Enable: false
+  - name: AlbHostRouting
+    description: >
+      Add ALB host routing. See:
+
+      -
+      https://github.com/oslokommune/golden-path-iac/tree/main/terraform/modules/alb-tg-host-routing
+
+      -
+      https://github.com/oslokommune/golden-path-iac/tree/main/terraform/modules/alb-tg-host-routing-apex
+    type: map
+    default:
+      Enable: false
+      Internal: true
+      Subdomain:
+        Enable: false
+        TargetGroupTargetStickiness: false
+      ApexDomain:
+        Enable: false
+        TargetGroupTargetStickiness: false
+  - name: DatabaseConnectivity
+    description: Add database.
+    type: map
+    default:
+      Enable: false
+  - name: OpenTelemetrySidecar
+    description: Add OpenTelemetry sidecar to collect Prometheus metrics.
+    type: map
+    default:
+      Enable: false
+  - name: Xray
+    description: Enable AWS X-Ray tracing.
+    type: map
+    default:
+      Enable: false
+  - name: VpcEndpoints
+    description: Enable VPC endpoints.
+    type: map
+    default:
+      Enable: false
+  - name: ServiceConnect
+    description: >-
+      Enable Amazon ECS Service Connect for service discovery. Enable this if
+      you want to easily discover and connect to other services in your ECS
+      cluster.
+    type: map
+    default:
+      Enable: false
+  - name: DailyShutdown
+    description: Enable daily shutdown of the ECS service.
+    type: map
+    default:
+      Enable: false
+  - name: IamForCicd
+    description: Enable IAM roles for CI/CD.
+    type: map
+    default:
+      Enable: false
+      AppGitHubRepo: null
+      IacGitHubRepo: null
+      AssumableCdRole: false
+  - name: Terragrunt
+    description: |-
+      Enable Terragrunt.
+      This is a experimental feature and should not be used in production.
+    type: map
+    default:
+      Enable: false
+skip_files:
+  - if: >-
+      {{ list outputFolder "__gp_config_app_image.auto.tfvars.json" | join "/" |
+      pathExists }}
+    path: __gp_config_app_image.auto.tfvars.json
+  - if: '{{ list outputFolder "config_override.tf" | join "/" | pathExists }}'
+    path: config_override.tf
+  - if: '{{ list outputFolder "terragrunt_custom.hcl" | join "/" | pathExists }}'
+    path: terragrunt_custom.hcl
+  - path: README.md
+  - path: CHANGELOG*.md
+partials:
+  - ../../partials/do-not-edit.txt
+  - ../partials/_config.tf
+dependencies:
+  - name: versions
+    template-url: ../versions
+    output-folder: .
+  - name: app-data
+    template-url: ../app-data
+    output-folder: '{{ outputFolder }}-data'
+hooks:
+  before:
+    - command: mv
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_config_override.tf'
+        - '{{ outputFolder }}/__gp_config_override.tf'
+      skip: |-
+        {{ or
+          (list outputFolder "__gp__config_override.tf" | join "/" |pathExists)
+          (not (list outputFolder "_config_override.tf" | join "/" | pathExists))
+        }}
+    - command: mv
+      args:
+        - '-f'
+        - '{{ outputFolder }}/__gp_config_override.tf'
+        - '{{ outputFolder }}/config_override.tf'
+      skip: |-
+        {{ or
+          (list outputFolder "config_override.tf" | join "/" |pathExists)
+          (not (list outputFolder "__gp_config_override.tf" | join "/" | pathExists))
+        }}
+    - command: mv
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_config_override.tf'
+        - '{{ outputFolder }}/config_override.tf'
+      skip: |-
+        {{ or
+          (list outputFolder "config_override.tf" | join "/" |pathExists)
+          (not (list outputFolder "_config_override.tf" | join "/" | pathExists))
+        }}
+    - command: mv
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_config_app_image.auto.tfvars.json'
+        - '{{ outputFolder }}/__gp_config_app_image.auto.tfvars.json'
+      skip: |-
+        {{ or
+          (list outputFolder "__gp_config_app_image.auto.tfvars.json" | join "/" | pathExists)
+          (not (list outputFolder "_config_app_image.auto.tfvars.json" | join "/" | pathExists))
+        }}
+    - command: mv
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_gp_app_alb_tg_host_routing_override.tf'
+        - '{{ outputFolder }}/_gp_alb_tg_host_routing_override.tf'
+      skip: |-
+        {{ or
+          (list outputFolder "_gp_alb_tg_host_routing_override.tf" | join "/" | pathExists)
+          (not (list outputFolder "_gp_app_alb_tg_host_routing_override.tf" | join "/" | pathExists))
+        }}
+    - command: mv
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_gp_app_ecs_service_override.tf'
+        - '{{ outputFolder }}/_gp_ecs_service_override.tf'
+      skip: |-
+        {{ or
+          (list outputFolder "_gp_ecs_service_override.tf" | join "/" | pathExists)
+          (not (list outputFolder "_gp_app_ecs_service_override.tf" | join "/" | pathExists))
+        }}
+    - command: mv
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_gp_app_security_groups_override.tf'
+        - '{{ outputFolder }}/_gp_security_groups_override.tf'
+      skip: |-
+        {{ or
+          (list outputFolder "_gp_security_groups_override.tf" | join "/" | pathExists)
+          (not (list outputFolder "_gp_app_security_groups_override.tf" | join "/" | pathExists))
+        }}
+    - command: rm
+      args:
+        - '-f'
+        - '{{ outputFolder }}/app_alb_tg_host_routing.tf'
+        - '{{ outputFolder }}/app_ecs_container_definition_main.tf'
+        - '{{ outputFolder }}/app_ecs_otel_collector_sidecar.tf'
+        - '{{ outputFolder }}/app_ecs_service.tf'
+        - '{{ outputFolder }}/app_iam_cicd_policies.tf'
+        - '{{ outputFolder }}/app_iam_cicd_roles.tf'
+        - '{{ outputFolder }}/app_security_groups.tf'
+        - '{{ outputFolder }}/_config_app_image.auto.tfvars.json'
+        - '{{ outputFolder }}/_config.tf'
+        - '{{ outputFolder }}/_dependencies.tf'
+        - '{{ outputFolder }}/_variables.tf'
+        - '{{ outputFolder }}/__gp_config_override.tf'
+        - '{{ outputFolder }}/_gp_app_alb_tg_host_routing.tf'
+        - '{{ outputFolder }}/_gp_app_ecs_container_definition_main.tf'
+        - '{{ outputFolder }}/_gp_app_ecs_otel_collector_sidecar.tf'
+        - '{{ outputFolder }}/_gp_app_ecs_service.tf'
+        - '{{ outputFolder }}/_gp_app_iam_cicd_policies.tf'
+        - '{{ outputFolder }}/_gp_app_iam_cicd_roles.tf'
+        - '{{ outputFolder }}/_gp_app_security_groups.tf'
+        - '{{ outputFolder }}/_gp_app_iam_cd_assumable_role.tf'
+    - command: find
+      args:
+        - '{{ outputFolder }}'
+        - (
+        - '-name'
+        - _gp_*.tf
+        - '-o'
+        - '-name'
+        - __gp_*.tf
+        - )
+        - '!'
+        - '-name'
+        - '*_override.tf'
+        - '-exec'
+        - rm
+        - '{}'
+        - ;
+  after:
+    - command: terraform
+      args:
+        - fmt
+      dir: '{{ outputFolder }}'
+    - command: terragrunt
+      args:
+        - hclfmt
+      dir: '{{ outputFolder }}'
+      skip: '{{ if not .Terragrunt.Enable }}true{{ else }}false{{ end }}'
+    - command: sh
+      args:
+        - '-c'
+        - >-
+          grep -rl "x-boilerplate-delete" . --include="*.tf"
+          --include="*.tfvars.json" --include="*.sh" --include="*.hcl" | xargs
+          --no-run-if-empty rm
+      dir: '{{ outputFolder }}'
+    - command: rmdir
+      args:
+        - '{{ outputFolder }}/bin'
+      skip: '{{ .IamForCicd.Enable }}'

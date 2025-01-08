@@ -15,8 +15,22 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
+type Updater struct {
+	ghReleases GitHubReleases
+}
+
+type GitHubReleases interface {
+	GetLatestReleases() (map[string]string, error)
+}
+
+func NewUpdater(ghReleases GitHubReleases) Updater {
+	return Updater{
+		ghReleases: ghReleases,
+	}
+}
+
 // Run updates the package manifest with the latest releases.
-func Run(pkgManifestFilename string, selectedPackages []common.Package, opts Options) error {
+func (u Updater) Run(pkgManifestFilename string, selectedPackages []common.Package, opts Options) error {
 	var manifest common.PackageManifest
 	{
 		currentManifest, err := common.LoadPackageManifest(pkgManifestFilename)
@@ -27,7 +41,7 @@ func Run(pkgManifestFilename string, selectedPackages []common.Package, opts Opt
 		if opts.DisableManifestUpdate {
 			manifest = currentManifest
 		} else {
-			manifest, err = updateManifest(currentManifest, selectedPackages)
+			manifest, err = u.updateManifest(currentManifest, selectedPackages)
 			if err != nil {
 				return fmt.Errorf("updating package manifest: %w", err)
 			}
@@ -61,8 +75,8 @@ func Run(pkgManifestFilename string, selectedPackages []common.Package, opts Opt
 }
 
 // updateManifest updates package versions in the manifest with the latest releases from GitHub
-func updateManifest(manifest common.PackageManifest, selectedPackages []common.Package) (common.PackageManifest, error) {
-	latestReleases, err := githubreleases.GetLatestReleases()
+func (u Updater) updateManifest(manifest common.PackageManifest, selectedPackages []common.Package) (common.PackageManifest, error) {
+	latestReleases, err := u.ghReleases.GetLatestReleases()
 	if err != nil {
 		if strings.Contains(err.Error(), "secret not found in keyring") {
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", githubreleases.AuthErrorHelpMessage)

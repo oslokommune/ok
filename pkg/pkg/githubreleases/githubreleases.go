@@ -31,6 +31,17 @@ Steps to resolve:
 3. If you're still encountering issues, you can bypass the keyring by setting the token as an environment variable:
    export GH_TOKEN=$(gh auth token)`
 
+type GitHubReleasesImpl struct {
+}
+
+func NewGitHubReleases() GitHubReleasesImpl {
+	return GitHubReleasesImpl{}
+}
+
+func (g GitHubReleasesImpl) GetLatestReleases() (map[string]string, error) {
+	return GetLatestReleases()
+}
+
 type Release struct {
 	Component string
 	Version   string

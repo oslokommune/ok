@@ -16,10 +16,55 @@ import (
 
 const AccessPackageUrl = "https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages"
 
+type StepTracker struct {
+	steps       []string
+	currentStep int
+}
+
+func NewStepTracker() *StepTracker {
+	return &StepTracker{
+		steps: []string{
+			"Request Access Package",
+			"Select AWS Profile",
+			"AWS Logout",
+			"AWS Login",
+			"Verify AWS Access",
+			"Start Working Shell",
+		},
+		currentStep: 0,
+	}
+}
+
+func (st *StepTracker) DisplayProgress() {
+	fmt.Print("\n📋 Current Progress\n")
+	fmt.Println("================")
+
+	for i, step := range st.steps {
+		stepNum := i + 1
+		if stepNum < st.currentStep {
+			fmt.Printf("✅ %d. %s\n", stepNum, step)
+		} else if stepNum == st.currentStep {
+			fmt.Printf("▶️ %d. \033[1m%s\033[0m  <- Current Step\n", stepNum, step)
+		} else {
+			fmt.Printf("⭕ %d. %s\n", stepNum, step)
+		}
+	}
+
+	fmt.Print("================\n\n")
+}
+
+func (st *StepTracker) NextStep() {
+	st.currentStep++
+	st.DisplayProgress()
+}
+
 func StartAdminSession(startShell bool) error {
 	red := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
 	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("3"))
+
+	tracker := NewStepTracker()
+	tracker.DisplayProgress()
 
 	printDivider()
 
@@ -34,6 +79,7 @@ func StartAdminSession(startShell bool) error {
 	fmt.Print("Your access request will be processed and EntraID group membership updated automatically (typically within 30-60 seconds)\n\n")
 	fmt.Print("2. Wait until the access package appears under the Active tab\n")
 	pressEnterToContinue("3. Press ENTER to continue when the access package is active")
+	tracker.NextStep()
 
 	printDivider()
 
@@ -42,6 +88,7 @@ func StartAdminSession(startShell bool) error {
 	if err != nil {
 		return fmt.Errorf("selecting AWS profile: %w", err)
 	}
+	tracker.NextStep()
 
 	fmt.Printf("\nUsing AWS_PROFILE = %s\n\n", awsProfile)
 	fmt.Print("Logging out of AWS to refresh privileges\n\n")
@@ -49,6 +96,7 @@ func StartAdminSession(startShell bool) error {
 	if err != nil {
 		return fmt.Errorf("logging out from AWS: %w", err)
 	}
+	tracker.NextStep()
 
 	printDivider()
 
@@ -58,6 +106,7 @@ func StartAdminSession(startShell bool) error {
 		return fmt.Errorf("logging in to AWS: %w", err)
 	}
 	fmt.Println()
+	tracker.NextStep()
 
 	printDivider()
 
@@ -78,6 +127,7 @@ func StartAdminSession(startShell bool) error {
 		fmt.Print("Then try to re-authenticate: ", yellow.Render("aws sso logout && aws sso login"), "\n")
 		return nil
 	}
+	tracker.NextStep()
 
 	fmt.Print("\n", green.Render("Great! Access granted"), "\n\n")
 	fmt.Print("Remove your Access Package when done (or extend if needed):\n")
@@ -93,6 +143,7 @@ func StartAdminSession(startShell bool) error {
 		if err != nil {
 			return fmt.Errorf("starting shell: %w", err)
 		}
+		tracker.NextStep()
 		return cleanupAndQuit(awsProfile)
 	} else {
 		fmt.Print("Ensure to set your environment: \n", yellow.Render("export AWS_PROFILE="+awsProfile), "\n\n")

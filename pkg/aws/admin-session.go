@@ -5,12 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 )
 
 const AccessPackageUrl = "https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages"
@@ -22,16 +23,17 @@ func StartAdminSession(startShell bool) error {
 
 	printDivider()
 
-	fmt.Print("\nEnable Access Package\n\n")
-	fmt.Print("1. Open this url in your favorite browser, and request access to an account of your choice:\n")
+	fmt.Print("\nRequest access to Access Package\n\n")
+	fmt.Print("1. Attempting to automatically open the access request page in your default browser\n")
+	fmt.Print("If the browser does not open, please navigate to the following URL\n")
 	fmt.Print(yellow.Render(AccessPackageUrl), "\n\n")
 	err := openURL(AccessPackageUrl)
 	if err != nil {
 		return fmt.Errorf("opening URL: %w", err)
 	}
-	fmt.Print("After requesting access, you should be added to the needed EntraID group (usually within 30-60s).\n\n")
-	fmt.Println("2. Wait for membership to be confirmed on on Slack")
-	pressEnterToContinue("3. Press ENTER")
+	fmt.Print("Your access request will be processed and EntraID group membership updated automatically (typically within 30-60 seconds)\n\n")
+	fmt.Print("2. Wait until the access package appears under the Active tab\n")
+	pressEnterToContinue("3. Press ENTER to continue when the access package is active")
 
 	printDivider()
 

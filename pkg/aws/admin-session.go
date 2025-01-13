@@ -67,7 +67,6 @@ func StartAdminSession(startShell bool) error {
 
 	tracker := NewStepTracker()
 	tracker.NextStep() // Move to the first step
-	tracker.DisplayProgress()
 
 	printDivider()
 

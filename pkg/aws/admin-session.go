@@ -54,7 +54,9 @@ func (st *StepTracker) DisplayProgress() {
 }
 
 func (st *StepTracker) NextStep() {
-	st.currentStep++
+	if st.currentStep < len(st.steps) {
+		st.currentStep++
+	}
 	st.DisplayProgress()
 }
 
@@ -64,6 +66,7 @@ func StartAdminSession(startShell bool) error {
 	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("3"))
 
 	tracker := NewStepTracker()
+	tracker.NextStep() // Move to the first step
 	tracker.DisplayProgress()
 
 	printDivider()

@@ -69,12 +69,12 @@ func StartAdminSession(startShell bool) error {
 	printDivider()
 
 	fmt.Print("\nRequest access to Access Package\n\n")
-	fmt.Print("1. Attempting to automatically open the access request page in your default browser\n")
-	fmt.Print("If the browser does not open, please navigate to the following URL\n")
-	fmt.Print(yellow.Render(AccessPackageUrl), "\n\n")
+	fmt.Print("1. We will open the access request page in your default browser\n")
+	fmt.Print("The URL is: ", yellow.Render(AccessPackageUrl), "\n")
+	pressEnterToContinue("Press ENTER to open the URL in your browser")
 	err := openURL(AccessPackageUrl)
 	if err != nil {
-		return fmt.Errorf("opening URL: %w", err)
+		fmt.Printf("Failed to open URL automatically. Please open it manually: %s\n", yellow.Render(AccessPackageUrl))
 	}
 	fmt.Print("Your access request will be processed and EntraID group membership updated automatically (typically within 30-60 seconds)\n\n")
 	fmt.Print("2. Wait until the access package appears under the Active tab\n")

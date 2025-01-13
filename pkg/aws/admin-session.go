@@ -70,6 +70,10 @@ func StartAdminSession(startShell bool) error {
 
 	printDivider()
 
+	if !confirmAction("Do you want to request access to Access Package") {
+		return fmt.Errorf("user aborted the process")
+	}
+
 	fmt.Print("\nRequest access to Access Package\n\n")
 	fmt.Print("1. We will open the access request page in your default browser\n")
 	fmt.Print("The URL is: ", yellow.Render(AccessPackageUrl), "\n")
@@ -90,6 +94,10 @@ func StartAdminSession(startShell bool) error {
 
 	printDivider()
 
+	if !confirmAction("Do you want to select an AWS profile") {
+		return fmt.Errorf("user aborted the process")
+	}
+
 	fmt.Print("\nSelect matching AWS profile\n\n")
 	awsProfile, err := selectAWSProfile()
 	if err != nil {
@@ -98,6 +106,10 @@ func StartAdminSession(startShell bool) error {
 	tracker.NextStep()
 
 	fmt.Printf("\nUsing AWS_PROFILE = %s\n\n", awsProfile)
+	if !confirmAction("Do you want to log out of AWS to refresh privileges") {
+		return fmt.Errorf("user aborted the process")
+	}
+
 	fmt.Print("Logging out of AWS to refresh privileges\n\n")
 	err = doAWSLogout(awsProfile)
 	if err != nil {
@@ -106,6 +118,10 @@ func StartAdminSession(startShell bool) error {
 	tracker.NextStep()
 
 	printDivider()
+
+	if !confirmAction("Do you want to start SSO Login") {
+		return fmt.Errorf("user aborted the process")
+	}
 
 	fmt.Print("\nStart SSO Login\n\n")
 	err = doAWSLogin(awsProfile)
@@ -116,6 +132,10 @@ func StartAdminSession(startShell bool) error {
 	tracker.NextStep()
 
 	printDivider()
+
+	if !confirmAction("Do you want to verify the selected AWS profile") {
+		return fmt.Errorf("user aborted the process")
+	}
 
 	fmt.Print("\nVerifying selected AWS profile by querying S3 buckets\n")
 	err = listS3Buckets(awsProfile)
@@ -142,6 +162,10 @@ func StartAdminSession(startShell bool) error {
 
 	if startShell {
 		printDivider()
+		if !confirmAction("Do you want to create a working shell") {
+			return fmt.Errorf("user aborted the process")
+		}
+
 		fmt.Print("\nCreating working shell!\n\n")
 		fmt.Print("After you are done, ", yellow.Render("log out of the shell"), " and you will be logged out of AWS.\n\n")
 		fmt.Print("Take care - have fun!\n\n")

@@ -65,6 +65,18 @@ func StartAdminSession(startShell bool) error {
 	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("3"))
 
+	fmt.Println("Welcome to the Admin Session Setup!")
+	fmt.Println("\nThis process will guide you through the following steps:")
+	fmt.Println("1. Request an Access Package for elevated permissions")
+	fmt.Println("2. Select an AWS profile for your admin session")
+	fmt.Println("3. Log out of your current AWS session (if any)")
+	fmt.Println("4. Log in to AWS with your new admin permissions")
+	fmt.Println("5. Verify your AWS access by listing S3 buckets")
+	fmt.Println("6. (Optional) Start a new shell with the admin AWS profile")
+	fmt.Println("\nEach step will require your confirmation before proceeding.")
+	fmt.Println("This ensures you're aware of and agree to each action taken.")
+	fmt.Println("\nLet's begin!")
+
 	tracker := NewStepTracker()
 	tracker.NextStep() // Move to the first step
 

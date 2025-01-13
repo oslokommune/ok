@@ -73,14 +73,19 @@ func StartAdminSession(startShell bool) error {
 	fmt.Print("\nRequest access to Access Package\n\n")
 	fmt.Print("1. We will open the access request page in your default browser\n")
 	fmt.Print("The URL is: ", yellow.Render(AccessPackageUrl), "\n")
-	pressEnterToContinue("Press ENTER to open the URL in your browser")
-	err := openURL(AccessPackageUrl)
-	if err != nil {
-		fmt.Printf("Failed to open URL automatically. Please open it manually: %s\n", yellow.Render(AccessPackageUrl))
+	if confirmAction("Open the URL in your browser") {
+		err := openURL(AccessPackageUrl)
+		if err != nil {
+			fmt.Printf("Failed to open URL automatically. Please open it manually: %s\n", yellow.Render(AccessPackageUrl))
+		}
+	} else {
+		fmt.Printf("Please open this URL manually: %s\n", yellow.Render(AccessPackageUrl))
 	}
 	fmt.Print("Your access request will be processed and EntraID group membership updated automatically (typically within 30-60 seconds)\n\n")
 	fmt.Print("2. Wait until the access package appears under the Active tab\n")
-	pressEnterToContinue("3. Press ENTER to continue when the access package is active")
+	for !confirmAction("Is the access package active") {
+		fmt.Println("Please wait until the access package is active before continuing.")
+	}
 	tracker.NextStep()
 
 	printDivider()
@@ -323,9 +328,23 @@ func isBash(shell string) bool {
 	return strings.HasSuffix(shell, "bash")
 }
 
-func pressEnterToContinue(message string) {
-	fmt.Println(message)
-	_, _ = fmt.Scanln()
+func confirmAction(prompt string) bool {
+	for {
+		fmt.Printf("\n➔ %s (yes/no): ", prompt)
+		var response string
+		_, err := fmt.Scanln(&response)
+		if err != nil {
+			fmt.Println("Error reading input:", err)
+			continue
+		}
+		response = strings.ToLower(strings.TrimSpace(response))
+		if response == "yes" || response == "y" {
+			return true
+		} else if response == "no" || response == "n" {
+			return false
+		}
+		fmt.Println("Please enter 'yes' or 'no'")
+	}
 }
 
 func printDivider() {

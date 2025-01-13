@@ -335,6 +335,7 @@ func confirmAction(prompt string) bool {
 		_, err := fmt.Scanln(&response)
 		if err != nil {
 			if err.Error() == "unexpected newline" {
+				fmt.Println("Yes")
 				return true // Default to 'yes' if user just presses Enter
 			}
 			fmt.Println("Error reading input:", err)
@@ -342,8 +343,10 @@ func confirmAction(prompt string) bool {
 		}
 		response = strings.ToLower(strings.TrimSpace(response))
 		if response == "" || response == "y" || response == "yes" {
+			fmt.Println("Yes")
 			return true
 		} else if response == "n" || response == "no" {
+			fmt.Println("No")
 			return false
 		}
 		fmt.Println("Please enter 'y' or 'n' (or press Enter for yes)")

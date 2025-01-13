@@ -330,20 +330,23 @@ func isBash(shell string) bool {
 
 func confirmAction(prompt string) bool {
 	for {
-		fmt.Printf("\n➔ %s (yes/no): ", prompt)
+		fmt.Printf("\n➔ %s [Y/n]: ", prompt)
 		var response string
 		_, err := fmt.Scanln(&response)
 		if err != nil {
+			if err.Error() == "unexpected newline" {
+				return true // Default to 'yes' if user just presses Enter
+			}
 			fmt.Println("Error reading input:", err)
 			continue
 		}
 		response = strings.ToLower(strings.TrimSpace(response))
-		if response == "yes" || response == "y" {
+		if response == "" || response == "y" || response == "yes" {
 			return true
-		} else if response == "no" || response == "n" {
+		} else if response == "n" || response == "no" {
 			return false
 		}
-		fmt.Println("Please enter 'yes' or 'no'")
+		fmt.Println("Please enter 'y' or 'n' (or press Enter for yes)")
 	}
 }
 

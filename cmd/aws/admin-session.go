@@ -10,7 +10,7 @@ import (
 
 var (
 	startShell bool
-	verbose    bool
+	verbosity  int
 )
 
 var AdminSessionCommand = &cobra.Command{
@@ -18,22 +18,24 @@ var AdminSessionCommand = &cobra.Command{
 	Short: "Start an admin session to an AWS account",
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return aws.StartAdminSession(startShell, verbose)
+		return aws.StartAdminSession(startShell, verbosity)
 	},
 }
 
 func init() {
 	AdminSessionCommand.Flags().BoolVarP(&startShell, "start-shell", "s", false, "Start a working shell to execute AWS commands")
-	AdminSessionCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose output")
+	AdminSessionCommand.Flags().IntVarP(&verbosity, "verbosity", "v", 1, "Set verbosity level (0-1)")
 
 	// Check for environment variable
-	if envVerbose, exists := os.LookupEnv("OK_AWS_ADMIN_SESSION_VERBOSE"); exists {
-		if parsedVerbose, err := strconv.ParseBool(envVerbose); err == nil {
-			verbose = parsedVerbose
+	if envVerbosity, exists := os.LookupEnv("OK_AWS_ADMIN_SESSION_VERBOSITY"); exists {
+		if parsedVerbosity, err := strconv.Atoi(envVerbosity); err == nil {
+			if parsedVerbosity >= 0 && parsedVerbosity <= 1 {
+				verbosity = parsedVerbosity
+			}
 		}
 	}
 
 	// CLI flag takes precedence over environment variable
-	AdminSessionCommand.Flags().BoolVarP(&verbose, "verbose", "v", verbose, "Enable verbose output")
+	AdminSessionCommand.Flags().IntVarP(&verbosity, "verbosity", "v", verbosity, "Set verbosity level (0-1)")
 }
 

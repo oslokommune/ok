@@ -90,10 +90,6 @@ func StartAdminSession(startShell bool, verbosity int) error {
 	tracker := NewStepTracker(verbosity)
 	tracker.NextStep() // Move to the first step
 
-	if !confirmAction("Request access to an Access Package through Microsoft Entra ID?") {
-		return fmt.Errorf("user aborted the process")
-	}
-
 	fmt.Print("\n- You need to open the access request page in your browser\n")
 	fmt.Print("- The URL is ", yellow.Render(AccessPackageUrl), "\n")
 	if confirmAction("Open the URL in your browser?") {
@@ -111,11 +107,7 @@ func StartAdminSession(startShell bool, verbosity int) error {
 	}
 	tracker.NextStep()
 
-	if !confirmAction("Do you want to select an AWS profile?") {
-		return fmt.Errorf("user aborted the process")
-	}
-
-	fmt.Print("\nSelect matching AWS profile\n\n")
+	fmt.Print("\nSelecting AWS profile\n\n")
 	awsProfile, err := selectAWSProfile()
 	if err != nil {
 		return fmt.Errorf("selecting AWS profile: %w", err)
@@ -123,10 +115,6 @@ func StartAdminSession(startShell bool, verbosity int) error {
 	tracker.NextStep()
 
 	fmt.Printf("\nUsing AWS_PROFILE = %s\n\n", awsProfile)
-	if !confirmAction("Do you want to log out of AWS to refresh privileges?") {
-		return fmt.Errorf("user aborted the process")
-	}
-
 	fmt.Print("Logging out of AWS to refresh privileges\n\n")
 	err = doAWSLogout(awsProfile)
 	if err != nil {
@@ -136,11 +124,7 @@ func StartAdminSession(startShell bool, verbosity int) error {
 
 	printDivider()
 
-	if !confirmAction("Do you want to start SSO Login?") {
-		return fmt.Errorf("user aborted the process")
-	}
-
-	fmt.Print("\nStart SSO Login\n\n")
+	fmt.Print("\nStarting SSO Login\n\n")
 	err = doAWSLogin(awsProfile)
 	if err != nil {
 		return fmt.Errorf("logging in to AWS: %w", err)
@@ -149,10 +133,6 @@ func StartAdminSession(startShell bool, verbosity int) error {
 	tracker.NextStep()
 
 	printDivider()
-
-	if !confirmAction("Do you want to verify the selected AWS profile?") {
-		return fmt.Errorf("user aborted the process")
-	}
 
 	fmt.Print("\nVerifying selected AWS profile by querying S3 buckets\n")
 	err = listS3Buckets(awsProfile)
@@ -179,7 +159,7 @@ func StartAdminSession(startShell bool, verbosity int) error {
 
 	if startShell {
 		printDivider()
-		if !confirmAction("Do you want to create a working shell?") {
+		if verbosity >= 1 && !confirmAction("Do you want to create a working shell?") {
 			return fmt.Errorf("user aborted the process")
 		}
 

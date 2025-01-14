@@ -19,9 +19,10 @@ const AccessPackageUrl = "https://myaccess.microsoft.com/@oslokommune.onmicrosof
 type StepTracker struct {
 	steps       []string
 	currentStep int
+	verbosity   int
 }
 
-func NewStepTracker() *StepTracker {
+func NewStepTracker(verbosity int) *StepTracker {
 	return &StepTracker{
 		steps: []string{
 			"Request Access Package",
@@ -32,10 +33,14 @@ func NewStepTracker() *StepTracker {
 			"Start Working Shell",
 		},
 		currentStep: 0,
+		verbosity:   verbosity,
 	}
 }
 
 func (st *StepTracker) DisplayProgress() {
+	if st.verbosity < 1 {
+		return
+	}
 	fmt.Print("\n📋 Current Progress\n")
 	fmt.Println(strings.Repeat("=", 50))
 
@@ -82,7 +87,7 @@ func StartAdminSession(startShell bool, verbosity int) error {
 		showIntroText()
 	}
 
-	tracker := NewStepTracker()
+	tracker := NewStepTracker(verbosity)
 	tracker.NextStep() // Move to the first step
 
 	if !confirmAction("Request access to an Access Package through Microsoft Entra ID?") {

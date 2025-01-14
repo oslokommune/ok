@@ -60,11 +60,7 @@ func (st *StepTracker) NextStep() {
 	st.DisplayProgress()
 }
 
-func StartAdminSession(startShell bool, verbose bool) error {
-	red := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
-	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
-	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("3"))
-
+func showIntroText() {
 	fmt.Println("\nWelcome to the AWS admin session setup!")
 	fmt.Println("\nThis process will guide you through the following steps:\n")
 	fmt.Println("1. Request an Microsoft Entra ID Access Package for elevated AWS permissions")
@@ -75,6 +71,16 @@ func StartAdminSession(startShell bool, verbose bool) error {
 	fmt.Println("6. (Optional) Start a new shell with the admin AWS profile")
 	fmt.Println("\nEach step will require your confirmation before proceeding.")
 	fmt.Println("\nLet's begin!")
+}
+
+func StartAdminSession(startShell bool, verbosity int) error {
+	red := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
+	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("3"))
+
+	if verbosity >= 1 {
+		showIntroText()
+	}
 
 	tracker := NewStepTracker()
 	tracker.NextStep() // Move to the first step

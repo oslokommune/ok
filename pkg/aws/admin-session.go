@@ -37,7 +37,7 @@ func NewStepTracker() *StepTracker {
 
 func (st *StepTracker) DisplayProgress() {
 	fmt.Print("\n📋 Current Progress\n")
-	fmt.Println("================")
+	fmt.Println(strings.Repeat("=", 50))
 
 	for i, step := range st.steps {
 		stepNum := i + 1
@@ -50,7 +50,7 @@ func (st *StepTracker) DisplayProgress() {
 		}
 	}
 
-	fmt.Print("================\n\n")
+	fmt.Println(strings.Repeat("=", 50))
 }
 
 func (st *StepTracker) NextStep() {
@@ -65,31 +65,27 @@ func StartAdminSession(startShell bool) error {
 	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("3"))
 
-	fmt.Println("Welcome to the Admin Session Setup!")
-	fmt.Println("\nThis process will guide you through the following steps:")
-	fmt.Println("1. Request an Access Package for elevated permissions")
+	fmt.Println("\nWelcome to the AWS admin session setup!")
+	fmt.Println("\nThis process will guide you through the following steps:\n")
+	fmt.Println("1. Request an Microsoft Entra ID Access Package for elevated AWS permissions")
 	fmt.Println("2. Select an AWS profile for your admin session")
 	fmt.Println("3. Log out of your current AWS session (if any)")
 	fmt.Println("4. Log in to AWS with your new admin permissions")
 	fmt.Println("5. Verify your AWS access by listing S3 buckets")
 	fmt.Println("6. (Optional) Start a new shell with the admin AWS profile")
 	fmt.Println("\nEach step will require your confirmation before proceeding.")
-	fmt.Println("This ensures you're aware of and agree to each action taken.")
 	fmt.Println("\nLet's begin!")
 
 	tracker := NewStepTracker()
 	tracker.NextStep() // Move to the first step
 
-	printDivider()
-
-	if !confirmAction("Do you want to request access to Access Package") {
+	if !confirmAction("Request access to an Access Package through Microsoft Entra ID?") {
 		return fmt.Errorf("user aborted the process")
 	}
 
-	fmt.Print("\nRequest access to Access Package\n\n")
-	fmt.Print("1. We will open the access request page in your default browser\n")
-	fmt.Print("The URL is: ", yellow.Render(AccessPackageUrl), "\n")
-	if confirmAction("Open the URL in your browser") {
+	fmt.Print("\n- You need to open the access request page in your browser\n")
+	fmt.Print("- The URL is ", yellow.Render(AccessPackageUrl), "\n")
+	if confirmAction("Open the URL in your browser?") {
 		err := openURL(AccessPackageUrl)
 		if err != nil {
 			fmt.Printf("Failed to open URL automatically. Please open it manually: %s\n", yellow.Render(AccessPackageUrl))
@@ -97,16 +93,14 @@ func StartAdminSession(startShell bool) error {
 	} else {
 		fmt.Printf("Please open this URL manually: %s\n", yellow.Render(AccessPackageUrl))
 	}
-	fmt.Print("Your access request will be processed and EntraID group membership updated automatically (typically within 30-60 seconds)\n\n")
-	fmt.Print("2. Wait until the access package appears under the Active tab\n")
-	for !confirmAction("Is the access package active") {
+	fmt.Print("\n- Your access request will be processed and EntraID group membership updated automatically (typically within 30-60 seconds)\n")
+	fmt.Print("- Wait until the access package appears under the Active tab\n")
+	for !confirmAction("Is the access package active?") {
 		fmt.Println("Please wait until the access package is active before continuing.")
 	}
 	tracker.NextStep()
 
-	printDivider()
-
-	if !confirmAction("Do you want to select an AWS profile") {
+	if !confirmAction("Do you want to select an AWS profile?") {
 		return fmt.Errorf("user aborted the process")
 	}
 
@@ -118,7 +112,7 @@ func StartAdminSession(startShell bool) error {
 	tracker.NextStep()
 
 	fmt.Printf("\nUsing AWS_PROFILE = %s\n\n", awsProfile)
-	if !confirmAction("Do you want to log out of AWS to refresh privileges") {
+	if !confirmAction("Do you want to log out of AWS to refresh privileges?") {
 		return fmt.Errorf("user aborted the process")
 	}
 
@@ -131,7 +125,7 @@ func StartAdminSession(startShell bool) error {
 
 	printDivider()
 
-	if !confirmAction("Do you want to start SSO Login") {
+	if !confirmAction("Do you want to start SSO Login?") {
 		return fmt.Errorf("user aborted the process")
 	}
 
@@ -145,7 +139,7 @@ func StartAdminSession(startShell bool) error {
 
 	printDivider()
 
-	if !confirmAction("Do you want to verify the selected AWS profile") {
+	if !confirmAction("Do you want to verify the selected AWS profile?") {
 		return fmt.Errorf("user aborted the process")
 	}
 
@@ -174,7 +168,7 @@ func StartAdminSession(startShell bool) error {
 
 	if startShell {
 		printDivider()
-		if !confirmAction("Do you want to create a working shell") {
+		if !confirmAction("Do you want to create a working shell?") {
 			return fmt.Errorf("user aborted the process")
 		}
 
@@ -371,7 +365,6 @@ func confirmAction(prompt string) bool {
 		_, err := fmt.Scanln(&response)
 		if err != nil {
 			if err.Error() == "unexpected newline" {
-				fmt.Println("Yes")
 				return true // Default to 'yes' if user just presses Enter
 			}
 			fmt.Println("Error reading input:", err)
@@ -379,10 +372,8 @@ func confirmAction(prompt string) bool {
 		}
 		response = strings.ToLower(strings.TrimSpace(response))
 		if response == "" || response == "y" || response == "yes" {
-			fmt.Println("Yes")
 			return true
 		} else if response == "n" || response == "no" {
-			fmt.Println("No")
 			return false
 		}
 		fmt.Println("Please enter 'yes' or 'no' (or press Enter for yes)")

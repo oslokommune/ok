@@ -56,6 +56,7 @@ func (st *StepTracker) DisplayProgress() {
 	}
 
 	fmt.Println(strings.Repeat("=", 50))
+	fmt.Println()
 }
 
 func (st *StepTracker) NextStep() {
@@ -66,7 +67,7 @@ func (st *StepTracker) NextStep() {
 }
 
 func showIntroText() {
-	fmt.Println("\nWelcome to the AWS admin session setup!")
+	fmt.Println("Welcome to the AWS admin session setup!")
 	fmt.Println("\nThis process will guide you through the following steps:\n")
 	fmt.Println("1. Request an Microsoft Entra ID Access Package for elevated AWS permissions")
 	fmt.Println("2. Select an AWS profile for your admin session")
@@ -90,7 +91,7 @@ func StartAdminSession(startShell bool, verbosity int) error {
 	tracker := NewStepTracker(verbosity)
 	tracker.NextStep() // Move to the first step
 
-	fmt.Print("\n- You need to open the access request page in your browser\n")
+	fmt.Print("- You need to open the access request page in your browser\n")
 	fmt.Print("- The URL is ", yellow.Render(AccessPackageUrl), "\n")
 	if confirmAction("Open the URL in your browser?") {
 		err := openURL(AccessPackageUrl)
@@ -98,41 +99,36 @@ func StartAdminSession(startShell bool, verbosity int) error {
 			fmt.Printf("Failed to open URL automatically. Please open it manually: %s\n", yellow.Render(AccessPackageUrl))
 		}
 	} else {
-		fmt.Printf("Please open this URL manually: %s\n", yellow.Render(AccessPackageUrl))
+		fmt.Printf("\nPlease open this URL manually: %s\n", yellow.Render(AccessPackageUrl))
 	}
 	fmt.Print("\n- Your access request will be processed and EntraID group membership updated automatically (typically within 30-60 seconds)\n")
 	fmt.Print("- Wait until the access package appears under the Active tab\n")
 	for !confirmAction("Is the access package active?") {
-		fmt.Println("Please wait until the access package is active before continuing.")
+		fmt.Println("\nPlease wait until the access package is active before continuing.")
 	}
 	tracker.NextStep()
 
-	fmt.Print("\nSelecting AWS profile\n\n")
 	awsProfile, err := selectAWSProfile()
 	if err != nil {
 		return fmt.Errorf("selecting AWS profile: %w", err)
 	}
 	tracker.NextStep()
 
-	fmt.Printf("\nUsing AWS_PROFILE = %s\n\n", awsProfile)
-	fmt.Print("Logging out of AWS to refresh privileges\n\n")
+	fmt.Printf("\n- Using AWS_PROFILE = %s\n", awsProfile)
+	fmt.Print("- Logging out of AWS to refresh privileges\n")
 	err = doAWSLogout(awsProfile)
 	if err != nil {
 		return fmt.Errorf("logging out from AWS: %w", err)
 	}
 	tracker.NextStep()
 
-	printDivider()
-
-	fmt.Print("\nStarting SSO Login\n\n")
+	fmt.Print("\n➔ Starting SSO Login\n\n")
 	err = doAWSLogin(awsProfile)
 	if err != nil {
 		return fmt.Errorf("logging in to AWS: %w", err)
 	}
 	fmt.Println()
 	tracker.NextStep()
-
-	printDivider()
 
 	fmt.Print("\nVerifying selected AWS profile by querying S3 buckets\n")
 	err = listS3Buckets(awsProfile)
@@ -196,7 +192,7 @@ func selectAWSProfile() (string, error) {
 
 	var selectedProfile string
 	selector := huh.NewSelect[string]().
-		Title("Select AWS profile:").
+		Title("\n➔ Select AWS profile:\n").
 		Options(profiles...).
 		Validate(func(t string) error {
 			if len(t) <= 0 {
@@ -276,7 +272,7 @@ func listS3Buckets(awsProfile string) error {
 }
 
 func cleanupAndQuit(awsProfile string) error {
-	fmt.Print("\nLogging out to kill existing AWS session\n\n")
+	fmt.Print("Logging out to kill existing AWS session\n\n")
 	err := doAWSLogout(awsProfile)
 	if err != nil {
 		return err

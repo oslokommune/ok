@@ -60,7 +60,7 @@ func (st *StepTracker) NextStep() {
 	st.DisplayProgress()
 }
 
-func StartAdminSession(startShell bool) error {
+func StartAdminSession(startShell bool, verbose bool) error {
 	red := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
 	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("3"))

@@ -114,7 +114,7 @@ func StartAdminSession(startShell bool, verbosity int) error {
 	}
 	tracker.NextStep()
 
-	fmt.Printf("\n- Using AWS_PROFILE = %s\n", awsProfile)
+	fmt.Printf("\n- Using AWS_PROFILE = %s\n", yellow.Render(awsProfile))
 	fmt.Print("- Logging out of AWS to refresh privileges\n")
 	err = doAWSLogout(awsProfile)
 	if err != nil {

@@ -24,7 +24,9 @@ var AdminSessionCommand = &cobra.Command{
 
 func init() {
 	AdminSessionCommand.Flags().BoolVarP(&startShell, "start-shell", "s", false, "Start a working shell to execute AWS commands")
-	AdminSessionCommand.Flags().IntVarP(&verbosity, "verbosity", "v", 1, "Set verbosity level (0-1)")
+
+	// Set default verbosity
+	verbosity = 1
 
 	// Check for environment variable
 	if envVerbosity, exists := os.LookupEnv("OK_AWS_ADMIN_SESSION_VERBOSITY"); exists {

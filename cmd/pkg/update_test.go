@@ -24,9 +24,10 @@ func TestUpdateCommand(t *testing.T) {
 			},
 			expectError:             false,
 			expectedPackageManifest: "testdata/bump-ref-field/expected/packages.yml",
+			expectedConfigDir:       "testdata/bump-ref-field/expected/config",
 		},
 		{
-			name:            "Should bump the Ref field only for semver-versione package Refs",
+			name:            "Should bump the Ref field only for semver-version package Refs",
 			args:            []string{},
 			packageManifest: "testdata/bump-ref-field-semver-only/input/packages.yml",
 			configDir:       "testdata/bump-ref-field-semver-only/input/config",
@@ -35,6 +36,18 @@ func TestUpdateCommand(t *testing.T) {
 			},
 			expectError:             false,
 			expectedPackageManifest: "testdata/bump-ref-field-semver-only/expected/packages.yml",
+		},
+		{
+			name:            "Should bump schema version in var files",
+			args:            []string{"app-hello"},
+			packageManifest: "testdata/bump-schema-version/input/packages.yml",
+			configDir:       "testdata/bump-schema-version/input/config",
+			releases: map[string]string{
+				"app": "v9.0.0",
+			},
+			expectError:             false,
+			expectedPackageManifest: "testdata/bump-schema-version/expected/packages.yml",
+			expectedConfigDir:       "testdata/bump-schema-version/expected/config",
 		},
 	}
 
@@ -76,7 +89,7 @@ func TestUpdateCommand(t *testing.T) {
 			err = os.Chdir(testDir)
 			require.NoError(t, err)
 
-			// Compare package file
+			// Compare package manifest file
 			actualBytes, err := os.ReadFile(filepath.Join(tempDir, "packages.yml"))
 			require.NoError(t, err)
 			actual := string(actualBytes)
@@ -86,6 +99,38 @@ func TestUpdateCommand(t *testing.T) {
 			expected := string(expectedBytes)
 
 			assert.Equal(t, expected, actual)
+
+			// Compare var files:
+			// Given
+			// testadat/some-test/expected/config/app-hello.yml, we want to compare it to
+			//                     tempDir/config/app-hello.yml
+			if tt.expectedConfigDir == "" {
+				return
+			}
+
+			err = filepath.Walk(tt.expectedConfigDir, func(path string, fileInfo os.FileInfo, err error) error {
+				require.NoError(t, err)
+
+				if fileInfo.IsDir() {
+					return nil
+				}
+
+				actualFilename := filepath.Join(tempDir, "config", fileInfo.Name())
+				actualVarFile := actualFilename
+
+				varFileBytes, err := os.ReadFile(actualVarFile)
+				require.NoError(t, err)
+				varFile := string(varFileBytes)
+
+				expectedFilename := filepath.Join(tt.expectedConfigDir, fileInfo.Name())
+				expectedVarFileBytes, err := os.ReadFile(expectedFilename)
+				require.NoError(t, err)
+				expectedVarFile := string(expectedVarFileBytes)
+
+				assert.Equal(t, expectedVarFile, varFile)
+
+				return nil
+			})
 		})
 	}
 }
@@ -98,6 +143,7 @@ type TestData struct {
 	releases                map[string]string
 	expectError             bool
 	expectedPackageManifest string
+	expectedConfigDir       string
 }
 
 type GitHubReleasesMock struct {

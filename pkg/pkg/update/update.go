@@ -30,7 +30,8 @@ func NewUpdater(ghReleases GitHubReleases) Updater {
 }
 
 // Run updates the package manifest with the latest releases.
-func (u Updater) Run(pkgManifestFilename string, selectedPackages []common.Package, opts Options) error {
+func (u Updater) Run(pkgManifestFilename string, selectedPackagesInput []common.Package, opts Options) error {
+	var selectedPackages []common.Package
 	var manifest common.PackageManifest
 	{
 		currentManifest, err := common.LoadPackageManifest(pkgManifestFilename)
@@ -40,11 +41,15 @@ func (u Updater) Run(pkgManifestFilename string, selectedPackages []common.Packa
 
 		if opts.DisableManifestUpdate {
 			manifest = currentManifest
+			selectedPackages = selectedPackagesInput
 		} else {
-			manifest, err = u.updateManifest(currentManifest, selectedPackages)
+			updateManifest, updatedSelectedPackages, err := u.updateManifest(currentManifest, selectedPackagesInput)
 			if err != nil {
 				return fmt.Errorf("updating package manifest: %w", err)
 			}
+
+			manifest = updateManifest
+			selectedPackages = updatedSelectedPackages
 
 			err = common.SavePackageManifest(pkgManifestFilename, manifest)
 			if err != nil {
@@ -54,7 +59,7 @@ func (u Updater) Run(pkgManifestFilename string, selectedPackages []common.Packa
 	}
 
 	if opts.UpdateSchemaConfig {
-		err := updateSchemaConfiguration(context.Background(), manifest, selectedPackages)
+		err := updateSchemaConfiguration(context.Background(), selectedPackages, manifest.PackagePrefix())
 		if err != nil {
 			return err
 		}
@@ -75,27 +80,28 @@ func (u Updater) Run(pkgManifestFilename string, selectedPackages []common.Packa
 }
 
 // updateManifest updates package versions in the manifest with the latest releases from GitHub
-func (u Updater) updateManifest(manifest common.PackageManifest, selectedPackages []common.Package) (common.PackageManifest, error) {
+func (u Updater) updateManifest(manifest common.PackageManifest, selectedPackages []common.Package) (common.PackageManifest, []common.Package, error) {
 	latestReleases, err := u.ghReleases.GetLatestReleases()
 	if err != nil {
 		if strings.Contains(err.Error(), "secret not found in keyring") {
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", githubreleases.AuthErrorHelpMessage)
 		}
 
-		return common.PackageManifest{}, fmt.Errorf("failed getting latest github releases: %w", err)
+		return common.PackageManifest{}, nil, fmt.Errorf("failed getting latest github releases: %w", err)
 	}
 
-	updatedManifest, err := updatePackages(manifest, selectedPackages, latestReleases)
+	updatedManifest, updatedPackages, err := updatePackages(manifest, selectedPackages, latestReleases)
 	if err != nil {
-		return common.PackageManifest{}, fmt.Errorf("updating packages: %w", err)
+		return common.PackageManifest{}, nil, fmt.Errorf("updating packages: %w", err)
 	}
 
-	return updatedManifest, nil
+	return updatedManifest, updatedPackages, nil
 }
 
 // updatePackages updates the package manifest with the latest releases. It only updates the packages found in selectedPackages.
-func updatePackages(manifest common.PackageManifest, selectedPackages []common.Package, latestReleases map[string]string) (common.PackageManifest, error) {
+func updatePackages(manifest common.PackageManifest, selectedPackages []common.Package, latestReleases map[string]string) (common.PackageManifest, []common.Package, error) {
 	updatedManifest := manifest.Clone()
+	updatedPackages := make([]common.Package, 0)
 
 	for i, _ := range manifest.Packages {
 		pkg := &updatedManifest.Packages[i]
@@ -113,30 +119,29 @@ func updatePackages(manifest common.PackageManifest, selectedPackages []common.P
 		// pkg is a package that is in selectedPackages, i.e. it should be updated
 		latestRelease, ok := latestReleases[pkg.Template] // e.g. v2.1.3
 		if !ok {
-			return common.PackageManifest{}, fmt.Errorf("no latest release found for package: %s", pkg.Template)
+			return common.PackageManifest{}, nil, fmt.Errorf("no latest release found for package: %s", pkg.Template)
 		}
 
 		newRef := fmt.Sprintf("%s-%s", pkg.Template, latestRelease) // e.g. app-v2.1.3
 		pkg.Ref = newRef
+		updatedPackages = append(updatedPackages, *pkg)
 	}
 
-	return updatedManifest, nil
+	return updatedManifest, updatedPackages, nil
 }
 
 // updateSchemaConfiguration does two things. For each package in the package manifest, that is also in selectedPackages:
 // 1) Download the JSON schema file for each template. The version download is the one found in the package manifest.
 // 2) Update the stack configuration file header with the downloaded JSON schema. For instance: "# yaml-language-server: $schema=.schemas/app-v8.0.5.schema.json"
-func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManifest, selectedPackages []common.Package) error {
+func updateSchemaConfiguration(ctx context.Context, selectedPackages []common.Package, manifestPackagePrefix string) error {
 	gh, err := githubreleases.GetGitHubClient()
 	if err != nil {
 		return fmt.Errorf("getting GitHub client: %w", err)
 	}
 
-	fmt.Println("Updating schema configuration files:")
+	fmt.Println("Updating json schemas:")
 
 	for _, pkg := range selectedPackages {
-		fmt.Printf("- %s\n", pkg.OutputFolder)
-
 		_, err := pkg.PackageVersion()
 		if err != nil {
 			// pkg.Ref might be "main". To keep code simple, we avoid dealing with non-semver versions.
@@ -147,6 +152,8 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 		if !ok {
 			continue
 		}
+
+		fmt.Printf("- %s\n", pkg.OutputFolder)
 
 		// Get current JSON schema for the package
 		jsonSchema, err := metadata.ParseFirstLine(varFile)
@@ -166,7 +173,7 @@ func updateSchemaConfiguration(ctx context.Context, manifest common.PackageManif
 
 		// Update the JSON schema, i.e. download it and update the varFile's schema declaration to point to it.
 		downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, pkg.Ref)
-		stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), pkg.Template)
+		stackPath := githubreleases.GetTemplatePath(manifestPackagePrefix, pkg.Template)
 
 		generatedSchema, err := schema.GenerateJsonSchemaForApp(ctx, downloader, stackPath, pkg.Ref)
 		if err != nil {

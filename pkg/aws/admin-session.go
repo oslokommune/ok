@@ -170,13 +170,13 @@ func handleAWSLoginOutput(reader io.Reader) {
 			if err == io.EOF {
 				return
 			}
-			panic(err)
+			fmt.Printf("WARNING: Error when reading login command output. Error: %s\n", err)
 		}
 		fmt.Printf("%s\n", line)
 		if len(line) == 9 {
 			err := sendNotification("Admin Session", "Login Code: "+string(line))
 			if err != nil {
-				panic(err)
+				fmt.Printf("WARNING: Error when creating login notification. Error: %s\n", err)
 			}
 		}
 	}

@@ -25,26 +25,31 @@ type AddResult struct {
  * The output folder is prefixed with the stack name and added to the packages manifest.
  */
 
-func Run(pkgManifestFilename string, templateName, outputFolder string, updateSchema bool) (*AddResult, error) {
-	ctx := context.Background()
+type Adder struct {
+	schemaGenerator common.SchemaGenerator
+}
 
-	gh, err := getGitHubClient()
-	if err != nil {
-		return nil, err
+func NewAdder(schemaGenerator common.SchemaGenerator) Adder {
+	return Adder{
+		schemaGenerator: schemaGenerator,
 	}
+}
+
+func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string, updateSchema bool) (*AddResult, error) {
+	ctx := context.Background()
 
 	templateVersion, err := getTemplateVersion(templateName)
 	if err != nil {
 		return nil, err
 	}
-	gitRef := fmt.Sprintf("%s-%s", templateName, templateVersion)
+	pkgRef := fmt.Sprintf("%s-%s", templateName, templateVersion)
 
 	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
 	if err != nil {
 		return nil, err
 	}
 
-	newPackage, err := createNewPackage(manifest, templateName, gitRef, outputFolder)
+	newPackage, err := createNewPackage(manifest, templateName, pkgRef, outputFolder)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +64,7 @@ func Run(pkgManifestFilename string, templateName, outputFolder string, updateSc
 	}
 
 	if updateSchema {
-		if err := updateSchemaConfig(ctx, gh, manifest, templateName, gitRef, outputFolder); err != nil {
+		if err := a.updateSchemaConfig(ctx, manifest, newPackage, outputFolder); err != nil {
 			return nil, err
 		}
 	}
@@ -115,18 +120,22 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 	return newPackage, nil
 }
 
-func updateSchemaConfig(ctx context.Context, gh *github.Client, manifest common.PackageManifest, templateName, gitRef, outputFolder string) error {
-	downloader := githubreleases.NewFileDownloader(gh, common.BoilerplateRepoOwner, common.BoilerplateRepoName, gitRef)
-	stackPath := githubreleases.GetTemplatePath(manifest.PackagePrefix(), templateName)
-
-	generatedSchema, err := schema.GenerateJsonSchemaForApp(ctx, downloader, stackPath, gitRef)
-	if err != nil {
-		return fmt.Errorf("generating json schema for app: %w", err)
-	}
-
+func (a Adder) updateSchemaConfig(
+	ctx context.Context, manifest common.PackageManifest, pkg common.Package, outputFolder string) error {
 	varFile := common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
 
-	_, err = schema.CreateOrUpdateVarFile(varFile, gitRef, generatedSchema)
+	jsonSchemaData, err := a.schemaGenerator.CreateJsonSchemaFile(ctx, manifest.PackagePrefix(), pkg)
+	if err != nil {
+		return fmt.Errorf("creating json schema file: %w", err)
+	}
+
+	schemaFilePath := schema.GetSchemaFilePath(varFile, pkg.Ref)
+	err = schema.WriteSchemaToFile(schemaFilePath, jsonSchemaData)
+	if err != nil {
+		return fmt.Errorf("writing schema to file %s: %w", schemaFilePath, err)
+	}
+
+	_, err = schema.CreateOrUpdateVarFile(varFile, pkg.Ref)
 	if err != nil {
 		return fmt.Errorf("creating or updating configuration file: %w", err)
 	}

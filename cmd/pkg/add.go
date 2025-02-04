@@ -13,43 +13,47 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var flagAddCommandUpdateSchema bool
+func NewAddCommand(schemaGenerator common.SchemaGenerator) *cobra.Command {
+	var flagAddCommandUpdateSchema bool
 
-var AddCommand = &cobra.Command{
-	Use:   "add template [outputFolder]",
-	Short: "Add the Boilerplate template to the package manifest with an optional output folder",
-	Long: `Add the Boilerplate template to the package manifest with an optional output folder.
+	adder := add.NewAdder(schemaGenerator)
+
+	cmd := &cobra.Command{
+		Use:   "add template [outputFolder]",
+		Short: "Add the Boilerplate template to the package manifest with an optional output folder",
+		Long: `Add the Boilerplate template to the package manifest with an optional output folder.
 The template version is fetched from the latest GitHub release in the template repository.
 The output folder is useful when you need multiple instances of the same template with different configurations, for example having multiple instances of the application template.`,
-	Example: `ok pkg add databases my-postgres-database
+		Example: `ok pkg add databases my-postgres-database
 ok pkg add app ecommerce-website
 ok pkg add app ecommerce-api
 	`,
-	ValidArgsFunction: addTabCompletion,
-	Args:              cobra.RangeArgs(1, 2),
-	RunE: func(cmd *cobra.Command, args []string) error {
-		templateName := getArg(args, 0, "")
-		outputFolder := getArg(args, 1, templateName)
+		ValidArgsFunction: addTabCompletion,
+		Args:              cobra.RangeArgs(1, 2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			templateName := getArg(args, 0, "")
+			outputFolder := getArg(args, 1, templateName)
 
-		result, err := add.Run(common.PackagesManifestFilename, templateName, outputFolder, flagAddCommandUpdateSchema)
-		if err != nil {
-			return err
-		}
-
-		slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, common.PackagesManifestFilename, result.OutputFolder))
-		nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
-		if len(nonExistingConfigFiles) > 0 {
-			slog.Info("\nCreate the following configuration files:\n")
-			for _, configFile := range nonExistingConfigFiles {
-				slog.Info(fmt.Sprintf("- %s\n", configFile))
+			result, err := adder.Run(common.PackagesManifestFilename, templateName, outputFolder, flagAddCommandUpdateSchema)
+			if err != nil {
+				return err
 			}
-		}
-		return nil
-	},
-}
 
-func init() {
-	AddCommand.Flags().BoolVar(&flagAddCommandUpdateSchema, "update-schema", true, "Update the JSON schema for affected packages")
+			slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, common.PackagesManifestFilename, result.OutputFolder))
+			nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
+			if len(nonExistingConfigFiles) > 0 {
+				slog.Info("\nCreate the following configuration files:\n")
+				for _, configFile := range nonExistingConfigFiles {
+					slog.Info(fmt.Sprintf("- %s\n", configFile))
+				}
+			}
+			return nil
+		},
+	}
+
+	cmd.Flags().BoolVar(&flagAddCommandUpdateSchema, "update-schema", true, "Update the JSON schema for affected packages")
+
+	return cmd
 }
 
 func getArg(args []string, index int, fallback string) string {

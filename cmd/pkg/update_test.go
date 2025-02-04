@@ -1,8 +1,10 @@
 package pkg_test
 
 import (
+	"context"
 	"fmt"
 	"github.com/oslokommune/ok/cmd/pkg"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -15,6 +17,7 @@ func TestUpdateCommand(t *testing.T) {
 		{
 			name:            "Should bump the Ref field for the specified packages",
 			args:            []string{"app-hello", "load-balancing-alb-main"},
+			jsonSchemasDir:  "testdata/bump-ref-field/input/json-schemas",
 			packageManifest: "testdata/bump-ref-field/input/packages.yml",
 			configDir:       "testdata/bump-ref-field/input/config",
 			releases: map[string]string{
@@ -29,6 +32,7 @@ func TestUpdateCommand(t *testing.T) {
 		{
 			name:            "Should bump the Ref field only for semver-version package Refs",
 			args:            []string{},
+			jsonSchemasDir:  "testdata/bump-ref-field-semver-only/input/json-schemas",
 			packageManifest: "testdata/bump-ref-field-semver-only/input/packages.yml",
 			configDir:       "testdata/bump-ref-field-semver-only/input/config",
 			releases: map[string]string{
@@ -40,6 +44,7 @@ func TestUpdateCommand(t *testing.T) {
 		{
 			name:            "Should bump schema version in var files",
 			args:            []string{"app-hello"},
+			jsonSchemasDir:  "testdata/bump-schema-version/input/json-schemas",
 			packageManifest: "testdata/bump-schema-version/input/packages.yml",
 			configDir:       "testdata/bump-schema-version/input/config",
 			releases: map[string]string{
@@ -54,10 +59,15 @@ func TestUpdateCommand(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Given
+			testDir, err := os.Getwd()
+			require.NoError(t, err)
+
 			ghReleases := &GitHubReleasesMock{
 				LatestReleases: tt.releases,
 			}
-			cmd := pkg.NewUpdateCommand(ghReleases)
+			schemaGenerator := NewSchemaGeneratorMock(filepath.Join(testDir, tt.jsonSchemasDir))
+
+			command := pkg.NewUpdateCommand(ghReleases, schemaGenerator)
 
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 			defer func(path string) {
@@ -69,22 +79,20 @@ func TestUpdateCommand(t *testing.T) {
 
 			fmt.Println("tempDir: ", tempDir)
 			copyTestdataToTempDir(t, tt, tempDir)
-			cmd.SetArgs(tt.args)
-
-			testDir, err := os.Getwd()
-			require.NoError(t, err)
+			command.SetArgs(tt.args)
 
 			err = os.Chdir(tempDir) // Works, but disables the possibility for parallel tests.
 			require.NoError(t, err)
 
 			// When
-			err = cmd.Execute()
+			err = command.Execute()
 
 			// Then
 			if tt.expectError {
 				assert.Error(t, err, "expected an error")
 				return
 			}
+			require.NoError(t, err)
 
 			err = os.Chdir(testDir)
 			require.NoError(t, err)
@@ -138,6 +146,7 @@ func TestUpdateCommand(t *testing.T) {
 type TestData struct {
 	name                    string
 	args                    []string
+	jsonSchemasDir          string
 	packageManifest         string
 	configDir               string
 	releases                map[string]string
@@ -184,4 +193,32 @@ func copyFile(src, dst string) error {
 	}
 
 	return nil
+}
+
+type SchemaGeneratorMock struct {
+	jsonSchemasDir string
+}
+
+func NewSchemaGeneratorMock(jsonSchemasDir string) SchemaGeneratorMock {
+	return SchemaGeneratorMock{
+		jsonSchemasDir: jsonSchemasDir,
+	}
+}
+
+// CreateJsonSchemaFile creates JSON schema file from a Boilerplate template configuration
+func (s SchemaGeneratorMock) CreateJsonSchemaFile(
+	ctx context.Context, manifestPackagePrefix string, pkg common.Package) ([]byte, error) {
+
+	// Example: app-v8.0.5.schema.json
+	schemaFilePath := fmt.Sprintf("%s.schema.json", pkg.Ref)
+
+	// Example: testdata/json-schemas/.schemas/app-v8.0.5.schema.json
+	filePath := filepath.Join(s.jsonSchemasDir, schemaFilePath)
+
+	schemaData, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("reading file %s: %w", filePath, err)
+	}
+
+	return schemaData, nil
 }

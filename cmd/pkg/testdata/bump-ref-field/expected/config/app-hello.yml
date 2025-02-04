@@ -10,6 +10,13 @@ ServiceConnect:
   Enable: true
 AlbHostRouting:
   Enable: true
+  Internal: false
+  Subdomain:
+    Enable: true
+    TargetGroupTargetStickiness: false
+  ApexDomain:
+    Enable: false
+    TargetGroupTargetStickiness: false
 DatabaseConnectivity:
   Enable: true
 OpenTelemetrySidecar:

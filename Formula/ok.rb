@@ -5,15 +5,15 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "5.4.2"
+  version "5.4.3"
 
   depends_on "fzf"
   depends_on "yq"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v5.4.2/ok_5.4.2_darwin_amd64.tar.gz"
-      sha256 "c0e4d5b91c42ba7cb2f300c7747c65e9836fe885de760de4ffbeeac75563f967"
+      url "https://github.com/oslokommune/ok/releases/download/v5.4.3/ok_5.4.3_darwin_amd64.tar.gz"
+      sha256 "6eb76097b2038b4754e47b78a514ca520d4e8f1183291970f45f1f1596dab2ab"
 
       def install
         bin.install "ok"
@@ -23,8 +23,8 @@ class Ok < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/oslokommune/ok/releases/download/v5.4.2/ok_5.4.2_darwin_arm64.tar.gz"
-      sha256 "417c13ea388ce32bb7f6566f0319ab8c06212ff67250f6ae3dfb4af8dc41c5c4"
+      url "https://github.com/oslokommune/ok/releases/download/v5.4.3/ok_5.4.3_darwin_arm64.tar.gz"
+      sha256 "e5d5a6be8cf05d267d77c770709901ec8ececa20497e7e2eb0a2cd17e5db30ca"
 
       def install
         bin.install "ok"
@@ -38,8 +38,8 @@ class Ok < Formula
   on_linux do
     if Hardware::CPU.intel?
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v5.4.2/ok_5.4.2_linux_amd64.tar.gz"
-        sha256 "2956cc0ff217e80a893e86c4ceeaca2a97d7b4ce04b9e19328e9408b55c21db7"
+        url "https://github.com/oslokommune/ok/releases/download/v5.4.3/ok_5.4.3_linux_amd64.tar.gz"
+        sha256 "0fcf9946334323b34603f6f9fea32b414f99a9f22d0abe754dfac7c64693d70f"
 
         def install
           bin.install "ok"
@@ -51,8 +51,8 @@ class Ok < Formula
     end
     if Hardware::CPU.arm?
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v5.4.2/ok_5.4.2_linux_arm64.tar.gz"
-        sha256 "299d22d58c77030819efe6cd8b4d8181fe04e38ba1b087ff238449a7ba707b74"
+        url "https://github.com/oslokommune/ok/releases/download/v5.4.3/ok_5.4.3_linux_arm64.tar.gz"
+        sha256 "2ebad81f42a642c972cf7b39d088ec5c9d0b95b3660df806cf9b7bace3222882"
 
         def install
           bin.install "ok"

@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.4.3](https://github.com/oslokommune/ok/compare/v5.4.2...v5.4.3) (2025-02-04)
+
+
+### Bug Fixes
+
+* Improve error handling on login code notification ([#376](https://github.com/oslokommune/ok/issues/376)) ([eaad94a](https://github.com/oslokommune/ok/commit/eaad94ab4b11f2415aefd33c6a3ab173e293e93b))
+
 ## [5.4.2](https://github.com/oslokommune/ok/compare/v5.4.1...v5.4.2) (2025-01-20)
 
 

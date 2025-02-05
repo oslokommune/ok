@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.4.4](https://github.com/oslokommune/ok/compare/v5.4.3...v5.4.4) (2025-02-05)
+
+
+### Bug Fixes
+
+* `ok pkg update` writes old template version to var file ([#375](https://github.com/oslokommune/ok/issues/375)) ([6f9d8df](https://github.com/oslokommune/ok/commit/6f9d8dfdc8617ab678a3da2d6c57fbc725043172))
+
 ## [5.4.3](https://github.com/oslokommune/ok/compare/v5.4.2...v5.4.3) (2025-02-04)
 
 

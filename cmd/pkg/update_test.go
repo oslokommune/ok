@@ -15,44 +15,47 @@ import (
 func TestUpdateCommand(t *testing.T) {
 	tests := []TestData{
 		{
-			name:            "Should bump the Ref field for the specified packages",
-			args:            []string{"app-hello", "load-balancing-alb-main"},
-			jsonSchemasDir:  "testdata/bump-ref-field/input/json-schemas",
-			packageManifest: "testdata/bump-ref-field/input/packages.yml",
-			configDir:       "testdata/bump-ref-field/input/config",
+			name:                    "Should bump the Ref field for the specified packages",
+			args:                    []string{"app-hello", "load-balancing-alb-main"},
+			testdataRootDir:         "testdata/bump-ref-field",
+			jsonSchemasDir:          "input/json-schemas",
+			packageManifestFilename: "input/packages.yml",
+			configDir:               "input/config",
 			releases: map[string]string{
 				"app":                "v9.0.0",
 				"load-balancing-alb": "v4.0.0",
 				"app-common":         "v7.0.0",
 			},
 			expectError:             false,
-			expectedPackageManifest: "testdata/bump-ref-field/expected/packages.yml",
-			expectedConfigDir:       "testdata/bump-ref-field/expected/config",
+			expectedPackageManifest: "expected/packages.yml",
+			expectedConfigDir:       "expected/config",
 		},
 		{
-			name:            "Should bump the Ref field only for semver-version package Refs",
-			args:            []string{},
-			jsonSchemasDir:  "testdata/bump-ref-field-semver-only/input/json-schemas",
-			packageManifest: "testdata/bump-ref-field-semver-only/input/packages.yml",
-			configDir:       "testdata/bump-ref-field-semver-only/input/config",
+			name:                    "Should bump the Ref field only for semver-version package Refs",
+			args:                    []string{},
+			testdataRootDir:         "testdata/bump-ref-field-semver-only",
+			jsonSchemasDir:          "input/json-schemas",
+			packageManifestFilename: "input/packages.yml",
+			configDir:               "input/config",
 			releases: map[string]string{
 				"app": "v9.0.0",
 			},
 			expectError:             false,
-			expectedPackageManifest: "testdata/bump-ref-field-semver-only/expected/packages.yml",
+			expectedPackageManifest: "expected/packages.yml",
 		},
 		{
-			name:            "Should bump schema version in var files",
-			args:            []string{"app-hello"},
-			jsonSchemasDir:  "testdata/bump-schema-version/input/json-schemas",
-			packageManifest: "testdata/bump-schema-version/input/packages.yml",
-			configDir:       "testdata/bump-schema-version/input/config",
+			name:                    "Should bump schema version in var files",
+			args:                    []string{"app-hello"},
+			testdataRootDir:         "testdata/bump-schema-version",
+			jsonSchemasDir:          "input/json-schemas",
+			packageManifestFilename: "input/packages.yml",
+			configDir:               "input/config",
 			releases: map[string]string{
 				"app": "v9.0.0",
 			},
 			expectError:             false,
-			expectedPackageManifest: "testdata/bump-schema-version/expected/packages.yml",
-			expectedConfigDir:       "testdata/bump-schema-version/expected/config",
+			expectedPackageManifest: "expected/packages.yml",
+			expectedConfigDir:       "expected/config",
 		},
 	}
 
@@ -62,18 +65,20 @@ func TestUpdateCommand(t *testing.T) {
 			testDir, err := os.Getwd()
 			require.NoError(t, err)
 
+			jsonSchemasDir := filepath.Join(testDir, tt.testdataRootDir, tt.jsonSchemasDir)
+			schemaGenerator := NewSchemaGeneratorMock(jsonSchemasDir)
+
 			ghReleases := &GitHubReleasesMock{
 				LatestReleases: tt.releases,
 			}
-			schemaGenerator := NewSchemaGeneratorMock(filepath.Join(testDir, tt.jsonSchemasDir))
 
 			command := pkg.NewUpdateCommand(ghReleases, schemaGenerator)
 
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
-			defer func(path string) {
-				err := os.RemoveAll(path)
-				require.NoError(t, err)
-			}(tempDir)
+			//defer func(path string) {
+			//	err := os.RemoveAll(path)
+			//	require.NoError(t, err)
+			//}(tempDir)
 
 			require.NoError(t, err)
 
@@ -102,7 +107,7 @@ func TestUpdateCommand(t *testing.T) {
 			require.NoError(t, err)
 			actual := string(actualBytes)
 
-			expectedBytes, err := os.ReadFile(tt.expectedPackageManifest)
+			expectedBytes, err := os.ReadFile(filepath.Join(tt.testdataRootDir, tt.expectedPackageManifest))
 			require.NoError(t, err)
 			expected := string(expectedBytes)
 
@@ -115,8 +120,9 @@ func TestUpdateCommand(t *testing.T) {
 			if tt.expectedConfigDir == "" {
 				return
 			}
+			expectedConfigDir := filepath.Join(tt.testdataRootDir, tt.expectedConfigDir)
 
-			err = filepath.Walk(tt.expectedConfigDir, func(path string, fileInfo os.FileInfo, err error) error {
+			err = filepath.Walk(expectedConfigDir, func(path string, fileInfo os.FileInfo, err error) error {
 				require.NoError(t, err)
 
 				if fileInfo.IsDir() {
@@ -130,7 +136,7 @@ func TestUpdateCommand(t *testing.T) {
 				require.NoError(t, err)
 				varFile := string(varFileBytes)
 
-				expectedFilename := filepath.Join(tt.expectedConfigDir, fileInfo.Name())
+				expectedFilename := filepath.Join(expectedConfigDir, fileInfo.Name())
 				expectedVarFileBytes, err := os.ReadFile(expectedFilename)
 				require.NoError(t, err)
 				expectedVarFile := string(expectedVarFileBytes)
@@ -146,8 +152,9 @@ func TestUpdateCommand(t *testing.T) {
 type TestData struct {
 	name                    string
 	args                    []string
+	testdataRootDir         string
 	jsonSchemasDir          string
-	packageManifest         string
+	packageManifestFilename string
 	configDir               string
 	releases                map[string]string
 	expectError             bool
@@ -163,18 +170,20 @@ func (g *GitHubReleasesMock) GetLatestReleases() (map[string]string, error) {
 	return g.LatestReleases, nil
 }
 
-func copyTestdataToTempDir(t *testing.T, tt TestData, rootDir string) {
-	if tt.packageManifest != "" {
-		srcPath := tt.packageManifest
-		dstPath := filepath.Join(rootDir, filepath.Base(tt.packageManifest))
+func copyTestdataToTempDir(t *testing.T, tt TestData, tempDir string) {
+	if tt.packageManifestFilename != "" {
+		srcPath := filepath.Join(tt.testdataRootDir, tt.packageManifestFilename)
+		dstPath := filepath.Join(tempDir, filepath.Base(tt.packageManifestFilename))
 
 		err := copyFile(srcPath, dstPath)
 		require.NoError(t, err)
 	}
 
 	if tt.configDir != "" {
-		srcDir := os.DirFS(tt.configDir)
-		dstDir := filepath.Join(rootDir, filepath.Base(tt.configDir))
+		configDir := filepath.Join(tt.testdataRootDir, tt.configDir)
+
+		srcDir := os.DirFS(configDir)
+		dstDir := filepath.Join(tempDir, filepath.Base(tt.configDir))
 
 		err := os.CopyFS(dstDir, srcDir)
 		require.NoError(t, err)

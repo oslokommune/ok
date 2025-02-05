@@ -205,7 +205,8 @@ func NewSchemaGeneratorMock(jsonSchemasDir string) SchemaGeneratorMock {
 	}
 }
 
-// CreateJsonSchemaFile creates JSON schema file from a Boilerplate template configuration
+// CreateJsonSchemaFile emulates creating JSON schema file from a Boilerplate template configuration.
+// Instead of generating the schema, it just copies a pre-generated file.
 func (s SchemaGeneratorMock) CreateJsonSchemaFile(
 	ctx context.Context, manifestPackagePrefix string, pkg common.Package) ([]byte, error) {
 

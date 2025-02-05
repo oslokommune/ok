@@ -21,10 +21,10 @@ type Package struct {
 
 func (p Package) String() string {
 	outputFolder := fmt.Sprintf("%-*.*s", outputFolderWidth, outputFolderWidth, p.OutputFolder)
-	template := fmt.Sprintf("%-*.*s", templateWidth, templateWidth, p.Template)
+	ref := fmt.Sprintf("%-*.*s", templateWidth, templateWidth, p.Ref)
 	varFiles := fmt.Sprintf("%-*.*s", varFilesWidth, varFilesWidth, fmt.Sprint(p.VarFiles))
 
-	return fmt.Sprintf("%s %s %s", outputFolder, template, varFiles)
+	return fmt.Sprintf("%s %s %s", outputFolder, ref, varFiles)
 }
 
 // Key returns a unique key for the package

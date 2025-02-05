@@ -1,10 +1,13 @@
 package schema
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/config"
+	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"log"
 	"log/slog"
 	"os"
@@ -14,80 +17,149 @@ import (
 	"github.com/oslokommune/ok/pkg/jsonschema"
 )
 
-func GenerateJsonSchemaForApp(ctx context.Context, downloader config.FileDownloader, stackPath, gitRef string) (*jsonschema.Document, error) {
+type Generator struct {
+}
+
+func NewGenerator() Generator {
+	return Generator{}
+}
+
+// CreateJsonSchemaFile creates JSON schema file from a Boilerplate template configuration
+func (g Generator) CreateJsonSchemaFile(
+	ctx context.Context, manifestPackagePrefix string, pkg common.Package) ([]byte, error) {
+
+	generatedSchema, err := GenerateJsonSchemaForApp(
+		ctx, common.BoilerplateRepoOwner, common.BoilerplateRepoName, manifestPackagePrefix, pkg)
+	if err != nil {
+		return nil, fmt.Errorf("generating json schema for app: %w", err)
+	}
+
+	data, err := JsonSchemaToBytes(generatedSchema)
+	if err != nil {
+		return nil, fmt.Errorf("generating bytes from json: %w", err)
+	}
+
+	return data, nil
+}
+
+func GenerateJsonSchemaForApp(ctx context.Context, repoOwner string, repoName string, manifestPackagePrefix string, pkg common.Package) (*jsonschema.Document, error) {
+	gh, err := githubreleases.GetGitHubClient()
+	if err != nil {
+		return nil, fmt.Errorf("getting GitHub client: %w", err)
+	}
+
+	downloader := githubreleases.NewFileDownloader(gh, repoOwner, repoName, pkg.Ref)
+	stackPath := githubreleases.GetTemplatePath(manifestPackagePrefix, pkg.Template)
+
+	generatedSchema, err := GenerateJsonSchemaForAppWithDownloader(ctx, downloader, stackPath, pkg.Ref)
+	if err != nil {
+		return nil, fmt.Errorf("generating json schema for app: %w", err)
+	}
+
+	return generatedSchema, nil
+}
+
+func GenerateJsonSchemaForAppWithDownloader(ctx context.Context, downloader config.FileDownloader, stackPath, gitRef string) (*jsonschema.Document, error) {
 	stacks, err := config.DownloadBoilerplateStacksWithDependencies(ctx, downloader, stackPath)
 	if err != nil {
 		return nil, fmt.Errorf("downloading boilerplate stacks: %w", err)
 	}
+
 	mobules := BuildModuleVariables(stacks)
+
 	schema, err := TransformModulesToJsonSchema(fmt.Sprintf("%s-%s", stackPath, gitRef), mobules)
 	if err != nil {
 		return nil, fmt.Errorf("transforming modules to json schema: %w", err)
 	}
+
 	return schema, nil
 }
 
-// WriteJsonSchemaFile writes a json schema to a file in the output directory with the given template and version.
-// The file will be named <template>-<version>.schema.json.
-// The return value is the path to the file.
-func WriteJsonSchemaFile(filePath string, schema *jsonschema.Document) (string, error) {
+func JsonSchemaToBytes(schema *jsonschema.Document) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetIndent("", "  ")
+
+	if err := enc.Encode(schema); err != nil {
+		return nil, fmt.Errorf("encoding schema to bytes: %w", err)
+	}
+
+	return buf.Bytes(), nil
+}
+
+func WriteSchemaToFile(filePath string, data []byte) error {
 	outputDir := filepath.Dir(filePath)
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return "", fmt.Errorf("creating output directory: %w", err)
+		return fmt.Errorf("creating output directory: %w", err)
 	}
 
-	slog.Debug("writing json schema file", slog.String("path", filePath), slog.String("schemaId", schema.ID))
-	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return "", fmt.Errorf("opening file: %w", err)
-	}
-	defer f.Close()
+	slog.Debug("writing json schema file", slog.String("path", filePath))
 
-	enc := json.NewEncoder(f)
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(schema); err != nil {
-		return "", fmt.Errorf("encoding schema to file %s: %w", filePath, err)
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		return fmt.Errorf("writing schema to file %s: %w", filePath, err)
 	}
 
-	return filePath, nil
+	return nil
 }
 
 const yamlLanguageServerComment = "# yaml-language-server:"
 
-func CreateOrUpdateVarFile(configFilePath string, schemaName string, schema *jsonschema.Document) (string, error) {
-	varFileDir := filepath.Dir(configFilePath)
-	schemasDir := filepath.Join(varFileDir, ".schemas")
+// GetSchemaFilePath converts a varFilePath to returns path to the schema file.
+// Example
+// Input:  config/app-hello.yaml
+// Output: config/.schemas/app-v8.0.5.schema.json
+func GetSchemaFilePath(varfilePath string, schemaName string) string {
+	varFileDir := getVarFileDir(varfilePath)
+	schemasDir := getSchemasDir(varFileDir)
+
+	schemaFileName := fmt.Sprintf("%s.schema.json", schemaName)
+	schemaFilePath := filepath.Join(schemasDir, schemaFileName)
+
+	return schemaFilePath
+}
+
+func getVarFileDir(varfilePath string) string {
+	return filepath.Dir(varfilePath)
+}
+
+func getSchemasDir(varFileDir string) string {
+	return filepath.Join(varFileDir, ".schemas")
+}
+
+// CreateOrUpdateVarFile creates or updates the first line of a var file to include a $schema reference to the schema
+// file. Creates means the line does not exist and is created. Updates means the line exists and is updated.
+func CreateOrUpdateVarFile(varfilePath string, schemaName string) (string, error) {
+	varFileDir := getVarFileDir(varfilePath)
+	schemasDir := getSchemasDir(varFileDir)
 
 	if err := os.MkdirAll(varFileDir, 0755); err != nil {
 		return "", fmt.Errorf("creating output directory: %w", err)
 	}
+
 	if err := os.MkdirAll(schemasDir, 0755); err != nil {
 		return "", fmt.Errorf("creating output directory: %w", err)
 	}
-	// write schema to the config dir with the name <schemaName>.schema.json
+
 	schemaFileName := fmt.Sprintf("%s.schema.json", schemaName)
 	schemaFilePath := filepath.Join(schemasDir, schemaFileName)
-	slog.Debug("writing schema file", slog.String("path", schemaFilePath), slog.String("varFileDir", varFileDir), slog.String("schemaDir", schemasDir), slog.String("schemaId", schema.ID))
-	_, err := WriteJsonSchemaFile(schemaFilePath, schema)
-	if err != nil {
-		return "", fmt.Errorf("writing schema file to %s: %w", schemaFilePath, err)
-	}
 
 	relativeSchemaPath, err := filepath.Rel(varFileDir, schemaFilePath)
 	if err != nil {
 		return "", fmt.Errorf("getting relative schema path: %w", err)
 	}
 
-	data, err := os.ReadFile(configFilePath)
+	data, err := os.ReadFile(varfilePath)
 	if err != nil && !os.IsNotExist(err) {
 		return "", fmt.Errorf("reading file: %w", err)
 	}
+
 	// Find if the first line starts with # yaml-language-server
 	cleanedVarFile := stripYamlLanguageServerComment(string(data))
 	newVarFile := appendYamlLanguageServerComment(cleanedVarFile, relativeSchemaPath)
-	err = os.WriteFile(configFilePath, []byte(newVarFile), 0644)
+
+	err = os.WriteFile(varfilePath, []byte(newVarFile), 0644)
 	if err != nil {
-		return "", fmt.Errorf("overwriting config file %s: %w", configFilePath, err)
+		return "", fmt.Errorf("overwriting config file %s: %w", varfilePath, err)
 	}
 
 	return "", nil
@@ -145,6 +217,7 @@ func buildModuleVariables(namespace string, currentConfig *config.BoilerplateSta
 
 	for _, dep := range currentConfig.Config.Dependencies {
 		depPath := config.JoinPath(currentConfig.Path, dep.TemplateUrl)
+
 		depConfig, ok := findConfigFromPath(depPath, configs)
 		if !ok {
 			log.Printf("dependency %s not found in configs referenced by %s", depPath, currentConfig.Path)
@@ -153,10 +226,12 @@ func buildModuleVariables(namespace string, currentConfig *config.BoilerplateSta
 
 		depNamespace := namespace
 		depOutputFolder := config.JoinPath(outputFolder, dep.OutputFolder)
+
 		// if we move to a different output folder, then we need to create a new namespace
 		if depOutputFolder != outputFolder {
 			depNamespace = JoinNamespaces(depNamespace, dep.Name)
 		}
+
 		subModuleVariables := buildModuleVariables(depNamespace, depConfig, configs, depOutputFolder)
 		for _, m := range subModuleVariables {
 			namespaceVariables[m.Namespace] = append(namespaceVariables[m.Namespace], m.Variables...)
@@ -203,11 +278,14 @@ func TransformModulesToJsonSchema(schemaId string, modules []*ModuleVariables) (
 			if strings.Contains(variable.Description, "do NOT edit") {
 				continue
 			}
+
 			typ := mapBoilerplateVariableTypeToSchemaType(variable.Type)
+
 			name := JoinNamespaces(module.Namespace, variable.Name)
 			if _, ok := properties[name]; ok {
 				continue
 			}
+
 			// Special case for StackName, since it is a required property in all stacks.
 			if variable.Name == "StackName" {
 				requiredProperties = append(requiredProperties, name)
@@ -288,10 +366,12 @@ func mapVariableObjectToProperties(variable config.BoilerplateVariable) map[stri
 	properties := make(map[string]jsonschema.Property)
 	for k, v := range defaultMap {
 		propertyName := k
+
 		schemaType, ok := mapGoTypeToSchemaType(v)
 		if !ok && v != nil {
 			slog.Debug("could not transform default map type to schema type", slog.String("variable", propertyName), slog.Any("defaultValue", v))
 		}
+
 		properties[propertyName] = jsonschema.Property{
 			Type:    schemaType,
 			Default: v,
@@ -307,13 +387,17 @@ func mapVariableObjectToFlatProperties(namespace string, variable config.Boilerp
 	if !ok {
 		return make(map[string]jsonschema.Property)
 	}
+
 	properties := make(map[string]jsonschema.Property)
+
 	for k, v := range defaultMap {
 		propertyName := JoinNamespaces(namespace, k)
+
 		schemaType, ok := mapGoTypeToSchemaType(v)
 		if !ok {
 			slog.Debug("could not transform default map type to schema type", slog.String("variable", propertyName))
 		}
+
 		properties[propertyName] = jsonschema.Property{
 			Type:        schemaType,
 			Description: fmt.Sprintf("Override single parameter of %s", namespace),

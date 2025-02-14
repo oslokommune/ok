@@ -74,6 +74,7 @@ func init() {
 	rootCmd.AddCommand(awsCommand)
 	awsCommand.AddCommand(aws.EcsExecCommand)
 	awsCommand.AddCommand(aws.AdminSessionCommand)
+	awsCommand.AddCommand(aws.ConfigGeneratorCommand)
 
 	initializeConfiguration()
 }

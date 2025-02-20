@@ -11,65 +11,67 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	InstallCommand.Flags().BoolVarP(&flagInteractive,
-		FlagInteractiveName, FlagInteractiveShorthand, false, FlagInteractiveUsage)
-}
-
-var InstallCommand = &cobra.Command{
-	Use:   "install [outputFolder ...]",
-	Short: "Install or update Boilerplate packages.",
-	Long: `Install or update Boilerplate packages.
+func NewInstallCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "install [outputFolder ...]",
+		Short: "Install or update Boilerplate packages.",
+		Long: `Install or update Boilerplate packages.
 
 ` + InstallUpdateArgumentDescription,
-	Example: `ok pkg install networking
+		Example: `ok pkg install networking
 ok pkg install networking my-app
 BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 `,
-	ValidArgsFunction: installTabCompletion,
-	SilenceErrors:     true,
-	RunE: func(cmd *cobra.Command, outputFolders []string) error {
-		if flagInteractive && len(outputFolders) > 0 {
-			return fmt.Errorf("cannot use both --interactive and outputFolder arguments")
-		}
+		ValidArgsFunction: installTabCompletion,
+		SilenceErrors:     true,
+		RunE: func(cmd *cobra.Command, outputFolders []string) error {
+			if flagInteractive && len(outputFolders) > 0 {
+				return fmt.Errorf("cannot use both --interactive and outputFolder arguments")
+			}
 
-		var packages []common.Package
-		var err error
+			var packages []common.Package
+			var err error
 
-		manifest, err := common.LoadPackageManifest(common.PackagesManifestFilename)
-		if err != nil {
-			return fmt.Errorf("loading package manifest: %w", err)
-		}
-
-		// Select packages
-		switch {
-		case len(outputFolders) > 0:
-			// Use output folders to determine which packages to install
-			packages = install.FindPackagesFromOutputFolders(manifest.Packages, outputFolders)
-
-		case flagInteractive:
-			// Use interactive mode to determine which packages to install
-			packages, err = interactive.SelectPackages(manifest, "install")
+			manifest, err := common.LoadPackageManifest(common.PackagesManifestFilename)
 			if err != nil {
-				return fmt.Errorf("selecting packages: %w", err)
+				return fmt.Errorf("loading package manifest: %w", err)
 			}
 
-			if len(packages) == 0 {
-				fmt.Println("No packages selected. Remember to use space (or x) to select package(s) to install.")
-				return nil
+			// Select packages
+			switch {
+			case len(outputFolders) > 0:
+				// Use output folders to determine which packages to install
+				packages = install.FindPackagesFromOutputFolders(manifest.Packages, outputFolders)
+
+			case flagInteractive:
+				// Use interactive mode to determine which packages to install
+				packages, err = interactive.SelectPackages(manifest, "install")
+				if err != nil {
+					return fmt.Errorf("selecting packages: %w", err)
+				}
+
+				if len(packages) == 0 {
+					fmt.Println("No packages selected. Remember to use space (or x) to select package(s) to install.")
+					return nil
+				}
+
+			default:
+				packages = manifest.Packages
 			}
 
-		default:
-			packages = manifest.Packages
-		}
+			err = install.Run(packages, manifest)
+			if err != nil {
+				return fmt.Errorf("installing packages: %w", err)
+			}
 
-		err = install.Run(packages, manifest)
-		if err != nil {
-			return fmt.Errorf("installing packages: %w", err)
-		}
+			return nil
+		},
+	}
 
-		return nil
-	},
+	cmd.Flags().BoolVarP(&flagInteractive,
+		FlagInteractiveName, FlagInteractiveShorthand, false, FlagInteractiveUsage)
+
+	return cmd
 }
 
 func installTabCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

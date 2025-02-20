@@ -2,12 +2,13 @@ package pkg_test
 
 import (
 	"fmt"
-	"github.com/oslokommune/ok/cmd/pkg"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/oslokommune/ok/cmd/pkg"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type InstallTestData struct {
@@ -38,7 +39,7 @@ func TestInstallCommand(t *testing.T) {
 			testDir, err := os.Getwd()
 			require.NoError(t, err)
 
-			command := pkg.NewInstallCommand()
+			command := pkg.NewInstallCommand() // figure out which parameters to pass here, if any
 
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 			//defer func(path string) {

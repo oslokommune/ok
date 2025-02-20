@@ -48,3 +48,15 @@ func copyFile(src, dst string) error {
 
 	return nil
 }
+
+// TODO Rewrite copyTestdataToTempDir to work like this. I.e. test structure for update tests must be the same. We
+// want all the test files to be copied, not select which ones.
+func copyTestdataRootDirToTempDir(t *testing.T, tt TestData, tempDir string) {
+	configDir := filepath.Join(tt.testdataRootDir, "input", "root")
+
+	srcDir := os.DirFS(configDir)
+	dstDir := filepath.Join(tempDir, filepath.Base(tt.configDir))
+
+	err := os.CopyFS(dstDir, srcDir)
+	require.NoError(t, err)
+}

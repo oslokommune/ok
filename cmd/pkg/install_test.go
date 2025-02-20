@@ -50,7 +50,7 @@ func TestInstallCommand(t *testing.T) {
 			require.NoError(t, err)
 
 			fmt.Println("tempDir: ", tempDir)
-			copyTestdataToTempDir(t, tt.TestData, tempDir)
+			copyTestdataRootDirToTempDir(t, tt.TestData, tempDir)
 			command.SetArgs(tt.args)
 
 			err = os.Chdir(tempDir) // Works, but disables the possibility for parallel tests.

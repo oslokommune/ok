@@ -1,0 +1,97 @@
+variables:
+  - name: TemplateVersion
+    type: string
+    description: Internal tracking of template version - do NOT edit
+    default: 2.7.1
+  - name: VpcEndpoints
+    description: Enable VPC Endpoints
+    type: map
+    default:
+      Enable: false
+      Ecr: false
+      Dkr: false
+      Logs: false
+      SsmMessages: false
+      Prometheus: false
+      Ssm: false
+      S3: false
+      Xray: false
+      Sqs: false
+      SecretsManager: false
+      Sts: false
+      Lambda: false
+  - name: VpcFlowLogs
+    description: Enable VPC Flow Logs
+    type: map
+    default:
+      Enable: false
+partials:
+  - ../../partials/do-not-edit.txt
+  - ../partials/_config.tf
+skip_files:
+  - path: CHANGELOG*.md
+  - if: '{{ list outputFolder "config_override.tf" | join "/" | pathExists }}'
+    path: config_override.tf
+dependencies:
+  - name: versions
+    template-url: ../versions
+    output-folder: .
+  - name: networking-data
+    template-url: ../networking-data
+    output-folder: ../{{ outputFolder | base }}-data
+  - name: terragrunt
+    template-url: ../terragrunt
+    output-folder: .
+    variables:
+      - name: DefaultDependenciesPaths
+        type: list
+        default:
+          - ../remote-state
+          - ../{{ outputFolder | base }}-data
+hooks:
+  before:
+    - command: mv
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_config_override.tf'
+        - '{{ outputFolder }}/config_override.tf'
+      skip: |-
+        {{ or
+            (list outputFolder "config_override.tf" | join "/" | pathExists)
+            (not (list outputFolder "_config_override.tf" | join "/" | pathExists))
+        }}
+    - command: rm
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_config.tf'
+        - '{{ outputFolder }}/vpc.tf'
+        - '{{ outputFolder }}/vpc_endpoints.tf'
+    - command: find
+      args:
+        - '{{ outputFolder }}'
+        - (
+        - '-name'
+        - _gp_*.tf
+        - '-o'
+        - '-name'
+        - __gp_*.tf
+        - )
+        - '!'
+        - '-name'
+        - '*_override.tf'
+        - '-exec'
+        - rm
+        - '{}'
+        - ;
+  after:
+    - command: terraform
+      args:
+        - fmt
+      dir: '{{ outputFolder }}'
+    - command: sh
+      args:
+        - '-c'
+        - >-
+          find . -maxdepth 1 -name "*.tf" | xargs --no-run-if-empty grep -l
+          "x-boilerplate-delete" | xargs --no-run-if-empty rm
+      dir: '{{ outputFolder }}'

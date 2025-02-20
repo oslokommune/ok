@@ -42,6 +42,8 @@ func TestInstallCommand(t *testing.T) {
 			command := pkg.NewInstallCommand() // figure out which parameters to pass here, if any
 
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
+
+			// Remove temp dir after test run
 			//defer func(path string) {
 			//	err := os.RemoveAll(path)
 			//	require.NoError(t, err)
@@ -52,6 +54,9 @@ func TestInstallCommand(t *testing.T) {
 			fmt.Println("tempDir: ", tempDir)
 			copyTestdataRootDirToTempDir(t, tt.TestData, tempDir)
 			command.SetArgs(tt.args)
+
+			err = os.Setenv("BASE_URL", "../boilerplate-repo")
+			require.NoError(t, err)
 
 			err = os.Chdir(tempDir) // Works, but disables the possibility for parallel tests.
 			require.NoError(t, err)

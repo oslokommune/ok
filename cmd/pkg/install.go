@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
@@ -44,7 +45,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 			if flagRecursive {
 				return installRecursive()
 			} else {
-				return installFromManifest(common.PackagesManifestFilename, outputFolders)
+				return installFromManifest(common.PackagesManifestFilename, outputFolders, ".")
 			}
 		},
 	}
@@ -62,7 +63,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 }
 
 func installRecursive() error {
-	var manifests []string
+	var manifestPaths []string
 
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -72,7 +73,7 @@ func installRecursive() error {
 		if info.IsDir() && path != "." {
 			manifestPath := filepath.Join(path, common.PackagesManifestFilename)
 			if _, err := os.Stat(manifestPath); err == nil {
-				manifests = append(manifests, manifestPath)
+				manifestPaths = append(manifestPaths, manifestPath)
 			}
 		}
 
@@ -83,17 +84,18 @@ func installRecursive() error {
 		return fmt.Errorf("walking the path: %w", err)
 	}
 
-	for _, manifest := range manifests {
-		err := installFromManifest(manifest, []string{})
+	for _, manifestPath := range manifestPaths {
+		manifestDir := path.Dir(manifestPath)
+		err := installFromManifest(manifestPath, []string{}, manifestDir)
 		if err != nil {
-			return fmt.Errorf("installing from manifest %s: %w", manifest, err)
+			return fmt.Errorf("installing from manifest %s: %w", manifestPath, err)
 		}
 	}
 
 	return nil
 }
 
-func installFromManifest(manifestFile string, outputFolders []string) error {
+func installFromManifest(manifestFile string, outputFolders []string, workingDirectory string) error {
 	var packages []common.Package
 	var err error
 
@@ -124,7 +126,7 @@ func installFromManifest(manifestFile string, outputFolders []string) error {
 		packages = manifest.Packages
 	}
 
-	err = install.Run(packages, manifest)
+	err = install.Run(packages, manifest, workingDirectory)
 	if err != nil {
 		return fmt.Errorf("installing packages: %w", err)
 	}

@@ -11,10 +11,11 @@ import (
 )
 
 // Run runs Boilerplate for the specified packages.
-func Run(packagesToInstall []common.Package, manifest common.PackageManifest) error {
+func Run(packagesToInstall []common.Package, manifest common.PackageManifest, workingDirectory string) error {
 	cmds, err := CreateBoilerplateCommands(packagesToInstall, CreateBoilerPlateCommandsOpts{
 		PackagePathPrefix: manifest.PackagePrefix(),
 		BaseUrlOrPath:     os.Getenv("BASE_URL"),
+		WorkingDirectory:  workingDirectory,
 	})
 
 	if err != nil {
@@ -43,7 +44,7 @@ func printPrettyCmd(cmd *exec.Cmd) {
 	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 
 	fmt.Println("------------------------------------------------------------------------------------------")
-	fmt.Println("Running boilerplate command:")
+	fmt.Printf("Running boilerplate command in dir '%s':\n", cmd.Dir)
 	fmt.Println(green.Render(cmdString))
 	fmt.Println("------------------------------------------------------------------------------------------")
 }
@@ -94,6 +95,7 @@ func CreateBoilerplateCommands(packages []common.Package, opts CreateBoilerPlate
 		}
 
 		cmd := exec.Command("boilerplate", cmdArgs...)
+		cmd.Dir = opts.WorkingDirectory
 		cmds = append(cmds, cmd)
 	}
 
@@ -109,4 +111,5 @@ func isUrl(str string) bool {
 type CreateBoilerPlateCommandsOpts struct {
 	PackagePathPrefix string
 	BaseUrlOrPath     string
+	WorkingDirectory  string
 }

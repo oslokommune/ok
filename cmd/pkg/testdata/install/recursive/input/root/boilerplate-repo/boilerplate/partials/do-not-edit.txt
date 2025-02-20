@@ -1,0 +1,4 @@
+{{- define "doNotEdit" -}}
+# DO NOT EDIT: Changes here will be overwritten by Boilerplate; NEVER EDIT MANUALLY
+# This file is part of the Golden Path. You can find the exact version in .boilerplate/_template_<name>.json.
+{{- end -}}

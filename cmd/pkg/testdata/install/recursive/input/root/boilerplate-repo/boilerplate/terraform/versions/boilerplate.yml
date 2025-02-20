@@ -1,0 +1,84 @@
+variables:
+  - name: TemplateVersion
+    type: string
+    description: Internal tracking of template version - do NOT edit
+    default: 3.2.2
+  - name: StackName
+    description: Name of Terraform stack.
+  - name: AccountId
+    description: AWS account ID.
+  - name: Region
+    description: AWS region.
+    default: eu-west-1
+  - name: Team
+    description: Team name.
+  - name: Environment
+    description: Environment name.
+  - name: TerraformVersion
+    description: The version of Terraform to use.
+    type: string
+    default: '>= 1.7.0'
+  - name: AwsProviderVersion
+    description: The version of the AWS provider to use.
+    type: string
+    default: '>= 5.70.0'
+  - name: IncludeLockFile
+    description: Include a Terraform lock file.
+    type: bool
+    default: false
+  - name: S3Backend
+    description: Use S3 as a backend.
+    type: bool
+    default: true
+  - name: IamForCicd
+    description: Enable IAM roles for CI/CD.
+    type: map
+    default:
+      AssumableCdRole: false
+skip_files:
+  - path: CHANGELOG*.md
+  - if: '{{ not .IncludeLockFile }}'
+    path: .terraform.lock.hcl
+partials:
+  - ../../partials/do-not-edit.txt
+dependencies:
+  - name: terragrunt
+    template-url: ../terragrunt
+    output-folder: .
+    variables:
+      - name: DefaultDependenciesPaths
+        type: list
+        default:
+          - ''
+hooks:
+  before:
+    - command: rm
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_versions.tf'
+    - command: mv
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_versions_override.tf'
+        - '{{ outputFolder }}/__gp_versions_override.tf'
+      skip: >-
+        {{ or (list outputFolder "__gp_versions_override.tf" | join "/" |
+        pathExists) (not (list outputFolder "_versions_override.tf" | join "/" |
+        pathExists)) }}
+    - command: find
+      args:
+        - '{{ outputFolder }}'
+        - (
+        - '-name'
+        - _gp_*.tf
+        - '-o'
+        - '-name'
+        - __gp_*.tf
+        - )
+        - '!'
+        - '-name'
+        - '*_override.tf'
+        - '-exec'
+        - rm
+        - '{}'
+        - ;

@@ -100,6 +100,8 @@ func installRecursive() error {
 			Border(lipgloss.RoundedBorder()).
 			BorderForeground(lipgloss.Color("#FFFFFF"))
 
+		fmt.Println()
+
 		fmt.Println(style.Render(fmt.Sprintf("Installing package manifest: %s", manifestPath)))
 
 		fmt.Println()

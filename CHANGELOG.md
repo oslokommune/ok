@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.5.0](https://github.com/oslokommune/ok/compare/v5.4.4...v5.5.0) (2025-02-21)
+
+
+### Features
+
+* add cli command for generating aws cli config ([#386](https://github.com/oslokommune/ok/issues/386)) ([2f8e154](https://github.com/oslokommune/ok/commit/2f8e154daa94d36ba5099362a53ff93e8af50b27))
+
 ## [5.4.4](https://github.com/oslokommune/ok/compare/v5.4.3...v5.4.4) (2025-02-05)
 
 

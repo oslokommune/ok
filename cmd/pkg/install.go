@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/charmbracelet/lipgloss"
 	"path"
 	"strings"
 
@@ -88,10 +89,26 @@ func installRecursive() error {
 	for _, manifestPath := range manifestPaths {
 		manifestDir := path.Dir(manifestPath)
 
+		var style = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("#00FF00")).
+			Background(lipgloss.Color("#000000")).
+			PaddingTop(2).
+			PaddingBottom(2).
+			PaddingLeft(4).
+			PaddingRight(4).
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("#FFFFFF"))
+
+		fmt.Println(style.Render(fmt.Sprintf("Installing package manifest: %s", manifestPath)))
+
+		fmt.Println()
+
 		err := installFromManifest(manifestPath, []string{}, manifestDir)
 		if err != nil {
 			return fmt.Errorf("installing from manifest %s: %w", manifestPath, err)
 		}
+
 	}
 
 	return nil

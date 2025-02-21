@@ -92,7 +92,7 @@ func installRecursive() error {
 		var style = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("#00FF00")).
-			Background(lipgloss.Color("#000000")).
+			Background(lipgloss.Color("22")).
 			PaddingTop(2).
 			PaddingBottom(2).
 			PaddingLeft(4).

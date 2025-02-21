@@ -87,10 +87,10 @@ func TestUpdateCommand(t *testing.T) {
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 
 			// Remove temp dir after test run
-			//defer func(path string) {
-			//	err := os.RemoveAll(path)
-			//	require.NoError(t, err)
-			//}(tempDir)
+			defer func(path string) {
+				err := os.RemoveAll(path)
+				require.NoError(t, err)
+			}(tempDir)
 
 			require.NoError(t, err)
 

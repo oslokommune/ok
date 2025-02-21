@@ -53,8 +53,9 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 	cmd.Flags().BoolVarP(&flagInteractive,
 		FlagInteractiveName, FlagInteractiveShorthand, false, FlagInteractiveUsage)
 
-	cmd.Flags().BoolVar(&flagRecursive,
+	cmd.Flags().BoolVarP(&flagRecursive,
 		"recursive",
+		"r",
 		false,
 		"Install packages from manifests found in all subdirectories",
 	)
@@ -86,6 +87,7 @@ func installRecursive() error {
 
 	for _, manifestPath := range manifestPaths {
 		manifestDir := path.Dir(manifestPath)
+
 		err := installFromManifest(manifestPath, []string{}, manifestDir)
 		if err != nil {
 			return fmt.Errorf("installing from manifest %s: %w", manifestPath, err)

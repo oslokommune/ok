@@ -29,8 +29,8 @@ func TestUpdateCommand(t *testing.T) {
 				name:                    "Should bump the Ref field for the specified packages",
 				args:                    []string{"app-hello", "load-balancing-alb-main"},
 				testdataRootDir:         "testdata/update/bump-ref-field",
-				packageManifestFilename: "input/packages.yml",
-				configDir:               "input/config",
+				packageManifestFilename: "input/root/packages.yml",
+				configDir:               "input/root/config",
 			},
 			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
@@ -91,15 +91,17 @@ func TestUpdateCommand(t *testing.T) {
 			command := pkg.NewUpdateCommand(ghReleases, schemaGenerator)
 
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
-			defer func(path string) {
-				err := os.RemoveAll(path)
-				require.NoError(t, err)
-			}(tempDir)
+
+			// Remove temp dir after test run
+			//defer func(path string) {
+			//	err := os.RemoveAll(path)
+			//	require.NoError(t, err)
+			//}(tempDir)
 
 			require.NoError(t, err)
 
 			fmt.Println("tempDir: ", tempDir)
-			copyTestdataToTempDir(t, tt.TestData, tempDir)
+			copyTestdataRootDirToTempDir(t, tt.TestData, tempDir)
 			command.SetArgs(tt.args)
 
 			err = os.Chdir(tempDir) // Works, but disables the possibility for parallel tests.

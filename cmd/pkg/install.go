@@ -58,7 +58,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 		"recursive",
 		"r",
 		false,
-		"Install packages from manifests found in all subdirectories",
+		"Install packages from manifests found in all subdirectories, but excluding the current directory.",
 	)
 
 	return cmd

@@ -67,17 +67,32 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 func installRecursive() error {
 	var manifestPaths []string
 
-	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(".", func(path string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if info.IsDir() && path != "." {
-			manifestPath := filepath.Join(path, common.PackagesManifestFilename)
-			if _, err := os.Stat(manifestPath); err == nil {
-				manifestPaths = append(manifestPaths, manifestPath)
-			}
+		if path == "." {
+			return nil
 		}
+
+		if !fileInfo.IsDir() {
+			return nil
+		}
+
+		if strings.HasPrefix(fileInfo.Name(), ".") {
+			return filepath.SkipDir
+		}
+
+		// Is there a package manifest in this directory?
+		manifestPath := filepath.Join(path, common.PackagesManifestFilename)
+
+		_, err = os.Stat(manifestPath)
+		if err != nil {
+			return nil
+		}
+
+		manifestPaths = append(manifestPaths, manifestPath)
 
 		return nil
 	})

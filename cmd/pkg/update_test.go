@@ -26,11 +26,9 @@ func TestUpdateCommand(t *testing.T) {
 	tests := []UpdateTestData{
 		{
 			TestData: TestData{
-				name:                    "Should bump the Ref field for the specified packages",
-				args:                    []string{"app-hello", "load-balancing-alb-main"},
-				testdataRootDir:         "testdata/update/bump-ref-field",
-				packageManifestFilename: "input/root/packages.yml",
-				configDir:               "input/root/config",
+				name:            "Should bump the Ref field for the specified packages",
+				args:            []string{"app-hello", "load-balancing-alb-main"},
+				testdataRootDir: "testdata/update/bump-ref-field",
 			},
 			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
@@ -44,11 +42,9 @@ func TestUpdateCommand(t *testing.T) {
 		},
 		{
 			TestData: TestData{
-				name:                    "Should bump the Ref field only for semver-version package Refs",
-				args:                    []string{},
-				testdataRootDir:         "testdata/update/bump-ref-field-semver-only",
-				packageManifestFilename: "input/packages.yml",
-				configDir:               "input/config",
+				name:            "Should bump the Ref field only for semver-version package Refs",
+				args:            []string{},
+				testdataRootDir: "testdata/update/bump-ref-field-semver-only",
 			},
 			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
@@ -59,11 +55,9 @@ func TestUpdateCommand(t *testing.T) {
 		},
 		{
 			TestData: TestData{
-				name:                    "Should bump schema version in var files",
-				args:                    []string{"app-hello"},
-				testdataRootDir:         "testdata/update/bump-schema-version",
-				packageManifestFilename: "input/packages.yml",
-				configDir:               "input/config",
+				name:            "Should bump schema version in var files",
+				args:            []string{"app-hello"},
+				testdataRootDir: "testdata/update/bump-schema-version",
 			},
 			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{

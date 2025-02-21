@@ -8,15 +8,11 @@ import (
 )
 
 type TestData struct {
-	name                    string
-	args                    []string
-	testdataRootDir         string
-	packageManifestFilename string
-	configDir               string
+	name            string
+	args            []string
+	testdataRootDir string
 }
 
-// TODO Rewrite copyTestdataToTempDir to work like this. I.e. test structure for update tests must be the same. We
-// want all the test files to be copied, not select which ones.
 func copyTestdataRootDirToTempDir(t *testing.T, tt TestData, tempDir string) {
 	configDir := filepath.Join(tt.testdataRootDir, "input", "root")
 

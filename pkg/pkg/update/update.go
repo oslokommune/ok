@@ -16,18 +16,16 @@ import (
 )
 
 type Updater struct {
-	ghReleases      GitHubReleases
-	schemaGenerator common.SchemaGenerator
+	ghReleases GitHubReleases
 }
 
 type GitHubReleases interface {
 	GetLatestReleases() (map[string]string, error)
 }
 
-func NewUpdater(ghReleases GitHubReleases, schemaGenerator common.SchemaGenerator) Updater {
+func NewUpdater(ghReleases GitHubReleases) Updater {
 	return Updater{
-		ghReleases:      ghReleases,
-		schemaGenerator: schemaGenerator,
+		ghReleases: ghReleases,
 	}
 }
 
@@ -132,10 +130,6 @@ func updatePackages(manifest common.PackageManifest, selectedPackages []common.P
 	return updatedManifest, updatedPackages, nil
 }
 
-// updateSchemaConfiguration does two things. For each package in the package manifest, that is also in selectedPackages:
-// 1) Download the JSON schema file for each template. The version download is the one found in the package manifest.
-// 2) Update the stack configuration file header with the downloaded JSON schema. For instance: "# yaml-language-server: $schema=.schemas/app-v8.0.5.schema.json"
-
 // updateSchemaConfiguration sets the varFile's JSON schema declaration to the same version as defined in the package
 // manifest.
 func (u Updater) updateSchemaConfiguration(ctx context.Context, selectedPackages []common.Package, manifestPackagePrefix string) error {
@@ -158,7 +152,7 @@ func (u Updater) updateSchemaConfiguration(ctx context.Context, selectedPackages
 		// Get current JSON schema for the package
 		jsonSchemaMetdata, err := metadata.ParseFirstLine(varFile)
 		if err != nil && errors.Is(err, metadata.ErrMissingSchemaDeclaration) {
-			_, err = schema.SetVarFileSchemaDeclaration(varFile, pkg.Ref)
+			err = schema.SetSchemaDeclarationInVarFile(varFile, pkg.Ref)
 			if err != nil {
 				return fmt.Errorf("creating or updating configuration file: %w", err)
 			}
@@ -175,7 +169,7 @@ func (u Updater) updateSchemaConfiguration(ctx context.Context, selectedPackages
 			continue
 		}
 
-		_, err = schema.SetVarFileSchemaDeclaration(varFile, pkg.Ref)
+		err = schema.SetSchemaDeclarationInVarFile(varFile, pkg.Ref)
 		if err != nil {
 			return fmt.Errorf("creating or updating configuration file: %w", err)
 		}

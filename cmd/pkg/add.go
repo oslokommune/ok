@@ -13,10 +13,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewAddCommand(schemaGenerator common.SchemaGenerator) *cobra.Command {
+func NewAddCommand() *cobra.Command {
 	var flagAddCommandUpdateSchema bool
 
-	adder := add.NewAdder(schemaGenerator)
+	adder := add.NewAdder()
 
 	cmd := &cobra.Command{
 		Use:   "add template [outputFolder]",

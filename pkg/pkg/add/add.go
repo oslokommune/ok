@@ -1,9 +1,7 @@
 package add
 
 import (
-	"context"
 	"fmt"
-	"github.com/google/go-github/v63/github"
 	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"os"
 	"strings"
@@ -26,18 +24,13 @@ type AddResult struct {
  */
 
 type Adder struct {
-	schemaGenerator common.SchemaGenerator
 }
 
-func NewAdder(schemaGenerator common.SchemaGenerator) Adder {
-	return Adder{
-		schemaGenerator: schemaGenerator,
-	}
+func NewAdder() Adder {
+	return Adder{}
 }
 
 func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string, updateSchema bool) (*AddResult, error) {
-	ctx := context.Background()
-
 	templateVersion, err := getTemplateVersion(templateName)
 	if err != nil {
 		return nil, err
@@ -64,7 +57,7 @@ func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string
 	}
 
 	if updateSchema {
-		if err := a.updateSchemaConfig(ctx, manifest, newPackage, outputFolder); err != nil {
+		if err := a.updateSchemaConfig(manifest, newPackage, outputFolder); err != nil {
 			return nil, err
 		}
 	}
@@ -75,14 +68,6 @@ func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string
 		TemplateName:    templateName,
 		TemplateVersion: templateVersion,
 	}, nil
-}
-
-func getGitHubClient() (*github.Client, error) {
-	gh, err := githubreleases.GetGitHubClient()
-	if err != nil {
-		return nil, fmt.Errorf("getting GitHub client: %w", err)
-	}
-	return gh, nil
 }
 
 func getTemplateVersion(templateName string) (string, error) {
@@ -120,23 +105,10 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 	return newPackage, nil
 }
 
-func (a Adder) updateSchemaConfig(
-	ctx context.Context, manifest common.PackageManifest, pkg common.Package, outputFolder string) error {
-	varFile := common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
+func (a Adder) updateSchemaConfig(manifest common.PackageManifest, pkg common.Package, outputFolder string) error {
+	varFilepath := common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
 
-	// TODO replace
-	jsonSchemaData, err := a.schemaGenerator.CreateJsonSchemaFile(ctx, manifest.PackagePrefix(), pkg)
-	if err != nil {
-		return fmt.Errorf("creating json schema file: %w", err)
-	}
-
-	schemaFilePath := schema.GetSchemaFilePath(varFile, pkg.Ref)
-	err = schema.WriteSchemaToFile(schemaFilePath, jsonSchemaData)
-	if err != nil {
-		return fmt.Errorf("writing schema to file %s: %w", schemaFilePath, err)
-	}
-
-	_, err = schema.SetVarFileSchemaDeclaration(varFile, pkg.Ref)
+	err := schema.SetSchemaDeclarationInVarFile(varFilepath, pkg.Ref)
 	if err != nil {
 		return fmt.Errorf("creating or updating configuration file: %w", err)
 	}

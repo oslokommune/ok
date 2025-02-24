@@ -5,11 +5,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
-	"github.com/oslokommune/ok/pkg/pkg/schema"
-
 	"github.com/oslokommune/ok/cmd/aws"
 	"github.com/oslokommune/ok/cmd/pkg"
+	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -60,9 +58,8 @@ func init() {
 
 	// Create dependencies
 	ghReleases := githubreleases.NewGitHubReleases()
-	schemaGenerator := schema.NewGenerator()
-	addCommand := pkg.NewAddCommand(schemaGenerator)
-	updateCommand := pkg.NewUpdateCommand(ghReleases, schemaGenerator)
+	addCommand := pkg.NewAddCommand()
+	updateCommand := pkg.NewUpdateCommand(ghReleases)
 	installCommand := pkg.NewInstallCommand()
 
 	// Add commands
@@ -71,7 +68,6 @@ func init() {
 	pkgCommand.AddCommand(addCommand)
 	pkgCommand.AddCommand(updateCommand)
 	pkgCommand.AddCommand(pkg.FmtCommand)
-	pkgCommand.AddCommand(pkg.SchemaCommand)
 
 	rootCmd.AddCommand(awsCommand)
 	awsCommand.AddCommand(aws.EcsExecCommand)

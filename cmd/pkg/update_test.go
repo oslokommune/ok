@@ -15,7 +15,6 @@ import (
 type UpdateTestData struct {
 	TestData
 
-	jsonSchemasDir          string
 	releases                map[string]string
 	expectError             bool
 	expectedPackageManifest string
@@ -30,7 +29,6 @@ func TestUpdateCommand(t *testing.T) {
 				args:            []string{"app-hello", "load-balancing-alb-main"},
 				testdataRootDir: "testdata/update/bump-ref-field",
 			},
-			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
 				"app":                "v9.0.0",
 				"load-balancing-alb": "v4.0.0",
@@ -46,7 +44,6 @@ func TestUpdateCommand(t *testing.T) {
 				args:            []string{},
 				testdataRootDir: "testdata/update/bump-ref-field-semver-only",
 			},
-			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
 				"app": "v9.0.0",
 			},
@@ -59,9 +56,36 @@ func TestUpdateCommand(t *testing.T) {
 				args:            []string{"app-hello"},
 				testdataRootDir: "testdata/update/bump-schema-version",
 			},
-			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
-				"app": "v9.0.0",
+				"app": "v9.0.1",
+			},
+			expectError:             false,
+			expectedPackageManifest: "expected/packages.yml",
+			expectedConfigDir:       "expected/config",
+		},
+		{
+			TestData: TestData{
+				name:            "Should bump schema version in var files",
+				args:            []string{"app-hello"},
+				testdataRootDir: "testdata/update/bump-schema-version",
+			},
+			releases: map[string]string{
+				"app": "v9.0.1",
+			},
+			expectError:             false,
+			expectedPackageManifest: "expected/packages.yml",
+			expectedConfigDir:       "expected/config",
+		},
+		{
+			// This test can be deleted when we're sure that nobody uses the old json schema declaration anymore. Example:
+			// # yaml-language-server: $schema=.schemas/app-v9.0.0.schema.json
+			TestData: TestData{
+				name:            "Should bump schema version in var files, even though the old schema declaration is used",
+				args:            []string{"app-hello"},
+				testdataRootDir: "testdata/update/bump-schema-version-when-dir-format",
+			},
+			releases: map[string]string{
+				"app": "v9.0.1",
 			},
 			expectError:             false,
 			expectedPackageManifest: "expected/packages.yml",
@@ -75,14 +99,11 @@ func TestUpdateCommand(t *testing.T) {
 			testDir, err := os.Getwd()
 			require.NoError(t, err)
 
-			jsonSchemasDir := filepath.Join(testDir, tt.testdataRootDir, tt.jsonSchemasDir)
-			schemaGenerator := NewSchemaGeneratorMock(jsonSchemasDir)
-
 			ghReleases := &GitHubReleasesMock{
 				LatestReleases: tt.releases,
 			}
 
-			command := pkg.NewUpdateCommand(ghReleases, schemaGenerator)
+			command := pkg.NewUpdateCommand(ghReleases)
 
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 

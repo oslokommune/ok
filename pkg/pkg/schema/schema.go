@@ -126,13 +126,13 @@ func getSchemasDir(varFileDir string) string {
 	return filepath.Join(varFileDir, ".schemas")
 }
 
-// SetVarFileSchemaDeclaration sets the first line of a var file to include a $schema reference to the schema file.
-func SetVarFileSchemaDeclaration(varfilePath string, schemaName string) (string, error) {
+// SetSchemaDeclarationInVarFile sets the first line of a var file to include a $schema reference to the schema file.
+func SetSchemaDeclarationInVarFile(varfilePath string, schemaName string) error {
 	varFileDir := getVarFileDir(varfilePath)
 
 	// TODO: Move this somewhhere else, it does not belong in this function.
 	if err := os.MkdirAll(varFileDir, 0755); err != nil {
-		return "", fmt.Errorf("creating output directory: %w", err)
+		return fmt.Errorf("creating output directory: %w", err)
 	}
 
 	schemaUri := fmt.Sprintf(
@@ -141,7 +141,7 @@ func SetVarFileSchemaDeclaration(varfilePath string, schemaName string) (string,
 
 	varFileData, err := os.ReadFile(varfilePath)
 	if err != nil && !os.IsNotExist(err) {
-		return "", fmt.Errorf("reading file: %w", err)
+		return fmt.Errorf("reading file: %w", err)
 	}
 
 	varFileWithoutJsonSchemaDeclaration := stripYamlLanguageServerComment(string(varFileData))
@@ -149,10 +149,10 @@ func SetVarFileSchemaDeclaration(varfilePath string, schemaName string) (string,
 
 	err = os.WriteFile(varfilePath, []byte(updatedVarFile), 0644)
 	if err != nil {
-		return "", fmt.Errorf("overwriting config file %s: %w", varfilePath, err)
+		return fmt.Errorf("overwriting config file %s: %w", varfilePath, err)
 	}
 
-	return "", nil
+	return nil
 }
 
 func stripYamlLanguageServerComment(varFileData string) string {

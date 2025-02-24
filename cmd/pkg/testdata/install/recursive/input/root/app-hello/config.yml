@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=.schemas/app-v9.8.5.schema.json
+StackName: "app-hello"
+app-data.StackName: "app-hello-data"
+AppName: "hello"
+AppEcsExec: false
+AppReadOnlyRootFileSystem: true
+ExampleImage:
+  Enable: false
+ServiceConnect:
+  Enable: true
+AlbHostRouting:
+  Enable: true
+  Internal: true
+  Subdomain:
+    Enable: true
+    TargetGroupTargetStickiness: false
+  ApexDomain:
+    Enable: false
+    TargetGroupTargetStickiness: false
+DatabaseConnectivity:
+  Enable: true
+OpenTelemetrySidecar:
+  Enable: true
+VpcEndpoints:
+  Enable: true
+Xray:
+  Enable: true
+DailyShutdown:
+  Enable: true
+IamForCicd:
+  Enable: true
+  AppGitHubRepo: pirates-apps
+  IacGitHubRepo: pirates-iac
+  AssumableCdRole: false
+Terragrunt:
+  Enable: true
+IncludeLockFile: false

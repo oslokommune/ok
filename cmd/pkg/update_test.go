@@ -12,15 +12,25 @@ import (
 	"testing"
 )
 
+type UpdateTestData struct {
+	TestData
+
+	jsonSchemasDir          string
+	releases                map[string]string
+	expectError             bool
+	expectedPackageManifest string
+	expectedConfigDir       string
+}
+
 func TestUpdateCommand(t *testing.T) {
-	tests := []TestData{
+	tests := []UpdateTestData{
 		{
-			name:                    "Should bump the Ref field for the specified packages",
-			args:                    []string{"app-hello", "load-balancing-alb-main"},
-			testdataRootDir:         "testdata/bump-ref-field",
-			jsonSchemasDir:          "input/json-schemas",
-			packageManifestFilename: "input/packages.yml",
-			configDir:               "input/config",
+			TestData: TestData{
+				name:            "Should bump the Ref field for the specified packages",
+				args:            []string{"app-hello", "load-balancing-alb-main"},
+				testdataRootDir: "testdata/update/bump-ref-field",
+			},
+			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
 				"app":                "v9.0.0",
 				"load-balancing-alb": "v4.0.0",
@@ -31,12 +41,12 @@ func TestUpdateCommand(t *testing.T) {
 			expectedConfigDir:       "expected/config",
 		},
 		{
-			name:                    "Should bump the Ref field only for semver-version package Refs",
-			args:                    []string{},
-			testdataRootDir:         "testdata/bump-ref-field-semver-only",
-			jsonSchemasDir:          "input/json-schemas",
-			packageManifestFilename: "input/packages.yml",
-			configDir:               "input/config",
+			TestData: TestData{
+				name:            "Should bump the Ref field only for semver-version package Refs",
+				args:            []string{},
+				testdataRootDir: "testdata/update/bump-ref-field-semver-only",
+			},
+			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
 				"app": "v9.0.0",
 			},
@@ -44,12 +54,14 @@ func TestUpdateCommand(t *testing.T) {
 			expectedPackageManifest: "expected/packages.yml",
 		},
 		{
-			name:            "Should bump schema version in var files",
-			args:            []string{"app-hello"},
-			testdataRootDir: "testdata/bump-schema-version",
-			configDir:       "input/app-hello",
+			TestData: TestData{
+				name:            "Should bump schema version in var files",
+				args:            []string{"app-hello"},
+				testdataRootDir: "testdata/update/bump-schema-version",
+			},
+			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
-				"app": "v9.0.1",
+				"app": "v9.0.0",
 			},
 			expectError:             false,
 			expectedPackageManifest: "expected/packages.yml",
@@ -73,15 +85,17 @@ func TestUpdateCommand(t *testing.T) {
 			command := pkg.NewUpdateCommand(ghReleases, schemaGenerator)
 
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
-			//defer func(path string) {
-			//	err := os.RemoveAll(path)
-			//	require.NoError(t, err)
-			//}(tempDir)
+
+			// Remove temp dir after test run
+			defer func(path string) {
+				err := os.RemoveAll(path)
+				require.NoError(t, err)
+			}(tempDir)
 
 			require.NoError(t, err)
 
 			fmt.Println("tempDir: ", tempDir)
-			copyTestdataToTempDir(t, tt, tempDir)
+			copyTestdataRootDirToTempDir(t, tt.TestData, tempDir)
 			command.SetArgs(tt.args)
 
 			err = os.Chdir(tempDir) // Works, but disables the possibility for parallel tests.
@@ -147,59 +161,12 @@ func TestUpdateCommand(t *testing.T) {
 	}
 }
 
-type TestData struct {
-	name                    string
-	args                    []string
-	testdataRootDir         string
-	jsonSchemasDir          string // TODO this field can be deleted.
-	packageManifestFilename string
-	configDir               string
-	releases                map[string]string
-	expectError             bool
-	expectedPackageManifest string
-	expectedConfigDir       string
-}
-
 type GitHubReleasesMock struct {
 	LatestReleases map[string]string
 }
 
 func (g *GitHubReleasesMock) GetLatestReleases() (map[string]string, error) {
 	return g.LatestReleases, nil
-}
-
-func copyTestdataToTempDir(t *testing.T, tt TestData, tempDir string) {
-	if tt.packageManifestFilename != "" {
-		srcPath := filepath.Join(tt.testdataRootDir, tt.packageManifestFilename)
-		dstPath := filepath.Join(tempDir, filepath.Base(tt.packageManifestFilename))
-
-		err := copyFile(srcPath, dstPath)
-		require.NoError(t, err)
-	}
-
-	if tt.configDir != "" {
-		configDir := filepath.Join(tt.testdataRootDir, tt.configDir)
-
-		srcDir := os.DirFS(configDir)
-		dstDir := filepath.Join(tempDir, filepath.Base(tt.configDir))
-
-		err := os.CopyFS(dstDir, srcDir)
-		require.NoError(t, err)
-	}
-}
-
-func copyFile(src, dst string) error {
-	input, err := os.ReadFile(src)
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(dst, input, 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 type SchemaGeneratorMock struct {

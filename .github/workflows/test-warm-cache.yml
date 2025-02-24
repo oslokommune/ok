@@ -1,0 +1,19 @@
+name: Warm cache for update-infrastructure workflow
+description: |
+  To ensure that the workflow 'test.yml' runs faster, this workflow warms
+  the cache on the main branch, which can then be used on branches in PRs. This is needed as workflows in PRs cannot
+  access caches from other PRs (branches), due to cache security restrictions:
+  https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#restrictions-for-accessing-a-cache
+
+on:
+  schedule:
+    # Run at 03:00 UTC+2 (01:00 UTC)
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  warm-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install ok and dependencies
+        uses: oslokommune/composite-actions/setup-ok@ec8af16c03d62d35987ff358fda9509908ad79eb # setup-ok: v1.3.0

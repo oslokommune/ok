@@ -1,0 +1,39 @@
+variables:
+  - name: TemplateVersion
+    type: string
+    description: Internal tracking of template version - do NOT edit
+    default: 3.2.1
+  - name: Terragrunt
+    description: |-
+      Enable Terragrunt.
+      This is a experimental feature and should not be used in production.
+    type: map
+    default:
+      Enable: false
+      DependenciesPaths: []
+  - name: DefaultDependenciesPaths
+    type: list
+    description: |-
+      Default dependecies paths for terragrunt.
+      This is a experimental feature and should not be used in production.
+    default: []
+skip_files:
+  - if: '{{ list outputFolder "terragrunt_custom.hcl" | join "/" | pathExists }}'
+    path: terragrunt_custom.hcl
+partials:
+  - ../../partials/do-not-edit.txt
+hooks:
+  after:
+    - command: terragrunt
+      args:
+        - hclfmt
+      dir: '{{ outputFolder }}'
+      skip: '{{ not (dig "Terragrunt" "Enable" false .) -}}'
+    - command: sh
+      args:
+        - '-c'
+        - >-
+          find . -maxdepth 2 -o -name "*.hcl" |
+          xargs --no-run-if-empty grep -l "x-boilerplate-delete" | xargs
+          --no-run-if-empty rm
+      dir: '{{ outputFolder }}'

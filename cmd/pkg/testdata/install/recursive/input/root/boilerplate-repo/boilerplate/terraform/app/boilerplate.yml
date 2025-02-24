@@ -1,0 +1,151 @@
+variables:
+  - name: TemplateVersion
+    type: string
+    description: Internal tracking of template version - do NOT edit
+    default: 9.8.5
+  - name: AppName
+    description: Application name
+    type: string
+  - name: AppReadOnlyRootFileSystem
+    description: Enable read-only root filesystem.
+    type: bool
+    default: false
+  - name: AppEcsExec
+    description: Enable ECS Exec.
+    type: bool
+    default: false
+  - name: ExampleImage
+    description: Use Nginx example image.
+    type: map
+    default:
+      Enable: false
+  - name: AlbHostRouting
+    description: >
+      Add ALB host routing. See:
+
+      -
+      https://github.com/oslokommune/golden-path-iac/tree/main/terraform/modules/alb-tg-host-routing
+
+      -
+      https://github.com/oslokommune/golden-path-iac/tree/main/terraform/modules/alb-tg-host-routing-apex
+    type: map
+    default:
+      Enable: false
+      Internal: true
+      Subdomain:
+        Enable: false
+        TargetGroupTargetStickiness: false
+      ApexDomain:
+        Enable: false
+        TargetGroupTargetStickiness: false
+  - name: DatabaseConnectivity
+    description: Add database.
+    type: map
+    default:
+      Enable: false
+  - name: OpenTelemetrySidecar
+    description: Add OpenTelemetry sidecar to collect Prometheus metrics.
+    type: map
+    default:
+      Enable: false
+  - name: Xray
+    description: Enable AWS X-Ray tracing.
+    type: map
+    default:
+      Enable: false
+  - name: VpcEndpoints
+    description: Enable VPC endpoints.
+    type: map
+    default:
+      Enable: false
+  - name: ServiceConnect
+    description: >-
+      Enable Amazon ECS Service Connect for service discovery. Enable this if
+      you want to easily discover and connect to other services in your ECS
+      cluster.
+    type: map
+    default:
+      Enable: false
+  - name: DailyShutdown
+    description: Enable daily shutdown of the ECS service.
+    type: map
+    default:
+      Enable: false
+  - name: IamForCicd
+    description: Enable IAM roles for CI/CD.
+    type: map
+    default:
+      Enable: false
+      AppGitHubRepo: null
+      IacGitHubRepo: null
+      AssumableCdRole: false
+skip_files:
+  - if: >-
+      {{ list outputFolder "__gp_config_app_image.auto.tfvars.json" | join "/" |
+      pathExists }}
+    path: __gp_config_app_image.auto.tfvars.json
+  - if: '{{ list outputFolder "config_override.tf" | join "/" | pathExists }}'
+    path: config_override.tf
+  - path: README.md
+  - path: CHANGELOG*.md
+partials:
+  - ../../partials/do-not-edit.txt
+  - ../partials/_config.tf
+dependencies:
+  - name: versions
+    template-url: ../versions
+    output-folder: .
+  - name: app-data
+    template-url: ../app-data
+    output-folder: ../{{ outputFolder | base }}-data
+  - name: terragrunt
+    template-url: ../terragrunt
+    output-folder: .
+    variables:
+      - name: DefaultDependenciesPaths
+        type: list
+        default:
+          - ../remote-state
+          - ../networking
+          - ../app-common
+          - ../{{ outputFolder | base }}-data
+          - ../load-balancing-alb-main
+          - >-
+            {{- if dig "DatabaseConnectivity" "Enable" false . }}../databases{{-
+            else }}{{- end }}
+hooks:
+  before:
+    - command: find
+      args:
+        - '{{ outputFolder }}'
+        - (
+        - '-name'
+        - _gp_*.tf
+        - '-o'
+        - '-name'
+        - __gp_*.tf
+        - )
+        - '!'
+        - '-name'
+        - '*_override.tf'
+        - '-exec'
+        - rm
+        - '{}'
+        - ;
+  after:
+    - command: terraform
+      args:
+        - fmt
+      dir: '{{ outputFolder }}'
+    - command: sh
+      args:
+        - '-c'
+        - >-
+          grep -rl "x-boilerplate-delete" . --include="*.tf"
+          --include="*.tfvars.json" --include="*.sh" | xargs --no-run-if-empty
+          rm
+      dir: '{{ outputFolder }}'
+    - command: rmdir
+      args:
+        - '{{ outputFolder }}/bin'
+      skip: '{{ .IamForCicd.Enable }}'

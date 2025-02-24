@@ -91,6 +91,19 @@ func TestUpdateCommand(t *testing.T) {
 			expectedPackageManifest: "expected/packages.yml",
 			expectedConfigDir:       "expected/config",
 		},
+		{
+			TestData: TestData{
+				name:            "Should migrate schema declaration from dir based to HTTPS based",
+				args:            []string{"app-hello"},
+				testdataRootDir: "testdata/update/migrate-schema-declaration-format",
+			},
+			releases: map[string]string{
+				"app": "v9.0.0",
+			},
+			expectError:             false,
+			expectedPackageManifest: "expected/packages.yml",
+			expectedConfigDir:       "expected/config",
+		},
 	}
 
 	for _, tt := range tests {
@@ -153,6 +166,7 @@ func TestUpdateCommand(t *testing.T) {
 			if tt.expectedConfigDir == "" {
 				return
 			}
+
 			expectedConfigDir := filepath.Join(tt.testdataRootDir, tt.expectedConfigDir)
 
 			err = filepath.Walk(expectedConfigDir, func(path string, fileInfo os.FileInfo, err error) error {

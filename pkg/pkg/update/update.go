@@ -162,7 +162,7 @@ func (u Updater) updateSchemaConfiguration(ctx context.Context, selectedPackages
 			return fmt.Errorf("parsing first line of file '%s': %w", varFile, err)
 		}
 
-		existingRef := fmt.Sprintf("%s-%s", jsonSchemaMetdata.Template, jsonSchemaMetdata.Version)
+		existingRef := fmt.Sprintf("%s-v%s", jsonSchemaMetdata.Template, jsonSchemaMetdata.Version)
 		if existingRef == pkg.Ref {
 			// No need to update the varFile with a new JSON schema, as the existing one is as declared in the pacckage
 			// manifest.

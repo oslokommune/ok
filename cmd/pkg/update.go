@@ -66,7 +66,7 @@ ok pkg update my-package
 			opts := update.Options{
 				DisableManifestUpdate: flagDisableManifestUpdate,
 				MigrateConfig:         flagMigrateConfig,
-				UpdateSchemaConfig:    flagUpdateCommandUpdateSchema,
+				UpdateSchema:          flagUpdateCommandUpdateSchema,
 			}
 
 			err = updater.Run(common.PackagesManifestFilename, packages, opts)

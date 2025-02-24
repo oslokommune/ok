@@ -126,38 +126,28 @@ func getSchemasDir(varFileDir string) string {
 	return filepath.Join(varFileDir, ".schemas")
 }
 
-// CreateOrUpdateVarFile creates or updates the first line of a var file to include a $schema reference to the schema
-// file. Creates means the line does not exist and is created. Updates means the line exists and is updated.
-func CreateOrUpdateVarFile(varfilePath string, schemaName string) (string, error) {
+// SetVarFileSchemaDeclaration sets the first line of a var file to include a $schema reference to the schema file.
+func SetVarFileSchemaDeclaration(varfilePath string, schemaName string) (string, error) {
 	varFileDir := getVarFileDir(varfilePath)
-	schemasDir := getSchemasDir(varFileDir)
 
+	// TODO: Move this somewhhere else, it does not belong in this function.
 	if err := os.MkdirAll(varFileDir, 0755); err != nil {
 		return "", fmt.Errorf("creating output directory: %w", err)
 	}
 
-	if err := os.MkdirAll(schemasDir, 0755); err != nil {
-		return "", fmt.Errorf("creating output directory: %w", err)
-	}
+	schemaUri := fmt.Sprintf(
+		"https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/%s.schema.json",
+		schemaName)
 
-	schemaFileName := fmt.Sprintf("%s.schema.json", schemaName)
-	schemaFilePath := filepath.Join(schemasDir, schemaFileName)
-
-	relativeSchemaPath, err := filepath.Rel(varFileDir, schemaFilePath)
-	if err != nil {
-		return "", fmt.Errorf("getting relative schema path: %w", err)
-	}
-
-	data, err := os.ReadFile(varfilePath)
+	varFileData, err := os.ReadFile(varfilePath)
 	if err != nil && !os.IsNotExist(err) {
 		return "", fmt.Errorf("reading file: %w", err)
 	}
 
-	// Find if the first line starts with # yaml-language-server
-	cleanedVarFile := stripYamlLanguageServerComment(string(data))
-	newVarFile := appendYamlLanguageServerComment(cleanedVarFile, relativeSchemaPath)
+	varFileWithoutJsonSchemaDeclaration := stripYamlLanguageServerComment(string(varFileData))
+	updatedVarFile := fmt.Sprintf("%s $schema=%s\n%s", yamlLanguageServerComment, schemaUri, varFileWithoutJsonSchemaDeclaration)
 
-	err = os.WriteFile(varfilePath, []byte(newVarFile), 0644)
+	err = os.WriteFile(varfilePath, []byte(updatedVarFile), 0644)
 	if err != nil {
 		return "", fmt.Errorf("overwriting config file %s: %w", varfilePath, err)
 	}
@@ -165,20 +155,12 @@ func CreateOrUpdateVarFile(varfilePath string, schemaName string) (string, error
 	return "", nil
 }
 
-func stripYamlLanguageServerComment(data string) string {
-	first, rest, ok := strings.Cut(data, "\n")
+func stripYamlLanguageServerComment(varFileData string) string {
+	first, rest, ok := strings.Cut(varFileData, "\n")
 	if ok && strings.HasPrefix(first, yamlLanguageServerComment) {
 		return rest
 	}
-	return data
-}
-
-func appendYamlLanguageServerComment(data, schemaPath string) string {
-	return fmt.Sprintf("%s $schema=%s\n%s", yamlLanguageServerComment, schemaPath, data)
-}
-
-func BuildJsonSchemaFromConfig(config *config.BoilerplateConfig, dependencies []config.BoilerplateConfig) (*jsonschema.Document, error) {
-	return nil, fmt.Errorf("not implemented")
+	return varFileData
 }
 
 type Stack struct {

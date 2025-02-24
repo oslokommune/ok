@@ -60,7 +60,7 @@ func (u Updater) Run(pkgManifestFilename string, selectedPackagesInput []common.
 		}
 	}
 
-	if opts.UpdateSchemaConfig {
+	if opts.UpdateSchema {
 		err := u.updateSchemaConfiguration(context.Background(), selectedPackages, manifest.PackagePrefix())
 		if err != nil {
 			return err
@@ -68,7 +68,7 @@ func (u Updater) Run(pkgManifestFilename string, selectedPackagesInput []common.
 	}
 
 	if opts.MigrateConfig {
-		err := migrate_config.MigratePackageConfig(selectedPackages)
+		err := migrate_config.MigrateVarFile(selectedPackages)
 		if err != nil {
 			return fmt.Errorf("migrating package config: %w", err)
 		}
@@ -135,6 +135,9 @@ func updatePackages(manifest common.PackageManifest, selectedPackages []common.P
 // updateSchemaConfiguration does two things. For each package in the package manifest, that is also in selectedPackages:
 // 1) Download the JSON schema file for each template. The version download is the one found in the package manifest.
 // 2) Update the stack configuration file header with the downloaded JSON schema. For instance: "# yaml-language-server: $schema=.schemas/app-v8.0.5.schema.json"
+
+// updateSchemaConfiguration sets the varFile's JSON schema declaration to the same version as defined in the package
+// manifest.
 func (u Updater) updateSchemaConfiguration(ctx context.Context, selectedPackages []common.Package, manifestPackagePrefix string) error {
 	fmt.Println("Updating json schemas:")
 
@@ -155,8 +158,12 @@ func (u Updater) updateSchemaConfiguration(ctx context.Context, selectedPackages
 		// Get current JSON schema for the package
 		jsonSchemaMetdata, err := metadata.ParseFirstLine(varFile)
 		if err != nil && errors.Is(err, metadata.ErrMissingSchemaDeclaration) {
-			// Proceeed with downloading JSON schema and updating the varFile, so that the JSON schema declaration is
-			// added to the varFile. The next time this code is run, the schema declaration will then be found.
+			_, err = schema.SetVarFileSchemaDeclaration(varFile, pkg.Ref)
+			if err != nil {
+				return fmt.Errorf("creating or updating configuration file: %w", err)
+			}
+
+			return nil
 		} else if err != nil {
 			return fmt.Errorf("parsing first line of file '%s': %w", varFile, err)
 		}
@@ -168,18 +175,7 @@ func (u Updater) updateSchemaConfiguration(ctx context.Context, selectedPackages
 			continue
 		}
 
-		jsonSchemaData, err := u.schemaGenerator.CreateJsonSchemaFile(ctx, manifestPackagePrefix, pkg)
-		if err != nil {
-			return fmt.Errorf("creating json schema file: %w", err)
-		}
-
-		schemaFilePath := schema.GetSchemaFilePath(varFile, pkg.Ref)
-		err = schema.WriteSchemaToFile(schemaFilePath, jsonSchemaData)
-		if err != nil {
-			return fmt.Errorf("writing schema to file %s: %w", schemaFilePath, err)
-		}
-
-		_, err = schema.CreateOrUpdateVarFile(varFile, pkg.Ref)
+		_, err = schema.SetVarFileSchemaDeclaration(varFile, pkg.Ref)
 		if err != nil {
 			return fmt.Errorf("creating or updating configuration file: %w", err)
 		}
@@ -198,5 +194,5 @@ func getLastVarFile(pkg common.Package) (string, bool) {
 type Options struct {
 	DisableManifestUpdate bool
 	MigrateConfig         bool
-	UpdateSchemaConfig    bool
+	UpdateSchema          bool
 }

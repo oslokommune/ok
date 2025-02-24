@@ -44,14 +44,12 @@ func TestUpdateCommand(t *testing.T) {
 			expectedPackageManifest: "expected/packages.yml",
 		},
 		{
-			name:                    "Should bump schema version in var files",
-			args:                    []string{"app-hello"},
-			testdataRootDir:         "testdata/bump-schema-version",
-			jsonSchemasDir:          "input/json-schemas",
-			packageManifestFilename: "input/packages.yml",
-			configDir:               "input/config",
+			name:            "Should bump schema version in var files",
+			args:            []string{"app-hello"},
+			testdataRootDir: "testdata/bump-schema-version",
+			configDir:       "input/app-hello",
 			releases: map[string]string{
-				"app": "v9.0.0",
+				"app": "v9.0.1",
 			},
 			expectError:             false,
 			expectedPackageManifest: "expected/packages.yml",
@@ -153,7 +151,7 @@ type TestData struct {
 	name                    string
 	args                    []string
 	testdataRootDir         string
-	jsonSchemasDir          string
+	jsonSchemasDir          string // TODO this field can be deleted.
 	packageManifestFilename string
 	configDir               string
 	releases                map[string]string

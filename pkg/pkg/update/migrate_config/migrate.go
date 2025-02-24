@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func MigratePackageConfig(packagesToUpdate []common.Package) error {
+func MigrateVarFile(packagesToUpdate []common.Package) error {
 	for _, pkg := range packagesToUpdate {
 		for _, varFile := range pkg.VarFiles {
 			fileHash, err := getFileHash(varFile)

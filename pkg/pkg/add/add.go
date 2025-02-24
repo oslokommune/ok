@@ -124,6 +124,7 @@ func (a Adder) updateSchemaConfig(
 	ctx context.Context, manifest common.PackageManifest, pkg common.Package, outputFolder string) error {
 	varFile := common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
 
+	// TODO replace
 	jsonSchemaData, err := a.schemaGenerator.CreateJsonSchemaFile(ctx, manifest.PackagePrefix(), pkg)
 	if err != nil {
 		return fmt.Errorf("creating json schema file: %w", err)
@@ -135,7 +136,7 @@ func (a Adder) updateSchemaConfig(
 		return fmt.Errorf("writing schema to file %s: %w", schemaFilePath, err)
 	}
 
-	_, err = schema.CreateOrUpdateVarFile(varFile, pkg.Ref)
+	_, err = schema.SetVarFileSchemaDeclaration(varFile, pkg.Ref)
 	if err != nil {
 		return fmt.Errorf("creating or updating configuration file: %w", err)
 	}

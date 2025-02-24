@@ -17,6 +17,7 @@ import (
 	"github.com/oslokommune/ok/pkg/jsonschema"
 )
 
+// TODO delete crap
 type Generator struct {
 }
 
@@ -127,6 +128,7 @@ func getSchemasDir(varFileDir string) string {
 }
 
 // SetSchemaDeclarationInVarFile sets the first line of a var file to include a $schema reference to the schema file.
+// schemaName should be a ok package Ref, for instance "app-v9.0.0"
 func SetSchemaDeclarationInVarFile(varfilePath string, schemaName string) error {
 	varFileDir := getVarFileDir(varfilePath)
 

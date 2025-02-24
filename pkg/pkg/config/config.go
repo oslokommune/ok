@@ -44,6 +44,7 @@ type GithubFileReference struct {
 	GitRef       string
 }
 
+// TODO delete
 func DownloadBoilerplateStacksWithDependencies(ctx context.Context, client FileDownloader, stackPath string) ([]*BoilerplateStack, error) {
 	stacks := make([]*BoilerplateStack, 0)
 	stackPathsToDownload := []string{stackPath}

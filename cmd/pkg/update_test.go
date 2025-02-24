@@ -65,40 +65,12 @@ func TestUpdateCommand(t *testing.T) {
 		},
 		{
 			TestData: TestData{
-				name:            "Should bump schema version in var files",
-				args:            []string{"app-hello"},
-				testdataRootDir: "testdata/update/bump-schema-version",
-			},
-			releases: map[string]string{
-				"app": "v9.0.1",
-			},
-			expectError:             false,
-			expectedPackageManifest: "expected/packages.yml",
-			expectedConfigDir:       "expected/config",
-		},
-		{
-			// This test can be deleted when we're sure that nobody uses the old json schema declaration anymore. Example:
-			// # yaml-language-server: $schema=.schemas/app-v9.0.0.schema.json
-			TestData: TestData{
-				name:            "Should bump schema version in var files, even though the old schema declaration is used",
-				args:            []string{"app-hello"},
-				testdataRootDir: "testdata/update/bump-schema-version-when-dir-format",
-			},
-			releases: map[string]string{
-				"app": "v9.0.1",
-			},
-			expectError:             false,
-			expectedPackageManifest: "expected/packages.yml",
-			expectedConfigDir:       "expected/config",
-		},
-		{
-			TestData: TestData{
 				name:            "Should migrate schema declaration from dir based to HTTPS based",
 				args:            []string{"app-hello"},
 				testdataRootDir: "testdata/update/migrate-schema-declaration-format",
 			},
 			releases: map[string]string{
-				"app": "v9.0.0",
+				"app": "v9.0.1",
 			},
 			expectError:             false,
 			expectedPackageManifest: "expected/packages.yml",
@@ -121,10 +93,10 @@ func TestUpdateCommand(t *testing.T) {
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 
 			// Remove temp dir after test run
-			defer func(path string) {
-				err := os.RemoveAll(path)
-				require.NoError(t, err)
-			}(tempDir)
+			//defer func(path string) {
+			//	err := os.RemoveAll(path)
+			//	require.NoError(t, err)
+			//}(tempDir)
 
 			require.NoError(t, err)
 

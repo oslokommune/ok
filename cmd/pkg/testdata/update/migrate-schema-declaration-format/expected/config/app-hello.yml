@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/app-v9.0.0.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/app-v9.0.1.schema.json
 StackName: "app-hello"
 app-data.StackName: "app-hello-data"
 AppName: "hello"

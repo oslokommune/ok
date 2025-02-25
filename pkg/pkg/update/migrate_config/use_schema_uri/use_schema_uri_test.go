@@ -73,24 +73,24 @@ func TestIsTransformed(t *testing.T) {
 	assert.NoError(t, err)
 
 	testCases := []struct {
-		name                  string
-		inputFile             string
-		expectedIsTransformed bool
+		name                string
+		inputFile           string
+		expectShouldMigrate bool
 	}{
 		{
-			name:                  "File with Subdomain and Apex set",
-			inputFile:             "app-hello-with-subdomain-and-apex.yml",
-			expectedIsTransformed: true,
+			name:                "Should migrate file with dir based schema declaration",
+			inputFile:           "app-hello.yml",
+			expectShouldMigrate: true,
 		},
 		{
-			name:                  "File with only Subdomain set",
-			inputFile:             "app-hello-with-subdomain.yml",
-			expectedIsTransformed: true,
+			name:                "Should not migrate file with URL based schema declaration",
+			inputFile:           "app-hello-expected.yml",
+			expectShouldMigrate: false,
 		},
 		{
-			name:                  "File with neither Subdomain or Apex set",
-			inputFile:             "app-hello.yml",
-			expectedIsTransformed: false,
+			name:                "Should not migrate file with missing schema declaration",
+			inputFile:           "app-hello-expected.yml",
+			expectShouldMigrate: false,
 		},
 	}
 
@@ -104,7 +104,7 @@ func TestIsTransformed(t *testing.T) {
 			assert.NoError(t, err)
 
 			// Then
-			assert.Equal(t, tc.expectedIsTransformed, result)
+			assert.Equal(t, tc.expectShouldMigrate, result)
 		})
 	}
 }

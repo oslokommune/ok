@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"text/template"
@@ -14,7 +15,7 @@ import (
 
 const (
 	defaultProfileNameTemplate = "{{.SessionName}}-{{.AccountName}}-{{.RoleName}}"
-	awsConfigTemplate          = `; run 'ok aws generate' to update the configuration
+	awsConfigTemplate          = `; Config starts here. Run 'ok aws generate' to generate new configuration.
 [sso-session {{.SessionName}}]
 sso_start_url = {{.StartURL}}
 sso_region = {{.SSORegion}}
@@ -79,10 +80,7 @@ func (g *ConfigGenerator) Generate(ctx context.Context) error {
 		return fmt.Errorf("generating profiles: %w", err)
 	}
 
-	// Print summary header
-	fmt.Printf("\nGenerating AWS config for %d profiles\n", len(profiles))
-	fmt.Println("\nAWS CLI config (e.g., `$HOME/.aws/config`):")
-	fmt.Println("---")
+	fmt.Fprintf(os.Stderr, "\nGenerating AWS CLI configuration (i.e., $HOME/.aws/config) for %d profiles\n\n", len(profiles))
 
 	config, err := g.generateConfig(profiles)
 	if err != nil {
@@ -90,7 +88,6 @@ func (g *ConfigGenerator) Generate(ctx context.Context) error {
 	}
 
 	fmt.Print(config)
-	fmt.Println("---")
 
 	return nil
 }

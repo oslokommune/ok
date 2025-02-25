@@ -80,7 +80,7 @@ func TestGenerateConfig(t *testing.T) {
 				SsoRegion:   "us-east-1",
 				Region:      "eu-west-1",
 			},
-			want: `; run 'ok aws generate' to update the configuration
+			want: `; Config starts here. Run 'ok aws generate' to generate new configuration.
 [sso-session mysession]
 sso_start_url = https://my-start-url.awsapps.com/start
 sso_region = us-east-1
@@ -114,7 +114,7 @@ region = eu-west-1
 				SsoStartUrl: "https://my-start-url.awsapps.com/start",
 				SsoRegion:   "us-east-1",
 			},
-			want: `; run 'ok aws generate' to update the configuration
+			want: `; Config starts here. Run 'ok aws generate' to generate new configuration.
 [sso-session mysession]
 sso_start_url = https://my-start-url.awsapps.com/start
 sso_region = us-east-1

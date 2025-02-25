@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.5.1](https://github.com/oslokommune/ok/compare/v5.5.0...v5.5.1) (2025-02-25)
+
+
+### Bug Fixes
+
+* output diagnostics to standard error ([#393](https://github.com/oslokommune/ok/issues/393)) ([1cf434a](https://github.com/oslokommune/ok/commit/1cf434a396b8e6bf8bffe294df36be73d092b7f1))
+
 ## [5.5.0](https://github.com/oslokommune/ok/compare/v5.4.4...v5.5.0) (2025-02-21)
 
 

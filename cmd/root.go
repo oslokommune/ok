@@ -5,13 +5,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
-	"github.com/oslokommune/ok/pkg/pkg/schema"
-
 	"github.com/oslokommune/ok/cmd/aws"
 	"github.com/oslokommune/ok/cmd/pkg"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

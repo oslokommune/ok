@@ -15,9 +15,7 @@ import (
 type UpdateTestData struct {
 	TestData
 
-	releases      map[string]string
-	expectError   bool
-	expectedFiles []string
+	releases map[string]string
 }
 
 func TestUpdateCommand(t *testing.T) {
@@ -27,17 +25,17 @@ func TestUpdateCommand(t *testing.T) {
 				name:            "Should bump the Ref field for the specified packages",
 				args:            []string{"app-hello", "load-balancing-alb-main"},
 				testdataRootDir: "testdata/update/bump-ref-field",
+				expectError:     false,
+				expectedFiles: []string{
+					"packages.yml",
+					"config/app-hello.yml",
+					"config/common-config.yml",
+				},
 			},
 			releases: map[string]string{
 				"app":                "v9.0.0",
 				"load-balancing-alb": "v4.0.0",
 				"app-common":         "v7.0.0",
-			},
-			expectError: false,
-			expectedFiles: []string{
-				"packages.yml",
-				"config/app-hello.yml",
-				"config/common-config.yml",
 			},
 		},
 		{
@@ -45,13 +43,12 @@ func TestUpdateCommand(t *testing.T) {
 				name:            "Should bump the Ref field only for semver-version package Refs",
 				args:            []string{},
 				testdataRootDir: "testdata/update/bump-ref-field-semver-only",
-			},
+				expectError:     false,
+				expectedFiles: []string{
+					"packages.yml",
+				}},
 			releases: map[string]string{
 				"app": "v9.0.0",
-			},
-			expectError: false,
-			expectedFiles: []string{
-				"packages.yml",
 			},
 		},
 		{
@@ -59,15 +56,15 @@ func TestUpdateCommand(t *testing.T) {
 				name:            "Should bump schema version in var files",
 				args:            []string{"app-hello"},
 				testdataRootDir: "testdata/update/bump-schema-version",
+				expectError:     false,
+				expectedFiles: []string{
+					"packages.yml",
+					"config/app-hello.yml",
+					"common-config.yml",
+				},
 			},
 			releases: map[string]string{
 				"app": "v9.0.1",
-			},
-			expectError: false,
-			expectedFiles: []string{
-				"packages.yml",
-				"config/app-hello.yml",
-				"common-config.yml",
 			},
 		},
 		{
@@ -75,15 +72,15 @@ func TestUpdateCommand(t *testing.T) {
 				name:            "Should migrate schema declaration from dir based to HTTPS based",
 				args:            []string{"app-hello"},
 				testdataRootDir: "testdata/update/migrate-schema-declaration-format",
+				expectError:     false,
+				expectedFiles: []string{
+					"packages.yml",
+					"config/app-hello.yml",
+					"common-config.yml",
+				},
 			},
 			releases: map[string]string{
 				"app": "v9.0.1",
-			},
-			expectError: false,
-			expectedFiles: []string{
-				"packages.yml",
-				"config/app-hello.yml",
-				"common-config.yml",
 			},
 		},
 	}

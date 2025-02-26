@@ -15,10 +15,9 @@ import (
 type UpdateTestData struct {
 	TestData
 
-	releases                map[string]string
-	expectError             bool
-	expectedPackageManifest string
-	expectedConfigDir       string
+	releases      map[string]string
+	expectError   bool
+	expectedFiles []string
 }
 
 func TestUpdateCommand(t *testing.T) {
@@ -34,9 +33,12 @@ func TestUpdateCommand(t *testing.T) {
 				"load-balancing-alb": "v4.0.0",
 				"app-common":         "v7.0.0",
 			},
-			expectError:             false,
-			expectedPackageManifest: "expected/packages.yml",
-			expectedConfigDir:       "expected/config",
+			expectError: false,
+			expectedFiles: []string{
+				"packages.yml",
+				"config/app-hello.yml",
+				"config/common-config.yml",
+			},
 		},
 		{
 			TestData: TestData{
@@ -47,8 +49,10 @@ func TestUpdateCommand(t *testing.T) {
 			releases: map[string]string{
 				"app": "v9.0.0",
 			},
-			expectError:             false,
-			expectedPackageManifest: "expected/packages.yml",
+			expectError: false,
+			expectedFiles: []string{
+				"packages.yml",
+			},
 		},
 		{
 			TestData: TestData{
@@ -59,9 +63,12 @@ func TestUpdateCommand(t *testing.T) {
 			releases: map[string]string{
 				"app": "v9.0.1",
 			},
-			expectError:             false,
-			expectedPackageManifest: "expected/packages.yml",
-			expectedConfigDir:       "expected/config",
+			expectError: false,
+			expectedFiles: []string{
+				"packages.yml",
+				"config/app-hello.yml",
+				"common-config.yml",
+			},
 		},
 		{
 			TestData: TestData{
@@ -72,9 +79,12 @@ func TestUpdateCommand(t *testing.T) {
 			releases: map[string]string{
 				"app": "v9.0.1",
 			},
-			expectError:             false,
-			expectedPackageManifest: "expected/packages.yml",
-			expectedConfigDir:       "expected/config",
+			expectError: false,
+			expectedFiles: []string{
+				"packages.yml",
+				"config/app-hello.yml",
+				"common-config.yml",
+			},
 		},
 	}
 
@@ -121,49 +131,17 @@ func TestUpdateCommand(t *testing.T) {
 			require.NoError(t, err)
 
 			// Compare package manifest file
-			actualBytes, err := os.ReadFile(filepath.Join(tempDir, "packages.yml"))
-			require.NoError(t, err)
-			actual := string(actualBytes)
+			for _, file := range tt.expectedFiles {
+				actualBytes, err := os.ReadFile(filepath.Join(tempDir, file))
+				require.NoError(t, err)
+				actual := string(actualBytes)
 
-			expectedBytes, err := os.ReadFile(filepath.Join(tt.testdataRootDir, tt.expectedPackageManifest))
-			require.NoError(t, err)
-			expected := string(expectedBytes)
+				expectedBytes, err := os.ReadFile(filepath.Join(tt.testdataRootDir, "expected", file))
+				require.NoError(t, err)
+				expected := string(expectedBytes)
 
-			assert.Equal(t, expected, actual)
-
-			// Compare var files:
-			// Given
-			// testadat/some-test/expected/config/app-hello.yml, we want to compare it to
-			//                     tempDir/config/app-hello.yml
-			if tt.expectedConfigDir == "" {
-				return
+				assert.Equal(t, expected, actual)
 			}
-
-			expectedConfigDir := filepath.Join(tt.testdataRootDir, tt.expectedConfigDir)
-
-			err = filepath.Walk(expectedConfigDir, func(path string, fileInfo os.FileInfo, err error) error {
-				require.NoError(t, err)
-
-				if fileInfo.IsDir() {
-					return nil
-				}
-
-				actualFilename := filepath.Join(tempDir, "config", fileInfo.Name())
-				actualVarFile := actualFilename
-
-				varFileBytes, err := os.ReadFile(actualVarFile)
-				require.NoError(t, err)
-				varFile := string(varFileBytes)
-
-				expectedFilename := filepath.Join(expectedConfigDir, fileInfo.Name())
-				expectedVarFileBytes, err := os.ReadFile(expectedFilename)
-				require.NoError(t, err)
-				expectedVarFile := string(expectedVarFileBytes)
-
-				assert.Equal(t, expectedVarFile, varFile)
-
-				return nil
-			})
 		})
 	}
 }

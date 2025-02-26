@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.6.0](https://github.com/oslokommune/ok/compare/v5.5.1...v5.6.0) (2025-02-26)
+
+
+### Features
+
+* Add flag `ok pkg install --recursive`(`-r`) ([#391](https://github.com/oslokommune/ok/issues/391)) ([6c23803](https://github.com/oslokommune/ok/commit/6c23803294ce0ee95f6bab5fec4cc8659187bbdb))
+
 ## [5.5.1](https://github.com/oslokommune/ok/compare/v5.5.0...v5.5.1) (2025-02-25)
 
 

@@ -20,6 +20,11 @@ jobs:
           cache-dependency-path: "go.sum"
 
 
+      # We don't need the ok binary from the setup-ok action, but we need the dependencies.
+      - name: Install ok dependencies
+        uses: oslokommune/composite-actions/setup-ok@ec8af16c03d62d35987ff358fda9509908ad79eb # setup-ok: v1.3.0
+
+
       - name: Run tests
         uses: magefile/mage-action@6a5dcb5fe61f43d7c08a98bc3cf9bc63c308c08e # v3.0.0
         with:

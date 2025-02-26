@@ -1,0 +1,67 @@
+variables:
+  - name: TemplateVersion
+    type: string
+    description: Internal tracking of template version - do NOT edit
+    default: 4.5.0
+  - name: Ecr
+    description: Enable ECR
+    type: map
+    default:
+      Enable: true
+skip_files:
+  - if: '{{ list outputFolder "config_override.tf" | join "/" | pathExists }}'
+    path: config_override.tf
+  - path: CHANGELOG*.md
+partials:
+  - ../../partials/do-not-edit.txt
+  - ../partials/_config.tf
+dependencies:
+  - name: versions
+    template-url: ../versions
+    output-folder: .
+  - name: terragrunt
+    template-url: ../terragrunt
+    output-folder: .
+    variables:
+      - name: DefaultDependenciesPaths
+        type: list
+        default:
+          - ../remote-state
+hooks:
+  before:
+    - command: rm
+      args:
+        - '-f'
+        - '{{ outputFolder }}/_config.tf'
+        - '{{ outputFolder }}/app_cloudwatch_logs.tf'
+        - '{{ outputFolder }}/_gp_app_cloudwatch_logs.tf'
+        - '{{ outputFolder }}/ecr_repository.tf'
+    - command: find
+      args:
+        - '{{ outputFolder }}'
+        - (
+        - '-name'
+        - _gp_*.tf
+        - '-o'
+        - '-name'
+        - __gp_*.tf
+        - )
+        - '!'
+        - '-name'
+        - '*_override.tf'
+        - '-exec'
+        - rm
+        - '{}'
+        - ;
+  after:
+    - command: terraform
+      args:
+        - fmt
+      dir: '{{ outputFolder }}'
+    - command: sh
+      args:
+        - '-c'
+        - >-
+          find . -maxdepth 1 -name "*.tf" | xargs --no-run-if-empty grep -l
+          "x-boilerplate-delete" | xargs --no-run-if-empty rm
+      dir: '{{ outputFolder }}'

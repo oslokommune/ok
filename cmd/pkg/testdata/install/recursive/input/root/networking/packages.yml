@@ -1,0 +1,7 @@
+Packages:
+- OutputFolder: .
+  Ref: networking-v2.7.1
+  Template: networking
+  VarFiles:
+  - ../common-config.yml
+  - config.yml

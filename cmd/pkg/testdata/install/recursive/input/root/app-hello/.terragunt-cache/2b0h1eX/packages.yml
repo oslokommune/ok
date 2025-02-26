@@ -1,0 +1,7 @@
+Packages:
+    - OutputFolder: .
+      Template: app
+      Ref: app-v9.8.5
+      VarFiles:
+        - ../common-config.yml # Doesn't exist, so this will fail.
+        - config.yml

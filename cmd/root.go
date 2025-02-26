@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
-	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"os"
 	"path"
+
+	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
+	"github.com/oslokommune/ok/pkg/pkg/schema"
 
 	"github.com/oslokommune/ok/cmd/aws"
 	"github.com/oslokommune/ok/cmd/pkg"
@@ -62,10 +63,11 @@ func init() {
 	schemaGenerator := schema.NewGenerator()
 	addCommand := pkg.NewAddCommand(schemaGenerator)
 	updateCommand := pkg.NewUpdateCommand(ghReleases, schemaGenerator)
+	installCommand := pkg.NewInstallCommand()
 
 	// Add commands
 	rootCmd.AddCommand(pkgCommand)
-	pkgCommand.AddCommand(pkg.InstallCommand)
+	pkgCommand.AddCommand(installCommand)
 	pkgCommand.AddCommand(addCommand)
 	pkgCommand.AddCommand(updateCommand)
 	pkgCommand.AddCommand(pkg.FmtCommand)

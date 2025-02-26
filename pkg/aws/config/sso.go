@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"os/exec"
 	"runtime"
 	"text/template"
@@ -127,8 +128,7 @@ func startCallbackServer() (*callbackServer, error) {
 		Addr:    listener.Addr().String(),
 	}
 
-	// Add this line to print the callback URL
-	fmt.Printf("Started local callback server at: http://%s\n", server.server.Addr)
+	fmt.Fprintf(os.Stderr, "Started local callback server at: http://%s\n", server.server.Addr)
 
 	go server.server.Serve(listener)
 
@@ -249,10 +249,11 @@ func authorize(ctx context.Context, ssooidcClient *ssooidc.Client, server *callb
 		}.Encode(),
 	)
 
-	fmt.Println("\nWaiting for browser authorization")
+	fmt.Fprintf(os.Stderr, "\nOpening browser at URL: %s\n", authURL)
 	if err := openURL(authURL); err != nil {
-		fmt.Printf("\nPlease open this URL in your browser:\n%s\n", authURL)
+		fmt.Fprintf(os.Stderr, "\nFailed to open browser. Please open the URL manually.\n")
 	}
+	fmt.Fprintf(os.Stderr, "\nWaiting for browser authorization\n")
 
 	authCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -295,7 +296,7 @@ func listAccounts(ctx context.Context, ssoClient *sso.Client, accessToken string
 		AccessToken: &accessToken,
 	})
 
-	fmt.Print("\nFetching available accounts and roles")
+	fmt.Fprintf(os.Stderr, "\nFetching available accounts and roles")
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 		if err != nil {
@@ -315,10 +316,10 @@ func listAccounts(ctx context.Context, ssoClient *sso.Client, accessToken string
 			account.Roles = roles
 
 			accounts = append(accounts, account)
-			fmt.Print(".")
+			fmt.Fprintf(os.Stderr, ".")
 		}
 	}
-	fmt.Println()
+	fmt.Fprintln(os.Stderr)
 
 	return accounts, nil
 }

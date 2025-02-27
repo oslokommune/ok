@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.8.0](https://github.com/oslokommune/ok/compare/v5.7.0...v5.8.0) (2025-02-27)
+
+
+### Features
+
+* Make `ok aws generate --help` output markdown ([33791d2](https://github.com/oslokommune/ok/commit/33791d201d992d8cab6ceacab0fb754dca28d675))
+
 ## [5.7.0](https://github.com/oslokommune/ok/compare/v5.6.0...v5.7.0) (2025-02-27)
 
 

@@ -22,8 +22,12 @@ type JsonSchema struct {
 	Version *semver.Version
 }
 
+func (j JsonSchema) Ref() string {
+	return fmt.Sprintf("%s-v%s", j.Template, j.Version.String())
+}
+
 func ParseFirstLine(varFile string) (JsonSchema, error) {
-	firstLine, err := readFirstLine(varFile)
+	firstLine, err := ReadFirstLine(varFile)
 	if err != nil {
 		return JsonSchema{}, fmt.Errorf("reading first line from %s: %w", varFile, err)
 	}
@@ -36,7 +40,7 @@ func ParseFirstLine(varFile string) (JsonSchema, error) {
 	return varFileMetadata, nil
 }
 
-func readFirstLine(filename string) (string, error) {
+func ReadFirstLine(filename string) (string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return "", err
@@ -76,7 +80,7 @@ func parseMetadata(firstLine string) (JsonSchema, error) {
 }
 
 func parseSchemaLine(line string) (string, string, error) {
-	re := regexp.MustCompile(`\.schemas/([\w-]+)-(\S+)\.schema\.json`)
+	re := regexp.MustCompile(`\$schema=.*\/([\w-]+)-(\S+)\.schema\.json`)
 
 	matches := re.FindStringSubmatch(line)
 	if len(matches) != 3 {

@@ -6,12 +6,13 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/add_apex_domain"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/use_schema_uri"
 	"io"
 	"log/slog"
 	"os"
 )
 
-func MigratePackageConfig(packagesToUpdate []common.Package) error {
+func MigrateVarFile(packagesToUpdate []common.Package) error {
 	for _, pkg := range packagesToUpdate {
 		for _, varFile := range pkg.VarFiles {
 			fileHash, err := getFileHash(varFile)
@@ -61,8 +62,13 @@ func update(varFile string, jsonSchema metadata.JsonSchema) error {
 	//
 	// This is to ensure that previously executed migrations/updates do not get messed up somehow, because of
 	// dependencies between them. Of course, if you know what you are doing, go ahead.
+	var err error
+	err = add_apex_domain.AddApexDomainSupport(varFile, jsonSchema)
+	if err != nil {
+		return err
+	}
 
-	err := add_apex_domain.AddApexDomainSupport(varFile, jsonSchema)
+	err = use_schema_uri.ReplaceDirWithUri(varFile, jsonSchema)
 	if err != nil {
 		return err
 	}

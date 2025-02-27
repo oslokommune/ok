@@ -15,7 +15,6 @@ import (
 type UpdateTestData struct {
 	TestData
 
-	jsonSchemasDir          string
 	releases                map[string]string
 	expectError             bool
 	expectedPackageManifest string
@@ -30,7 +29,6 @@ func TestUpdateCommand(t *testing.T) {
 				args:            []string{"app-hello", "load-balancing-alb-main"},
 				testdataRootDir: "testdata/update/bump-ref-field",
 			},
-			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
 				"app":                "v9.0.0",
 				"load-balancing-alb": "v4.0.0",
@@ -46,7 +44,6 @@ func TestUpdateCommand(t *testing.T) {
 				args:            []string{},
 				testdataRootDir: "testdata/update/bump-ref-field-semver-only",
 			},
-			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
 				"app": "v9.0.0",
 			},
@@ -59,9 +56,21 @@ func TestUpdateCommand(t *testing.T) {
 				args:            []string{"app-hello"},
 				testdataRootDir: "testdata/update/bump-schema-version",
 			},
-			jsonSchemasDir: "input/json-schemas",
 			releases: map[string]string{
-				"app": "v9.0.0",
+				"app": "v9.0.1",
+			},
+			expectError:             false,
+			expectedPackageManifest: "expected/packages.yml",
+			expectedConfigDir:       "expected/config",
+		},
+		{
+			TestData: TestData{
+				name:            "Should migrate schema declaration from dir based to HTTPS based",
+				args:            []string{"app-hello"},
+				testdataRootDir: "testdata/update/migrate-schema-declaration-format",
+			},
+			releases: map[string]string{
+				"app": "v9.0.1",
 			},
 			expectError:             false,
 			expectedPackageManifest: "expected/packages.yml",
@@ -75,22 +84,19 @@ func TestUpdateCommand(t *testing.T) {
 			testDir, err := os.Getwd()
 			require.NoError(t, err)
 
-			jsonSchemasDir := filepath.Join(testDir, tt.testdataRootDir, tt.jsonSchemasDir)
-			schemaGenerator := NewSchemaGeneratorMock(jsonSchemasDir)
-
 			ghReleases := &GitHubReleasesMock{
 				LatestReleases: tt.releases,
 			}
 
-			command := pkg.NewUpdateCommand(ghReleases, schemaGenerator)
+			command := pkg.NewUpdateCommand(ghReleases)
 
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 
 			// Remove temp dir after test run
-			defer func(path string) {
-				err := os.RemoveAll(path)
-				require.NoError(t, err)
-			}(tempDir)
+			//defer func(path string) {
+			//	err := os.RemoveAll(path)
+			//	require.NoError(t, err)
+			//}(tempDir)
 
 			require.NoError(t, err)
 
@@ -132,6 +138,7 @@ func TestUpdateCommand(t *testing.T) {
 			if tt.expectedConfigDir == "" {
 				return
 			}
+
 			expectedConfigDir := filepath.Join(tt.testdataRootDir, tt.expectedConfigDir)
 
 			err = filepath.Walk(expectedConfigDir, func(path string, fileInfo os.FileInfo, err error) error {

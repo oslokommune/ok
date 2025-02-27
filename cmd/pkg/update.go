@@ -11,12 +11,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewUpdateCommand(ghReleases GitHubReleases, schemaGenerator common.SchemaGenerator) *cobra.Command {
+func NewUpdateCommand(ghReleases GitHubReleases) *cobra.Command {
 	var flagDisableManifestUpdate bool
 	var flagUpdateCommandUpdateSchema bool
 	var flagMigrateConfig bool
 
-	updater := update.NewUpdater(ghReleases, schemaGenerator)
+	updater := update.NewUpdater(ghReleases)
 
 	cmd := &cobra.Command{
 		Use:   "update [outputFolder ...]",
@@ -66,7 +66,7 @@ ok pkg update my-package
 			opts := update.Options{
 				DisableManifestUpdate: flagDisableManifestUpdate,
 				MigrateConfig:         flagMigrateConfig,
-				UpdateSchemaConfig:    flagUpdateCommandUpdateSchema,
+				UpdateSchema:          flagUpdateCommandUpdateSchema,
 			}
 
 			err = updater.Run(common.PackagesManifestFilename, packages, opts)

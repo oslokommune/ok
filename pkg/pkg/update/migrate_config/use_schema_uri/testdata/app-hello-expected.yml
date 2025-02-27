@@ -2,33 +2,34 @@
 StackName: "app-hello"
 app-data.StackName: "app-hello-data"
 AppName: "hello"
-AppEcsExec: true
-AppReadOnlyRootFileSystem: true
+AppEcsExec: false
+AppReadOnlyRootFileSystem: false
 ExampleImage:
-  Enable: true
+  Enable: false
 ServiceConnect:
-  Enable: true
+  Enable: false
 AlbHostRouting:
   Enable: true
-  Internal: false
+  Internal: true
   Subdomain:
     Enable: true
-    TargetGroupTargetStickiness: false
+    TargetGroupTargetStickiness: true
   ApexDomain:
     Enable: false
     TargetGroupTargetStickiness: false
 DatabaseConnectivity:
   Enable: true
 OpenTelemetrySidecar:
-  Enable: true
+  Enable: false
 VpcEndpoints:
-  Enable: true
+  Enable: false
 Xray:
-  Enable: true
+  Enable: false
 DailyShutdown:
-  Enable: true
+  Enable: false
 IamForCicd:
   Enable: true
-  AppGitHubRepo: pirates-apps
-  IacGitHubRepo: pirates-iac
-  #AssumableCdRole: false
+  AppGitHubRepo: my-app
+  IacGitHubRepo: my-iac
+  AssumableCdRole: false
+IncludeLockFile: false

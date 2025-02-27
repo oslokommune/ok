@@ -78,8 +78,7 @@ func TestUpdateCommand(t *testing.T) {
 				},
 			},
 			releases: map[string]string{
-				"app":        "v9.0.0",
-				"app-common": "v4.0.0",
+				"app": "v9.0.1",
 			},
 		},
 		{

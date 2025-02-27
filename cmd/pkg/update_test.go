@@ -1,10 +1,8 @@
 package pkg_test
 
 import (
-	"context"
 	"fmt"
 	"github.com/oslokommune/ok/cmd/pkg"
-	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -149,33 +147,4 @@ type GitHubReleasesMock struct {
 
 func (g *GitHubReleasesMock) GetLatestReleases() (map[string]string, error) {
 	return g.LatestReleases, nil
-}
-
-type SchemaGeneratorMock struct {
-	jsonSchemasDir string
-}
-
-func NewSchemaGeneratorMock(jsonSchemasDir string) SchemaGeneratorMock {
-	return SchemaGeneratorMock{
-		jsonSchemasDir: jsonSchemasDir,
-	}
-}
-
-// CreateJsonSchemaFile emulates creating JSON schema file from a Boilerplate template configuration.
-// Instead of generating the schema, it just copies a pre-generated file.
-func (s SchemaGeneratorMock) CreateJsonSchemaFile(
-	ctx context.Context, manifestPackagePrefix string, pkg common.Package) ([]byte, error) {
-
-	// Example: app-v8.0.5.schema.json
-	schemaFilePath := fmt.Sprintf("%s.schema.json", pkg.Ref)
-
-	// Example: testdata/json-schemas/.schemas/app-v8.0.5.schema.json
-	filePath := filepath.Join(s.jsonSchemasDir, schemaFilePath)
-
-	schemaData, err := os.ReadFile(filePath)
-	if err != nil {
-		return nil, fmt.Errorf("reading file %s: %w", filePath, err)
-	}
-
-	return schemaData, nil
 }

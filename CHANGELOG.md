@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.7.0](https://github.com/oslokommune/ok/compare/v5.6.0...v5.7.0) (2025-02-27)
+
+
+### Features
+
+* Use external schemas ([#397](https://github.com/oslokommune/ok/issues/397)) ([0b3a6f8](https://github.com/oslokommune/ok/commit/0b3a6f8f9614ba947ae425d53be5f3da7ca5836b))
+
 ## [5.6.0](https://github.com/oslokommune/ok/compare/v5.5.1...v5.6.0) (2025-02-26)
 
 

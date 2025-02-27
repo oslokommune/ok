@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/oslokommune/ok/pkg/pkg/install"
 	"github.com/oslokommune/ok/pkg/pkg/install/interactive"
 	"strings"
@@ -15,8 +16,7 @@ func NewUpdateCommand(ghReleases GitHubReleases) *cobra.Command {
 	var flagDisableManifestUpdate bool
 	var flagUpdateCommandUpdateSchema bool
 	var flagMigrateConfig bool
-
-	updater := update.NewUpdater(ghReleases)
+	var flagRecursive bool
 
 	cmd := &cobra.Command{
 		Use:   "update [outputFolder ...]",
@@ -33,34 +33,12 @@ ok pkg update my-package
 				return fmt.Errorf("cannot use both --interactive and outputFolder arguments")
 			}
 
-			var packages []common.Package
-			var err error
-
-			manifest, err := common.LoadPackageManifest(common.PackagesManifestFilename)
-			if err != nil {
-				return fmt.Errorf("loading package manifest: %w", err)
+			if len(outputFolders) > 0 && flagRecursive {
+				return fmt.Errorf("cannot use both outputFolder arguments and --recursive arguments")
 			}
 
-			// Select packages
-			switch {
-			case len(outputFolders) > 0:
-				// Use output folders to determine which packages to install
-				packages = install.FindPackagesFromOutputFolders(manifest.Packages, outputFolders)
-
-			case flagInteractive:
-				// Use interactive mode to determine which packages to install
-				packages, err = interactive.SelectPackages(manifest, "update")
-				if err != nil {
-					return fmt.Errorf("selecting packages: %w", err)
-				}
-
-				if len(packages) == 0 {
-					fmt.Println("No packages selected. Remember to use space (or x) to select package(s) to install.")
-					return nil
-				}
-
-			default:
-				packages = manifest.Packages
+			if flagInteractive && flagRecursive {
+				return fmt.Errorf("cannot use both --interactive and --recursive arguments")
 			}
 
 			opts := update.Options{
@@ -69,12 +47,14 @@ ok pkg update my-package
 				UpdateSchema:          flagUpdateCommandUpdateSchema,
 			}
 
-			err = updater.Run(common.PackagesManifestFilename, packages, opts)
-			if err != nil {
-				return fmt.Errorf("updating packages: %w", err)
+			updater := update.NewUpdater(ghReleases)
+
+			if flagRecursive {
+				return runRecursiveInSubdirs(createUpdateRecursiveFn(updater, opts))
+			} else {
+				return updateFromManifest(common.PackagesManifestFilename, outputFolders, ".", updater, opts)
 			}
 
-			return nil
 		},
 	}
 
@@ -97,7 +77,64 @@ ok pkg update my-package
 		true,
 		"Automatically migrate package configuration files to the latest version, if possible")
 
+	addRecursiveFlagToCmd(cmd, &flagRecursive, "Update")
+
 	return cmd
+}
+
+func createUpdateRecursiveFn(updater update.Updater, opts update.Options) RunRecursive {
+	return func(manifestPath string, manifestDir string, style lipgloss.Style) error {
+		fmt.Println()
+		fmt.Println(style.Render(fmt.Sprintf("Updating package manifest: %s", manifestPath)))
+		fmt.Println()
+
+		err := updateFromManifest(manifestPath, []string{}, manifestDir, updater, opts)
+		if err != nil {
+			return fmt.Errorf("installing from manifest %s: %w", manifestPath, err)
+		}
+
+		return nil
+	}
+}
+
+// TODO remove workingDirectpry?
+func updateFromManifest(manifestFile string, outputFolders []string, workingDirectory string, updater update.Updater, opts update.Options) error {
+	var packages []common.Package
+	var err error
+
+	manifest, err := common.LoadPackageManifest(manifestFile)
+	if err != nil {
+		return fmt.Errorf("loading package manifest: %w", err)
+	}
+
+	// Select packages
+	switch {
+	case len(outputFolders) > 0:
+		// Use output folders to determine which packages to install
+		packages = install.FindPackagesFromOutputFolders(manifest.Packages, outputFolders)
+
+	case flagInteractive:
+		// Use interactive mode to determine which packages to install
+		packages, err = interactive.SelectPackages(manifest, "update")
+		if err != nil {
+			return fmt.Errorf("selecting packages: %w", err)
+		}
+
+		if len(packages) == 0 {
+			fmt.Println("No packages selected. Remember to use space (or x) to select package(s) to install.")
+			return nil
+		}
+
+	default:
+		packages = manifest.Packages
+	}
+
+	err = updater.Run(manifestFile, packages, opts, workingDirectory)
+	if err != nil {
+		return fmt.Errorf("updating packages: %w", err)
+	}
+
+	return nil
 }
 
 func updateTabCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

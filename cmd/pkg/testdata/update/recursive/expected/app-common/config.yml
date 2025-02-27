@@ -1,0 +1,7 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/app-common-v4.0.0.schema.json
+StackName: "app-common"
+
+Terragrunt:
+  Enable: true
+
+IncludeLockFile: false

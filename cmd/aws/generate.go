@@ -19,16 +19,20 @@ var ConfigGeneratorCommand = &cobra.Command{
 	Long: `Generate AWS CLI configuration for AWS IAM Identity Center roles.
 
 Profile name template supports the following variables:
-  {{.SessionName}}  - The name of the SSO session
-  {{.AccountName}}  - The name of the AWS account
-  {{.AccountID}}    - The ID of the AWS account
-  {{.RoleName}}     - The name of the IAM role
+
+- ` + "`{{.SessionName}}`" + `: The name of the SSO session
+- ` + "`{{.AccountName}}`" + `: The name of the AWS account
+- ` + "`{{.AccountID}}`" + `: The ID of the AWS account
+- ` + "`{{.RoleName}}`" + `: The name of the IAM role
 
 Example:
-  ok aws generate \
-    --sso-start-url "https://my-sso.awsapps.com/start" \
-    --sso-region "eu-west-1" \
-    --template "ok-{{.AccountName}}-{{.RoleName}}"`,
+
+` + "```" + `
+ok aws generate \
+  --sso-start-url "https://my-sso.awsapps.com/start" \
+  --sso-region "eu-west-1" \
+  --template "ok-{{.AccountName}}-{{.RoleName}}"
+` + "```" + ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if region == "" {
 			region = ssoRegion

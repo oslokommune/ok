@@ -81,6 +81,24 @@ func TestUpdateCommand(t *testing.T) {
 				"app": "v9.0.1",
 			},
 		},
+		{
+			TestData: TestData{
+				name:            "Should update ok packages recursively",
+				args:            []string{"--recursive"},
+				testdataRootDir: "testdata/update/recursive",
+				expectError:     false,
+				expectedFiles: []string{
+					"app-common/packages.yml",
+					"app-common/config.yml",
+					"app-hello/packages.yml",
+					"app-hello/config.yml",
+				},
+			},
+			releases: map[string]string{
+				"app":        "v9.0.0",
+				"app-common": "v4.0.0",
+			},
+		},
 	}
 
 	for _, tt := range tests {

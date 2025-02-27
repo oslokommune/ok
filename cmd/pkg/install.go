@@ -3,7 +3,6 @@ package pkg
 import (
 	"fmt"
 	"github.com/charmbracelet/lipgloss"
-	"path"
 	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
@@ -11,8 +10,6 @@ import (
 
 	"github.com/oslokommune/ok/pkg/pkg/install"
 	"github.com/spf13/cobra"
-	"os"
-	"path/filepath"
 )
 
 func NewInstallCommand() *cobra.Command {
@@ -44,7 +41,7 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 			}
 
 			if flagRecursive {
-				return installRecursive()
+				return runRecursiveInSubdirs(installWithBanner)
 			} else {
 				return installFromManifest(common.PackagesManifestFilename, outputFolders, ".")
 			}
@@ -54,78 +51,26 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 	cmd.Flags().BoolVarP(&flagInteractive,
 		FlagInteractiveName, FlagInteractiveShorthand, false, FlagInteractiveUsage)
 
-	cmd.Flags().BoolVarP(&flagRecursive,
-		"recursive",
-		"r",
-		false,
-		"Install packages from manifests found in all subdirectories, but excluding the current directory.",
-	)
+	//cmd.Flags().BoolVarP(&flagRecursive,
+	//	"recursive",
+	//	"r",
+	//	false,
+	//	"Install packages from manifests found in all subdirectories, but excluding the current directory.",
+	//)
+
+	addRecursiveFlagToCmd(cmd, &flagRecursive, "Install")
 
 	return cmd
 }
 
-func installRecursive() error {
-	var manifestPaths []string
+func installWithBanner(manifestPath string, manifestDir string, style lipgloss.Style) error {
+	fmt.Println()
+	fmt.Println(style.Render(fmt.Sprintf("Installing package manifest: %s", manifestPath)))
+	fmt.Println()
 
-	err := filepath.Walk(".", func(path string, fileInfo os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if path == "." {
-			return nil
-		}
-
-		if !fileInfo.IsDir() {
-			return nil
-		}
-
-		if strings.HasPrefix(fileInfo.Name(), ".") {
-			return filepath.SkipDir
-		}
-
-		// Is there a package manifest in this directory?
-		manifestPath := filepath.Join(path, common.PackagesManifestFilename)
-
-		_, err = os.Stat(manifestPath)
-		if err != nil {
-			return nil
-		}
-
-		manifestPaths = append(manifestPaths, manifestPath)
-
-		return nil
-	})
-
+	err := installFromManifest(manifestPath, []string{}, manifestDir)
 	if err != nil {
-		return fmt.Errorf("walking the path: %w", err)
-	}
-
-	for _, manifestPath := range manifestPaths {
-		manifestDir := path.Dir(manifestPath)
-
-		var style = lipgloss.NewStyle().
-			Bold(true).
-			Foreground(lipgloss.Color("#00FF00")).
-			Background(lipgloss.Color("22")).
-			PaddingTop(2).
-			PaddingBottom(2).
-			PaddingLeft(4).
-			PaddingRight(4).
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("#FFFFFF"))
-
-		fmt.Println()
-
-		fmt.Println(style.Render(fmt.Sprintf("Installing package manifest: %s", manifestPath)))
-
-		fmt.Println()
-
-		err := installFromManifest(manifestPath, []string{}, manifestDir)
-		if err != nil {
-			return fmt.Errorf("installing from manifest %s: %w", manifestPath, err)
-		}
-
+		return fmt.Errorf("installing from manifest %s: %w", manifestPath, err)
 	}
 
 	return nil

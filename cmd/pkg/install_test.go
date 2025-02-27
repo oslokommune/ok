@@ -11,21 +11,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type InstallTestData struct {
-	TestData
-
-	expectError   bool
-	expectedFiles []string
-}
-
 func TestInstallCommand(t *testing.T) {
-	tests := []InstallTestData{
+	tests := []TestData{
 		{
-			TestData: TestData{
-				name:            "Should install ok packages recursively",
-				args:            []string{"--recursive"},
-				testdataRootDir: "testdata/install/recursive",
-			},
+			name:            "Should install ok packages recursively",
+			args:            []string{"--recursive"},
+			testdataRootDir: "testdata/install/recursive",
 			expectedFiles: []string{
 				"app-hello/.boilerplate/_template_app.json",
 				"networking/.boilerplate/_template_networking.json",
@@ -52,7 +43,7 @@ func TestInstallCommand(t *testing.T) {
 			require.NoError(t, err)
 
 			fmt.Println("tempDir: ", tempDir)
-			copyTestdataRootDirToTempDir(t, tt.TestData, tempDir)
+			copyTestdataRootDirToTempDir(t, tt, tempDir)
 			command.SetArgs(tt.args)
 
 			err = os.Setenv("BASE_URL", "../boilerplate-repo")

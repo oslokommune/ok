@@ -11,6 +11,9 @@ type TestData struct {
 	name            string
 	args            []string
 	testdataRootDir string
+
+	expectError   bool
+	expectedFiles []string
 }
 
 func copyTestdataRootDirToTempDir(t *testing.T, tt TestData, tempDir string) {

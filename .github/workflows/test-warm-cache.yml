@@ -1,6 +1,6 @@
 name: Warm cache for test workflows
 description: |
-  To ensure that the workflows 'test.yml' runs faster, this workflow warms
+  To ensure that the workflows using this cache runs faster, this workflow warms
   the cache on the main branch, which can then be used on branches in PRs. This is needed as workflows in PRs cannot
   access caches from other PRs (branches), due to cache security restrictions:
   https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#restrictions-for-accessing-a-cache

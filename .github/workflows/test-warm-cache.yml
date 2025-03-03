@@ -1,6 +1,6 @@
 name: Warm cache for update-infrastructure workflow
 description: |
-  To ensure that the workflow 'test.yml' runs faster, this workflow warms
+  To ensure that the workflows 'test.yml' runs faster, this workflow warms
   the cache on the main branch, which can then be used on branches in PRs. This is needed as workflows in PRs cannot
   access caches from other PRs (branches), due to cache security restrictions:
   https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows#restrictions-for-accessing-a-cache
@@ -17,3 +17,7 @@ jobs:
     steps:
       - name: Install ok and dependencies
         uses: oslokommune/composite-actions/setup-ok@ec8af16c03d62d35987ff358fda9509908ad79eb # setup-ok: v1.3.0
+
+
+      - name: Set up Go
+        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0

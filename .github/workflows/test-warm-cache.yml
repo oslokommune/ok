@@ -19,5 +19,9 @@ jobs:
         uses: oslokommune/composite-actions/setup-ok@ec8af16c03d62d35987ff358fda9509908ad79eb # setup-ok: v1.3.0
 
 
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+
       - name: Set up Go
         uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0

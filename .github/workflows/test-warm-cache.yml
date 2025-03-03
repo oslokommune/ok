@@ -1,4 +1,4 @@
-name: Warm cache for update-infrastructure workflow
+name: Warm cache for test workflows
 description: |
   To ensure that the workflows 'test.yml' runs faster, this workflow warms
   the cache on the main branch, which can then be used on branches in PRs. This is needed as workflows in PRs cannot

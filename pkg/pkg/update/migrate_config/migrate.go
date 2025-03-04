@@ -10,11 +10,14 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path"
 )
 
-func MigrateVarFile(packagesToUpdate []common.Package) error {
+func MigrateVarFile(packagesToUpdate []common.Package, workingDirectory string) error {
 	for _, pkg := range packagesToUpdate {
-		for _, varFile := range pkg.VarFiles {
+		for _, varFileRelative := range pkg.VarFiles {
+			varFile := path.Join(workingDirectory, varFileRelative)
+
 			fileHash, err := getFileHash(varFile)
 			if err != nil {
 				return fmt.Errorf("getting file hash: %w", err)

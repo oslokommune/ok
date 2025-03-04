@@ -1,0 +1,7 @@
+Packages:
+    - OutputFolder: app-common
+      Template: app-common
+      Ref: app-common-v4.0.0
+      VarFiles:
+        - ../common-config.yml
+        - config.yml

@@ -1,7 +1,6 @@
 package update
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"github.com/Masterminds/semver"
@@ -9,6 +8,7 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
@@ -30,7 +30,7 @@ func NewUpdater(ghReleases GitHubReleases) Updater {
 }
 
 // Run updates the package manifest with the latest releases.
-func (u Updater) Run(pkgManifestFilename string, selectedPackagesInput []common.Package, opts Options) error {
+func (u Updater) Run(pkgManifestFilename string, selectedPackagesInput []common.Package, opts Options, workingDirectory string) error {
 	var selectedPackages []common.Package
 	var manifest common.PackageManifest
 	{
@@ -59,14 +59,14 @@ func (u Updater) Run(pkgManifestFilename string, selectedPackagesInput []common.
 	}
 
 	if opts.UpdateSchema {
-		err := u.updateSchemaConfiguration(context.Background(), selectedPackages, manifest.PackagePrefix())
+		err := u.setJsonSchemaDeclarationInVarFiles(selectedPackages, workingDirectory)
 		if err != nil {
 			return err
 		}
 	}
 
 	if opts.MigrateConfig {
-		err := migrate_config.MigrateVarFile(selectedPackages)
+		err := migrate_config.MigrateVarFile(selectedPackages, workingDirectory)
 		if err != nil {
 			return fmt.Errorf("migrating package config: %w", err)
 		}
@@ -130,9 +130,9 @@ func updatePackages(manifest common.PackageManifest, selectedPackages []common.P
 	return updatedManifest, updatedPackages, nil
 }
 
-// updateSchemaConfiguration sets the varFile's JSON schema declaration to the same version as defined in the package
-// manifest.
-func (u Updater) updateSchemaConfiguration(ctx context.Context, selectedPackages []common.Package, manifestPackagePrefix string) error {
+// setJsonSchemaDeclarationInVarFiles sets the varFile's JSON schema declaration to the same version as defined in the
+// package manifest.
+func (u Updater) setJsonSchemaDeclarationInVarFiles(selectedPackages []common.Package, workingDirectory string) error {
 	fmt.Println("Updating json schemas:")
 
 	for _, pkg := range selectedPackages {
@@ -142,7 +142,7 @@ func (u Updater) updateSchemaConfiguration(ctx context.Context, selectedPackages
 			continue
 		}
 
-		varFile, ok := getLastVarFile(pkg)
+		varFile, ok := getLastVarFile(pkg, workingDirectory)
 		if !ok {
 			continue
 		}
@@ -178,10 +178,13 @@ func (u Updater) updateSchemaConfiguration(ctx context.Context, selectedPackages
 	return nil
 }
 
-func getLastVarFile(pkg common.Package) (string, bool) {
+func getLastVarFile(pkg common.Package, workingDirectory string) (string, bool) {
 	if len(pkg.VarFiles) > 0 {
-		return pkg.VarFiles[len(pkg.VarFiles)-1], true
+		varFileRelative := pkg.VarFiles[len(pkg.VarFiles)-1]
+		varFile := path.Join(workingDirectory, varFileRelative)
+		return varFile, true
 	}
+
 	return "", false
 }
 

@@ -145,7 +145,7 @@ func TestGetLastConfigFile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, ok := getLastVarFile(tt.pkg)
+			result, ok := getLastVarFile(tt.pkg, "")
 			require.Equal(t, tt.ok, ok)
 			require.Equal(t, tt.expected, result)
 		})

@@ -51,13 +51,6 @@ BASE_URL=../boilerplate/terraform ok pkg install networking my-app
 	cmd.Flags().BoolVarP(&flagInteractive,
 		FlagInteractiveName, FlagInteractiveShorthand, false, FlagInteractiveUsage)
 
-	//cmd.Flags().BoolVarP(&flagRecursive,
-	//	"recursive",
-	//	"r",
-	//	false,
-	//	"Install packages from manifests found in all subdirectories, but excluding the current directory.",
-	//)
-
 	addRecursiveFlagToCmd(cmd, &flagRecursive, "Install")
 
 	return cmd

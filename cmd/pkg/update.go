@@ -90,7 +90,7 @@ func createUpdateRecursiveFn(updater update.Updater, opts update.Options) RunRec
 
 		err := updateFromManifest(manifestDir, manifestPath, []string{}, updater, opts)
 		if err != nil {
-			return fmt.Errorf("installing from manifest %s: %w", manifestPath, err)
+			return fmt.Errorf("updating manifest %s: %w", manifestPath, err)
 		}
 
 		return nil

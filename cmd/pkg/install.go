@@ -70,7 +70,7 @@ func installWithBanner(manifestPath string, manifestDir string, style lipgloss.S
 
 	err := installFromManifest(manifestPath, []string{}, manifestDir)
 	if err != nil {
-		return fmt.Errorf("installing from manifest %s: %w", manifestPath, err)
+		return fmt.Errorf("installing manifest %s: %w", manifestPath, err)
 	}
 
 	return nil

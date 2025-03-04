@@ -52,7 +52,7 @@ ok pkg update my-package
 			if flagRecursive {
 				return runRecursiveInSubdirs(createUpdateRecursiveFn(updater, opts))
 			} else {
-				return updateFromManifest(common.PackagesManifestFilename, outputFolders, ".", updater, opts)
+				return updateFromManifest(".", common.PackagesManifestFilename, outputFolders, updater, opts)
 			}
 
 		},
@@ -88,7 +88,7 @@ func createUpdateRecursiveFn(updater update.Updater, opts update.Options) RunRec
 		fmt.Println(style.Render(fmt.Sprintf("Updating package manifest: %s", manifestPath)))
 		fmt.Println()
 
-		err := updateFromManifest(manifestPath, []string{}, manifestDir, updater, opts)
+		err := updateFromManifest(manifestDir, manifestPath, []string{}, updater, opts)
 		if err != nil {
 			return fmt.Errorf("installing from manifest %s: %w", manifestPath, err)
 		}
@@ -97,8 +97,7 @@ func createUpdateRecursiveFn(updater update.Updater, opts update.Options) RunRec
 	}
 }
 
-// TODO remove workingDirectpry?
-func updateFromManifest(manifestFile string, outputFolders []string, workingDirectory string, updater update.Updater, opts update.Options) error {
+func updateFromManifest(workingDirectory string, manifestFile string, outputFolders []string, updater update.Updater, opts update.Options) error {
 	var packages []common.Package
 	var err error
 

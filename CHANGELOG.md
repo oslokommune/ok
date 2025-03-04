@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.9.0](https://github.com/oslokommune/ok/compare/v5.8.0...v5.9.0) (2025-03-04)
+
+
+### Features
+
+* Add `--recursive` for `ok pkg update` ([#403](https://github.com/oslokommune/ok/issues/403)) ([706ee99](https://github.com/oslokommune/ok/commit/706ee99a076e8c40358c787bed4ae54b67886962))
+
 ## [5.8.0](https://github.com/oslokommune/ok/compare/v5.7.0...v5.8.0) (2025-02-27)
 
 

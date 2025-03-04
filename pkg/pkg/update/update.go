@@ -59,7 +59,7 @@ func (u Updater) Run(pkgManifestFilename string, selectedPackagesInput []common.
 	}
 
 	if opts.UpdateSchema {
-		err := u.setJsonSchemaDeclarationInVarfiles(selectedPackages, workingDirectory)
+		err := u.setJsonSchemaDeclarationInVarFiles(selectedPackages, workingDirectory)
 		if err != nil {
 			return err
 		}
@@ -130,9 +130,9 @@ func updatePackages(manifest common.PackageManifest, selectedPackages []common.P
 	return updatedManifest, updatedPackages, nil
 }
 
-// setJsonSchemaDeclarationInVarfiles sets the varFile's JSON schema declaration to the same version as defined in the
+// setJsonSchemaDeclarationInVarFiles sets the varFile's JSON schema declaration to the same version as defined in the
 // package manifest.
-func (u Updater) setJsonSchemaDeclarationInVarfiles(selectedPackages []common.Package, workingDirectory string) error {
+func (u Updater) setJsonSchemaDeclarationInVarFiles(selectedPackages []common.Package, workingDirectory string) error {
 	fmt.Println("Updating json schemas:")
 
 	for _, pkg := range selectedPackages {

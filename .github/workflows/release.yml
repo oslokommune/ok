@@ -5,6 +5,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - '**/*.sh'
+      - '**/*.rb'
   workflow_dispatch:
 
 jobs:

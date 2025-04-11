@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/oslokommune/ok/cmd/aws"
+	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/spf13/cobra"
@@ -72,6 +73,9 @@ func init() {
 	awsCommand.AddCommand(aws.EcsExecCommand)
 	awsCommand.AddCommand(aws.AdminSessionCommand)
 	awsCommand.AddCommand(aws.ConfigGeneratorCommand)
+
+	rootCmd.AddCommand(pkCommand)
+	pkCommand.AddCommand(pk.NewInstallCommand())
 
 	initializeConfiguration()
 }

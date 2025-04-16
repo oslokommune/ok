@@ -1,11 +1,10 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/app-v9.11.0.schema.json
-StackName: "app-hello"
-app-data.StackName: "app-hello-data"
-AppName: "hello"
-AppEcsExec: true
+StackName: "app-too-tikki"
+app-data.StackName: "app-too-tikki-data"
+AppName: "too-tikki"
+AppEcsExec: false
 AppReadOnlyRootFileSystem: true
-#ExampleImage:
-#  Enable: true
+ExampleImage:
+  Enable: false
 ServiceConnect:
   Enable: true
 AlbHostRouting:
@@ -13,14 +12,14 @@ AlbHostRouting:
   Internal: false
   Subdomain:
     Enable: true
-    TargetGroupTargetStickiness: false
+    TargetGroupTargetStickiness: true
   ApexDomain:
     Enable: false
     TargetGroupTargetStickiness: false
 DatabaseConnectivity:
   Enable: true
 OpenTelemetrySidecar:
-  Enable: true
+  Enable: false
 VpcEndpoints:
   Enable: true
 Xray:
@@ -31,4 +30,11 @@ IamForCicd:
   Enable: true
   AppGitHubRepo: pirates-apps
   IacGitHubRepo: pirates-iac
-  #AssumableCdRole: false
+  AssumableCdRole: false
+  EcsDeployFromAppRepo: false
+Terragrunt:
+  Enable: false
+  DefaultDependenciesPaths: []
+  DependenciesPaths: []
+terragrunt.DefaultDependenciesPaths: []
+IncludeLockFile: false

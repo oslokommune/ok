@@ -1,0 +1,34 @@
+template_defaults: &template_defaults
+  base_path: boilerplate/terraform
+  repo_url: git@github.com:oslokommune/golden-path-boilerplate.git
+
+config_defaults: &config_defaults
+  output_folder_base: stacks/dev
+  output_folder_subdir: ""
+
+templates:
+  auth-service:
+    template:
+      <<: *template_defaults
+      name: api
+      ref: api-v4.5.0
+    config:
+      <<: *config_defaults
+      output_folder_subdir: auth-service
+
+  web-frontend:
+    template:
+      <<: *template_defaults
+    config:
+      <<: *config_defaults
+      output_folder_subdir: web-frontend
+
+  deploy-workflow:
+    template:
+      <<: *template_defaults
+      name: github-workflow
+      ref: workflow-v1.2.0
+    config:
+      <<: *config_defaults
+      output_folder_base: .github
+      output_folder_subdir: workflows

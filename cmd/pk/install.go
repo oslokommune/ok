@@ -18,7 +18,18 @@ func NewInstallCommand() *cobra.Command {
 				fmt.Printf("Error: %v\n", err)
 				return
 			}
-			fmt.Printf("The .ok directory is located at: %s\n", okDir)
+
+			// Load configs from the .ok directory
+			configs, err := pk.LoadConfigs(okDir)
+			if err != nil {
+				fmt.Printf("Error loading configs: %v\n", err)
+				return
+			}
+
+			// Print the loaded configs
+			for _, config := range configs {
+				fmt.Printf("Loaded Config: %+v\n", config)
+			}
 		},
 	}
 

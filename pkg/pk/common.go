@@ -1,6 +1,7 @@
 package pk
 
 import (
+	"io/fs"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -23,4 +24,23 @@ func GetOkDirPath() (string, error) {
 		return "", err
 	}
 	return filepath.Join(gitRoot, ".ok"), nil
+}
+
+// FindYamlFiles returns a slice of paths to all YAML files in the specified directory.
+func FindYamlFiles(dir string) ([]string, error) {
+	var yamlFiles []string
+	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.IsDir() && (filepath.Ext(path) == ".yaml" || filepath.Ext(path) == ".yml") {
+			yamlFiles = append(yamlFiles, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return yamlFiles, nil
 }

@@ -74,7 +74,6 @@ func init() {
 	awsCommand.AddCommand(aws.AdminSessionCommand)
 	awsCommand.AddCommand(aws.ConfigGeneratorCommand)
 
-	// Ensure configuration is initialized before adding commands
 	initializeConfiguration()
 
 	if viper.GetBool("enable_experimental") {

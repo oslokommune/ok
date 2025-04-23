@@ -74,10 +74,13 @@ func init() {
 	awsCommand.AddCommand(aws.AdminSessionCommand)
 	awsCommand.AddCommand(aws.ConfigGeneratorCommand)
 
-	rootCmd.AddCommand(pkCommand)
-	pkCommand.AddCommand(pk.NewInstallCommand())
-
+	// Ensure configuration is initialized before adding commands
 	initializeConfiguration()
+
+	if viper.GetBool("enable_experimental") {
+		rootCmd.AddCommand(pkCommand)
+		pkCommand.AddCommand(pk.NewInstallCommand())
+	}
 }
 
 // initializeConfiguration is the function that initializes configuration using viper. It is called at the start of the application.

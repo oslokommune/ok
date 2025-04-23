@@ -2,6 +2,7 @@ package pk
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/oslokommune/ok/pkg/pk"
 	"github.com/spf13/cobra"
@@ -45,8 +46,9 @@ func NewInstallCommand() *cobra.Command {
 			if dryRun {
 				fmt.Printf("Dry-run: %v\n", args)
 			} else {
+				gitDir := filepath.Dir(okDir) // Assuming gitDir is the parent directory of okDir
 				fmt.Printf("Running boilerplate command with args: %v\n", args)
-				err := pk.RunBoilerplateCommand(args, okDir)
+				err := pk.RunBoilerplateCommand(args, gitDir)
 				if err != nil {
 					fmt.Printf("Error running boilerplate command: %v\n", err)
 					return

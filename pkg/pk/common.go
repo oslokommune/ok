@@ -112,10 +112,8 @@ func BuildBoilerplateArgs(tpl Template) []string {
 	return args
 }
 
-// RunBoilerplateCommand takes a Template, builds the arguments, and executes the boilerplate command.
-func RunBoilerplateCommand(tpl Template) error {
-	args := BuildBoilerplateArgs(tpl)
-
+// RunBoilerplateCommand takes arguments as input and executes the boilerplate command.
+func RunBoilerplateCommand(args []string) error {
 	cmd := exec.Command("boilerplate", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

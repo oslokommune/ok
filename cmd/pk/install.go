@@ -33,11 +33,11 @@ func NewInstallCommand() *cobra.Command {
 				return
 			}
 
-			// Print useful information about the merged configurations
-			fmt.Println("Merged Template Configurations:")
+			// Print the boilerplate args that will be run
+			fmt.Println("Boilerplate Command Arguments:")
 			for _, config := range mergedConfigs {
-				fmt.Printf("- Name: %s, Repo: %s, Ref: %s, Path: %s, Subfolder: %s, VarFiles: %v\n",
-					config.Name, config.Repo, config.Ref, config.Path, config.Subfolder, config.VarFiles)
+				args := pk.BuildBoilerplateArgs(config)
+				fmt.Printf("- %v\n", args)
 			}
 		},
 	}

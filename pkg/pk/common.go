@@ -93,3 +93,32 @@ func ApplyCommon(cfgs []Config) ([]Template, error) {
 	}
 	return out, nil
 }
+
+// BuildBoilerplateArgs takes a Template and constructs the arguments for the boilerplate command.
+func BuildBoilerplateArgs(tpl Template) []string {
+	args := []string{
+		"--template-url", tpl.Repo + "//" + tpl.Path + "?ref=" + tpl.Ref,
+		"--output-folder", filepath.Join(tpl.BaseOutputFolder, tpl.Subfolder),
+	}
+
+	if tpl.NonInteractive {
+		args = append(args, "--non-interactive")
+	}
+
+	for _, varFile := range tpl.VarFiles {
+		args = append(args, "--var-file", varFile)
+	}
+
+	return args
+}
+
+// RunBoilerplateCommand takes a Template, builds the arguments, and executes the boilerplate command.
+func RunBoilerplateCommand(tpl Template) error {
+	args := BuildBoilerplateArgs(tpl)
+
+	cmd := exec.Command("boilerplate", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd.Run()
+}

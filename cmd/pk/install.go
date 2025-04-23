@@ -26,9 +26,18 @@ func NewInstallCommand() *cobra.Command {
 				return
 			}
 
-			// Print the loaded configs
-			for _, config := range configs {
-				fmt.Printf("Loaded Config: %+v\n", config)
+			// Generate merged template configurations
+			mergedConfigs, err := pk.GenerateTemplateConfigs(configs)
+			if err != nil {
+				fmt.Printf("Error generating merged configs: %v\n", err)
+				return
+			}
+
+			// Print useful information about the merged configurations
+			fmt.Println("Merged Template Configurations:")
+			for _, config := range mergedConfigs {
+				fmt.Printf("- Name: %s, Repo: %s, Ref: %s, Path: %s, Subfolder: %s, VarFiles: %v\n",
+					config.Name, config.Repo, config.Ref, config.Path, config.Subfolder, config.VarFiles)
 			}
 		},
 	}

@@ -2,9 +2,12 @@ package pk
 
 import (
 	"io/fs"
+	"io/ioutil"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // GetGitRoot returns the root directory of the Git repository.
@@ -43,4 +46,29 @@ func FindYamlFiles(dir string) ([]string, error) {
 	}
 
 	return yamlFiles, nil
+}
+
+// LoadConfigs loads YAML files from the specified directory into a slice of Config structures.
+func LoadConfigs(dir string) ([]Config, error) {
+	yamlFiles, err := FindYamlFiles(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	var configs []Config
+	for _, file := range yamlFiles {
+		data, err := ioutil.ReadFile(file)
+		if err != nil {
+			return nil, err
+		}
+
+		var config Config
+		if err := yaml.Unmarshal(data, &config); err != nil {
+			return nil, err
+		}
+
+		configs = append(configs, config)
+	}
+
+	return configs, nil
 }

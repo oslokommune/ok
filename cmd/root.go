@@ -85,7 +85,7 @@ func init() {
 // initializeConfiguration is the function that initializes configuration using viper. It is called at the start of the application.
 func initializeConfiguration() {
 	setConfigFile()
-	viper.SetDefault("enable_experimental", true)
+	viper.SetDefault("enable_experimental", false)
 	viper.SetEnvPrefix("ok")
 	viper.AutomaticEnv()
 	loadConfiguration()

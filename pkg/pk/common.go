@@ -112,11 +112,12 @@ func BuildBoilerplateArgs(tpl Template) []string {
 	return args
 }
 
-// RunBoilerplateCommand takes arguments as input and executes the boilerplate command.
-func RunBoilerplateCommand(args []string) error {
+// RunBoilerplateCommand takes arguments and a working directory as input and executes the boilerplate command.
+func RunBoilerplateCommand(args []string, workingDir string) error {
 	cmd := exec.Command("boilerplate", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+	cmd.Dir = workingDir // Set the working directory to the provided path
 
 	return cmd.Run()
 }

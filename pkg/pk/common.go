@@ -2,7 +2,7 @@ package pk
 
 import (
 	"io/fs"
-	"io/ioutil"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -11,8 +11,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// GetGitRoot returns the root directory of the Git repository.
-func GetGitRoot() (string, error) {
+// RepoRoot returns the root directory of the Git repository.
+func RepoRoot() (string, error) {
 	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
 	output, err := cmd.Output()
 	if err != nil {
@@ -21,17 +21,17 @@ func GetGitRoot() (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
-// GetOkDirPath returns the path to the ".ok" directory inside the Git root.
-func GetOkDirPath() (string, error) {
-	gitRoot, err := GetGitRoot()
+// OkDir returns the path to the ".ok" directory inside the Git root.
+func OkDir() (string, error) {
+	gitRoot, err := RepoRoot()
 	if err != nil {
 		return "", err
 	}
 	return filepath.Join(gitRoot, ".ok"), nil
 }
 
-// FindYamlFiles returns a slice of paths to all YAML files in the specified directory.
-func FindYamlFiles(dir string) ([]string, error) {
+// YAMLFiles returns a slice of paths to all YAML files in the specified directory.
+func YAMLFiles(dir string) ([]string, error) {
 	var yamlFiles []string
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -51,14 +51,14 @@ func FindYamlFiles(dir string) ([]string, error) {
 
 // LoadConfigs loads YAML files from the specified directory into a slice of Config structures.
 func LoadConfigs(dir string) ([]Config, error) {
-	yamlFiles, err := FindYamlFiles(dir)
+	yamlFiles, err := YAMLFiles(dir)
 	if err != nil {
 		return nil, err
 	}
 
 	var configs []Config
 	for _, file := range yamlFiles {
-		data, err := ioutil.ReadFile(file)
+		data, err := os.ReadFile(file) // Updated from ioutil.ReadFile to os.ReadFile
 		if err != nil {
 			return nil, err
 		}
@@ -74,20 +74,19 @@ func LoadConfigs(dir string) ([]Config, error) {
 	return configs, nil
 }
 
-// GenerateTemplateConfigs generates a list of template configurations with common settings merged in.
-func GenerateTemplateConfigs(cfgs []Config) ([]Template, error) {
+// ApplyCommon applies cfg.Common to each cfg.Templates entry and
+// returns the fully-resolved templates.
+func ApplyCommon(cfgs []Config) ([]Template, error) {
 	var out []Template
+
 	for _, cfg := range cfgs {
 		for _, tpl := range cfg.Templates {
-			merged := tpl // Start with the template
+			merged := tpl // start with the template
 
-			// Merge common config into the template
-			if err := mergo.Merge(&merged, cfg.Common, mergo.WithOverride); err != nil {
+			// copy non-zero fields from cfg.Common into merged
+			if err := mergo.Merge(&merged, cfg.Common); err != nil {
 				return nil, err
 			}
-
-			// Append VarFiles from both common and template
-			merged.VarFiles = append(cfg.Common.VarFiles, tpl.VarFiles...)
 
 			out = append(out, merged)
 		}

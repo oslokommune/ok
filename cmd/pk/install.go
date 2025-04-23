@@ -13,7 +13,7 @@ func NewInstallCommand() *cobra.Command {
 		Short: "Hello World install command",
 		Long:  "This is a simple Hello World install command.",
 		Run: func(cmd *cobra.Command, args []string) {
-			okDir, err := pk.GetOkDirPath()
+			okDir, err := pk.OkDir()
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 				return
@@ -27,7 +27,7 @@ func NewInstallCommand() *cobra.Command {
 			}
 
 			// Generate merged template configurations
-			mergedConfigs, err := pk.GenerateTemplateConfigs(configs)
+			mergedConfigs, err := pk.ApplyCommon(configs)
 			if err != nil {
 				fmt.Printf("Error generating merged configs: %v\n", err)
 				return

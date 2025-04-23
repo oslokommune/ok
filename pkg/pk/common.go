@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/dario.cat/mergo"
 	"gopkg.in/yaml.v3"
 )
 
@@ -71,4 +72,45 @@ func LoadConfigs(dir string) ([]Config, error) {
 	}
 
 	return configs, nil
+}
+
+// TemplateConfig represents a template configuration with common settings merged in.
+type TemplateConfig struct {
+	Repo             string   `yaml:"repo"`
+	Path             string   `yaml:"path"`
+	NonInteractive   bool     `yaml:"non_interactive"`
+	Ref              string   `yaml:"ref"`
+	VarFiles         []string `yaml:"var_files"`
+	BaseOutputFolder string   `yaml:"base_output_folder"`
+	Name             string   `yaml:"name"`
+	Subfolder        string   `yaml:"subfolder"`
+}
+
+// GenerateTemplateConfigs generates a list of template configurations with common settings merged in.
+func GenerateTemplateConfigs(cfgs []Config) ([]TemplateConfig, error) {
+	var out []TemplateConfig
+	for _, cfg := range cfgs {
+		for _, tpl := range cfg.Templates {
+			merged := TemplateConfig{
+				Name:      tpl.Name,
+				Subfolder: tpl.Subfolder,
+			} // Initialize with template-specific fields
+
+			// Merge common config into the template
+			if err := mergo.Merge(&merged, cfg.Common, mergo.WithOverride); err != nil {
+				return nil, err
+			}
+
+			// Merge template-specific fields
+			if err := mergo.Merge(&merged, tpl, mergo.WithOverride); err != nil {
+				return nil, err
+			}
+
+			// Append VarFiles from both common and template
+			merged.VarFiles = append(cfg.Common.VarFiles, tpl.VarFiles...)
+
+			out = append(out, merged)
+		}
+	}
+	return out, nil
 }

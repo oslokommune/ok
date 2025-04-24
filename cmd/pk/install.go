@@ -2,60 +2,58 @@ package pk
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/oslokommune/ok/pkg/pk"
 	"github.com/spf13/cobra"
 )
 
 func NewInstallCommand() *cobra.Command {
+	var dryRun bool
+
 	cmd := &cobra.Command{
 		Use:   "install",
-		Short: "Hello World install command",
-		Long:  "This is a simple Hello World install command.",
-	}
+		Short: "Generate project boilerplate",
+		Long:  "Reads .ok configuration files, merges them and runs the boilerplate generator.",
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			okDir, err := pk.OkDir()
+			if err != nil {
+				return fmt.Errorf("locating .ok directory: %w", err)
+			}
 
-	cmd.Flags().Bool("dry-run", false, "Print the boilerplate command arguments without executing them")
+			repoDir, err := pk.RepoRoot()
+			if err != nil {
+				return fmt.Errorf("finding repository root: %w", err)
+			}
 
-	cmd.Run = func(cmd *cobra.Command, args []string) {
-		okDir, err := pk.OkDir()
-		if err != nil {
-			fmt.Printf("Error: %v\n", err)
-			return
-		}
+			configs, err := pk.LoadConfigs(okDir)
+			if err != nil {
+				return fmt.Errorf("loading configs: %w", err)
+			}
 
-		// Load configs from the .ok directory
-		configs, err := pk.LoadConfigs(okDir)
-		if err != nil {
-			fmt.Printf("Error loading configs: %v\n", err)
-			return
-		}
+			effectiveCfgs, err := pk.ApplyCommon(configs)
+			if err != nil {
+				return fmt.Errorf("applying common configs: %w", err)
+			}
 
-		// Generate merged template configurations
-		mergedConfigs, err := pk.ApplyCommon(configs)
-		if err != nil {
-			fmt.Printf("Error generating merged configs: %v\n", err)
-			return
-		}
+			for _, cfg := range effectiveCfgs {
+				args := pk.BuildBoilerplateArgs(cfg)
 
-		// Check if dry-run flag is set
-		dryRun, _ := cmd.Flags().GetBool("dry-run")
+				if dryRun {
+					fmt.Fprintf(cmd.OutOrStdout(), "dry-run: %v\n", args)
+					continue
+				}
 
-		for _, config := range mergedConfigs {
-			args := pk.BuildBoilerplateArgs(config)
-			if dryRun {
-				fmt.Printf("Dry-run: %v\n", args)
-			} else {
-				gitDir := filepath.Dir(okDir) // Assuming gitDir is the parent directory of okDir
-				fmt.Printf("Running boilerplate command with args: %v\n", args)
-				err := pk.RunBoilerplateCommand(args, gitDir)
-				if err != nil {
-					fmt.Printf("Error running boilerplate command: %v\n", err)
-					return
+				if err := pk.RunBoilerplateCommand(args, repoDir); err != nil {
+					return fmt.Errorf("running boilerplate command: %w", err)
 				}
 			}
-		}
+
+			return nil
+		},
 	}
+
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false,
+		"print the generated boilerplate command without executing it")
 
 	return cmd
 }

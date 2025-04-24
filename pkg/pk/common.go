@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"dario.cat/mergo"
@@ -50,6 +51,9 @@ func YAMLFiles(dir string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Sort the YAML files to ensure deterministic order
+	sort.Strings(yamlFiles)
 
 	return yamlFiles, nil
 }

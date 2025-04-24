@@ -15,12 +15,14 @@ func NewInstallCommand() *cobra.Command {
 		Short: "Generate project boilerplate",
 		Long:  "Reads .ok configuration files, merges them and runs the boilerplate generator.",
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			okDir, err := pk.OkDir()
+			ctx := cmd.Context()
+
+			okDir, err := pk.OkDir(ctx)
 			if err != nil {
 				return fmt.Errorf("locating .ok directory: %w", err)
 			}
 
-			repoDir, err := pk.RepoRoot()
+			repoDir, err := pk.RepoRoot(ctx)
 			if err != nil {
 				return fmt.Errorf("finding repository root: %w", err)
 			}
@@ -46,7 +48,7 @@ func NewInstallCommand() *cobra.Command {
 					continue
 				}
 
-				if err := pk.RunBoilerplateCommand(args, repoDir); err != nil {
+				if err := pk.RunBoilerplateCommand(ctx, args, repoDir); err != nil {
 					return fmt.Errorf("running boilerplate command: %w", err)
 				}
 			}

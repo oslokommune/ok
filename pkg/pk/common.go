@@ -1,6 +1,7 @@
 package pk
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"net/url"
@@ -14,8 +15,8 @@ import (
 )
 
 // RepoRoot returns the root directory of the Git repository.
-func RepoRoot() (string, error) {
-	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+func RepoRoot(ctx context.Context) (string, error) {
+	cmd := exec.CommandContext(ctx, "git", "rev-parse", "--show-toplevel")
 	output, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("git rev-parse --show-toplevel: %w", err)
@@ -24,8 +25,8 @@ func RepoRoot() (string, error) {
 }
 
 // OkDir returns the path to the ".ok" directory inside the Git root.
-func OkDir() (string, error) {
-	gitRoot, err := RepoRoot()
+func OkDir(ctx context.Context) (string, error) {
+	gitRoot, err := RepoRoot(ctx)
 	if err != nil {
 		return "", fmt.Errorf("RepoRoot failed: %w", err)
 	}
@@ -128,11 +129,11 @@ func BuildBoilerplateArgs(tpl Template) ([]string, error) {
 }
 
 // RunBoilerplateCommand takes arguments and a working directory as input and executes the boilerplate command.
-func RunBoilerplateCommand(args []string, workingDir string) error {
-	cmd := exec.Command("boilerplate", args...)
+func RunBoilerplateCommand(ctx context.Context, args []string, workingDir string) error {
+	cmd := exec.CommandContext(ctx, "boilerplate", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Dir = workingDir // Set the working directory to the provided path
+	cmd.Dir = workingDir
 
 	return cmd.Run()
 }

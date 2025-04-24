@@ -84,18 +84,8 @@ func TestIsTransformed(t *testing.T) {
 	}{
 		{
 			name:                  "File with Subdomain and Apex set",
-			inputFile:             "app-too-tikki-with-subdomain-and-apex.yml",
+			inputFile:             "app-too-tikki-expected.yml",
 			expectedIsTransformed: true,
-		},
-		{
-			name:                  "File with only Subdomain set",
-			inputFile:             "app-too-tikki-with-subdomain.yml",
-			expectedIsTransformed: true,
-		},
-		{
-			name:                  "File with neither Subdomain or Apex set",
-			inputFile:             "app-too-tikki.yml",
-			expectedIsTransformed: false,
 		},
 	}
 

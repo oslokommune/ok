@@ -56,7 +56,7 @@ func AddPathBasedRouting(varFile string, varFileJsonSchema metadata.JsonSchema) 
 // isMigrated returns true if var file already has been transformed.
 func isMigrated(varFile string) (bool, error) {
 	// To test this logic in your terminal, run:
-	// yq eval ".AlbHostRouting != null" app-too-tikki.yml
+	// yq ".ApplicationLoadBalancer != null" app-too-tikki.yml
 
 	args := []string{
 		"eval",

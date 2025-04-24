@@ -1,6 +1,7 @@
 package pk
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/fs"
@@ -67,8 +68,10 @@ func LoadConfigs(dir string) ([]Config, error) {
 		}
 
 		var config Config
-		if err := yaml.Unmarshal(data, &config); err != nil {
-			return nil, fmt.Errorf("unmarshalling YAML from file %s: %w", file, err)
+		dec := yaml.NewDecoder(bytes.NewReader(data))
+		dec.KnownFields(true) // Enable strict mode
+		if err := dec.Decode(&config); err != nil {
+			return nil, fmt.Errorf("decoding YAML from file %s: %w", file, err)
 		}
 
 		configs = append(configs, config)
@@ -107,8 +110,12 @@ func buildGitSource(repo, subPath, ref string) string {
 	if ref != "" {
 		q.Set("ref", ref)
 	}
+	qs := q.Encode() // "" when ref is empty
 
-	return fmt.Sprintf("%s//%s?%s", repo, subPath, q.Encode())
+	if qs != "" {
+		return fmt.Sprintf("%s//%s?%s", repo, subPath, qs)
+	}
+	return fmt.Sprintf("%s//%s", repo, subPath)
 }
 
 func BuildBoilerplateArgs(tpl Template) ([]string, error) {

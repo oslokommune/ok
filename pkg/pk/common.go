@@ -3,6 +3,7 @@ package pk
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io/fs"
 	"net/url"
@@ -20,7 +21,7 @@ func RepoRoot(ctx context.Context) (string, error) {
 	cmd := exec.CommandContext(ctx, "git", "rev-parse", "--show-toplevel")
 	output, err := cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("git rev-parse --show-toplevel: %w", err)
+		return "", errors.Join(fmt.Errorf("git rev-parse --show-toplevel"), err)
 	}
 	return strings.TrimSpace(string(output)), nil
 }
@@ -29,7 +30,7 @@ func RepoRoot(ctx context.Context) (string, error) {
 func OkDir(ctx context.Context) (string, error) {
 	gitRoot, err := RepoRoot(ctx)
 	if err != nil {
-		return "", fmt.Errorf("RepoRoot failed: %w", err)
+		return "", errors.Join(fmt.Errorf("RepoRoot failed"), err)
 	}
 	return filepath.Join(gitRoot, ".ok"), nil
 }
@@ -37,9 +38,9 @@ func OkDir(ctx context.Context) (string, error) {
 // YAMLFiles returns a slice of paths to all YAML files in the specified directory.
 func YAMLFiles(dir string) ([]string, error) {
 	var yamlFiles []string
-	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return fmt.Errorf("walking directory %s: %w", dir, err)
+	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
 		}
 		if !d.IsDir() && (filepath.Ext(path) == ".yaml" || filepath.Ext(path) == ".yml") {
 			yamlFiles = append(yamlFiles, path)

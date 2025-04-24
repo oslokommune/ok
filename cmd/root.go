@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -43,7 +44,7 @@ func Execute() {
 	err := rootCmd.Execute()
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(errors.Join(fmt.Errorf("root command execution failed"), err))
 		os.Exit(1)
 	}
 }

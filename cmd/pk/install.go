@@ -1,6 +1,7 @@
 package pk
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/oslokommune/ok/pkg/pk"
@@ -19,28 +20,28 @@ func NewInstallCommand() *cobra.Command {
 
 			okDir, err := pk.OkDir(ctx)
 			if err != nil {
-				return fmt.Errorf("locating .ok directory: %w", err)
+				return errors.Join(fmt.Errorf("locating .ok directory"), err)
 			}
 
 			repoDir, err := pk.RepoRoot(ctx)
 			if err != nil {
-				return fmt.Errorf("finding repository root: %w", err)
+				return errors.Join(fmt.Errorf("finding repository root"), err)
 			}
 
 			configs, err := pk.LoadConfigs(okDir)
 			if err != nil {
-				return fmt.Errorf("loading configs: %w", err)
+				return errors.Join(fmt.Errorf("loading configs"), err)
 			}
 
 			effectiveCfgs, err := pk.ApplyCommon(configs)
 			if err != nil {
-				return fmt.Errorf("applying common configs: %w", err)
+				return errors.Join(fmt.Errorf("applying common configs"), err)
 			}
 
 			for _, cfg := range effectiveCfgs {
 				args, err := pk.BuildBoilerplateArgs(cfg)
 				if err != nil {
-					return fmt.Errorf("building boilerplate args: %w", err)
+					return errors.Join(fmt.Errorf("building boilerplate args"), err)
 				}
 
 				if dryRun {
@@ -49,7 +50,7 @@ func NewInstallCommand() *cobra.Command {
 				}
 
 				if err := pk.RunBoilerplateCommand(ctx, args, repoDir); err != nil {
-					return fmt.Errorf("running boilerplate command: %w", err)
+					return errors.Join(fmt.Errorf("running boilerplate command"), err)
 				}
 			}
 

@@ -18,7 +18,7 @@ func RepoRoot() (string, error) {
 	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
 	output, err := cmd.Output()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("git rev-parse --show-toplevel: %w", err)
 	}
 	return strings.TrimSpace(string(output)), nil
 }
@@ -27,7 +27,7 @@ func RepoRoot() (string, error) {
 func OkDir() (string, error) {
 	gitRoot, err := RepoRoot()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("RepoRoot failed: %w", err)
 	}
 	return filepath.Join(gitRoot, ".ok"), nil
 }
@@ -37,7 +37,7 @@ func YAMLFiles(dir string) ([]string, error) {
 	var yamlFiles []string
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return fmt.Errorf("walking directory %s: %w", dir, err)
 		}
 		if !d.IsDir() && (filepath.Ext(path) == ".yaml" || filepath.Ext(path) == ".yml") {
 			yamlFiles = append(yamlFiles, path)
@@ -60,14 +60,14 @@ func LoadConfigs(dir string) ([]Config, error) {
 
 	var configs []Config
 	for _, file := range yamlFiles {
-		data, err := os.ReadFile(file) // Updated from ioutil.ReadFile to os.ReadFile
+		data, err := os.ReadFile(file)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("reading file %s: %w", file, err)
 		}
 
 		var config Config
 		if err := yaml.Unmarshal(data, &config); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("unmarshalling YAML from file %s: %w", file, err)
 		}
 
 		configs = append(configs, config)

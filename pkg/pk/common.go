@@ -119,7 +119,7 @@ func buildGitSource(repo, subPath, ref string) string {
 	return fmt.Sprintf("%s//%s", repo, subPath)
 }
 
-func BuildBoilerplateArgs(tpl Template) ([]string, error) {
+func BuildBoilerplateArgs(tpl Template) []string {
 	source := buildGitSource(tpl.Repo, tpl.Path, tpl.Ref)
 
 	args := []string{
@@ -133,7 +133,7 @@ func BuildBoilerplateArgs(tpl Template) ([]string, error) {
 	for _, vf := range tpl.VarFiles {
 		args = append(args, "--var-file", vf)
 	}
-	return args, nil
+	return args
 }
 
 // RunBoilerplateCommand takes arguments and a working directory as input and executes the boilerplate command.

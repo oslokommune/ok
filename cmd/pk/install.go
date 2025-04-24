@@ -39,10 +39,7 @@ func NewInstallCommand() *cobra.Command {
 			}
 
 			for _, cfg := range effectiveCfgs {
-				args, err := pk.BuildBoilerplateArgs(cfg)
-				if err != nil {
-					return errors.Join(fmt.Errorf("building boilerplate args"), err)
-				}
+				args := pk.BuildBoilerplateArgs(cfg)
 
 				if dryRun {
 					fmt.Fprintf(cmd.OutOrStdout(), "dry-run: %v\n", args)

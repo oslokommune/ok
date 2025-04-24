@@ -1,7 +1,9 @@
 package pk
 
 import (
+	"fmt"
 	"io/fs"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -94,22 +96,35 @@ func ApplyCommon(cfgs []Config) ([]Template, error) {
 	return out, nil
 }
 
-// BuildBoilerplateArgs takes a Template and constructs the arguments for the boilerplate command.
-func BuildBoilerplateArgs(tpl Template) []string {
+// buildGitSource constructs a Git source URL with a subpath and optional query parameters.
+func buildGitSource(repo, subPath, ref string) string {
+	// Ensure exactly one “//” separator between repo and subPath.
+	repo = strings.TrimSuffix(repo, "/")
+	subPath = strings.TrimPrefix(subPath, "/")
+
+	q := url.Values{}
+	if ref != "" {
+		q.Set("ref", ref)
+	}
+
+	return fmt.Sprintf("%s//%s?%s", repo, subPath, q.Encode())
+}
+
+func BuildBoilerplateArgs(tpl Template) ([]string, error) {
+	source := buildGitSource(tpl.Repo, tpl.Path, tpl.Ref)
+
 	args := []string{
-		"--template-url", tpl.Repo + "//" + tpl.Path + "?ref=" + tpl.Ref,
+		"--template-url", source,
 		"--output-folder", filepath.Join(tpl.BaseOutputFolder, tpl.Subfolder),
 	}
 
 	if tpl.NonInteractive {
 		args = append(args, "--non-interactive")
 	}
-
-	for _, varFile := range tpl.VarFiles {
-		args = append(args, "--var-file", varFile)
+	for _, vf := range tpl.VarFiles {
+		args = append(args, "--var-file", vf)
 	}
-
-	return args
+	return args, nil
 }
 
 // RunBoilerplateCommand takes arguments and a working directory as input and executes the boilerplate command.

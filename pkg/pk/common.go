@@ -92,10 +92,13 @@ func ApplyCommon(cfgs []Config) ([]Template, error) {
 
 	for _, cfg := range cfgs {
 		for _, tpl := range cfg.Templates {
-			merged := tpl // start with the template
+			merged := tpl
 
-			// copy non-zero fields from cfg.Common into merged
-			if err := mergo.Merge(&merged, cfg.Common); err != nil {
+			if err := mergo.Merge(
+				&merged,
+				cfg.Common,
+				mergo.WithAppendSlice,
+			); err != nil {
 				return nil, err
 			}
 

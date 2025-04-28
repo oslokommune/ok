@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.10.0](https://github.com/oslokommune/ok/compare/v5.9.0...v5.10.0) (2025-04-28)
+
+
+### Features
+
+* Add `ok pk install` experimental subcommand for new package file format ([#425](https://github.com/oslokommune/ok/issues/425)) ([ef33ddf](https://github.com/oslokommune/ok/commit/ef33ddf854f9f53487079f7f2666511e57a8c475))
+
 ## [5.9.0](https://github.com/oslokommune/ok/compare/v5.8.0...v5.9.0) (2025-03-04)
 
 

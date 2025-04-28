@@ -1,6 +1,11 @@
 package common
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+)
 
 const PackagesManifestFilename = "packages.yml"
 const BoilerplateRepoOwner = "oslokommune"
@@ -37,4 +42,70 @@ func PrintProcessedPackages(update []Package, action string) {
 	for _, pkg := range update {
 		fmt.Printf("  - %s\n", pkg.String())
 	}
+}
+
+// GenerateRelativePath creates a path to navigate back to the root directory
+// from the specified outputFolder
+func GenerateRelativePath(outputFolder string) string {
+	outputFolder = strings.TrimRight(outputFolder, "/")
+	dirCount := strings.Count(outputFolder, "/") + 1
+	path := ""
+	for i := 0; i < dirCount; i++ {
+		path += "../"
+	}
+	return strings.TrimRight(path, "/")
+}
+
+func fileExists(path string) (bool, error) {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return !info.IsDir(), nil
+}
+
+func dirExists(path string) (bool, error) {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return info.IsDir(), nil
+}
+
+func UseConsolidatedPackageStructure(dir string) (bool, error) {
+	packagePath := filepath.Join(dir, PackagesManifestFilename)
+	configDir := filepath.Join(dir, BoilerplatePackageTerraformConfigPrefix)
+
+	packageExists, err := fileExists(packagePath)
+	if err != nil {
+		return false, err
+	}
+
+	configDirExists, err := dirExists(configDir)
+	if err != nil {
+		return false, err
+	}
+
+	if packageExists && configDirExists {
+		return true, nil
+	}
+
+	if packageExists {
+		manifest, err := LoadPackageManifest(packagePath)
+		if err != nil {
+			return false, err
+		}
+
+		if manifest.DefaultPackagePathPrefix == BoilerplatePackageGitHubActionsPath {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

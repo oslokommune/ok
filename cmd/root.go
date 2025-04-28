@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
 
 	"github.com/oslokommune/ok/cmd/aws"
+	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/spf13/cobra"
@@ -42,7 +44,7 @@ func Execute() {
 	err := rootCmd.Execute()
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(errors.Join(fmt.Errorf("root command execution failed"), err))
 		os.Exit(1)
 	}
 }
@@ -74,12 +76,17 @@ func init() {
 	awsCommand.AddCommand(aws.ConfigGeneratorCommand)
 
 	initializeConfiguration()
+
+	if viper.GetBool("enable_experimental") {
+		rootCmd.AddCommand(pkCommand)
+		pkCommand.AddCommand(pk.NewInstallCommand())
+	}
 }
 
 // initializeConfiguration is the function that initializes configuration using viper. It is called at the start of the application.
 func initializeConfiguration() {
 	setConfigFile()
-	viper.SetDefault("enable_experimental", true)
+	viper.SetDefault("enable_experimental", false)
 	viper.SetEnvPrefix("ok")
 	viper.AutomaticEnv()
 	loadConfiguration()

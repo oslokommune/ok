@@ -3,10 +3,12 @@ package pkg
 import (
 	"errors"
 	"fmt"
-	"github.com/oslokommune/ok/pkg/pkg/common"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strings"
+
+	"github.com/oslokommune/ok/pkg/pkg/common"
 
 	"github.com/oslokommune/ok/pkg/pkg/add"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
@@ -33,18 +35,34 @@ ok pkg add app ecommerce-api
 		RunE: func(cmd *cobra.Command, args []string) error {
 			templateName := getArg(args, 0, "")
 			outputFolder := getArg(args, 1, templateName)
+			currentDir, err := os.Getwd()
+			if err != nil {
+				cmd.PrintErrf("failed to get current dir: %s\n", err)
+				return nil
+			}
+			consolidatedPackageStructure, err := common.UseConsolidatedPackageStructure(currentDir)
+			if err != nil {
+				cmd.PrintErrf("failed to check if we should be using consolidated package structure: %s\n", err)
+				return nil
+			}
+			var packagesManifestFilename = common.PackagesManifestFilename
+			if !consolidatedPackageStructure {
+				packagesManifestFilename = filepath.Join(outputFolder, packagesManifestFilename)
+			}
 
-			result, err := adder.Run(common.PackagesManifestFilename, templateName, outputFolder, flagAddCommandUpdateSchema)
+			result, err := adder.Run(packagesManifestFilename, templateName, outputFolder, flagAddCommandUpdateSchema, consolidatedPackageStructure)
 			if err != nil {
 				return err
 			}
 
-			slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, common.PackagesManifestFilename, result.OutputFolder))
-			nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
-			if len(nonExistingConfigFiles) > 0 {
-				slog.Info("\nCreate the following configuration files:\n")
-				for _, configFile := range nonExistingConfigFiles {
-					slog.Info(fmt.Sprintf("- %s\n", configFile))
+			slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, packagesManifestFilename, result.OutputFolder))
+			if consolidatedPackageStructure {
+				nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
+				if len(nonExistingConfigFiles) > 0 {
+					slog.Info("\nCreate the following configuration files:\n")
+					for _, configFile := range nonExistingConfigFiles {
+						slog.Info(fmt.Sprintf("- %s\n", configFile))
+					}
 				}
 			}
 			return nil

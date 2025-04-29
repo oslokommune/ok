@@ -2,9 +2,10 @@ package add
 
 import (
 	"fmt"
-	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"os"
 	"strings"
+
+	"github.com/oslokommune/ok/pkg/pkg/schema"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
@@ -30,7 +31,7 @@ func NewAdder() Adder {
 	return Adder{}
 }
 
-func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string, updateSchema bool) (*AddResult, error) {
+func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string, updateSchema bool, consolidatedPackageStructure bool) (*AddResult, error) {
 	templateVersion, err := getTemplateVersion(templateName)
 	if err != nil {
 		return nil, err
@@ -42,7 +43,7 @@ func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string
 		return nil, err
 	}
 
-	newPackage, err := createNewPackage(manifest, templateName, pkgRef, outputFolder)
+	newPackage, err := createNewPackage(manifest, templateName, pkgRef, outputFolder, consolidatedPackageStructure)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +58,7 @@ func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string
 	}
 
 	if updateSchema {
-		if err := a.updateSchemaConfig(manifest, newPackage, outputFolder); err != nil {
+		if err := a.updateSchemaConfig(manifest, newPackage, outputFolder, consolidatedPackageStructure); err != nil {
 			return nil, err
 		}
 	}
@@ -86,9 +87,18 @@ func getTemplateVersion(templateName string) (string, error) {
 	return templateVersion, nil
 }
 
-func createNewPackage(manifest common.PackageManifest, templateName, gitRef, outputFolder string) (common.Package, error) {
-	configFile := common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
-	commonConfigFile := common.VarFile(manifest.PackageConfigPrefix(), "common-config")
+func createNewPackage(manifest common.PackageManifest, templateName, gitRef, outputFolder string, consolidatedPackageStructure bool) (common.Package, error) {
+	var configFile, commonConfigFile, out string
+	if consolidatedPackageStructure {
+		configFile = common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
+		commonConfigFile = common.VarFile(manifest.PackageConfigPrefix(), "common-config")
+		out = manifest.PackageOutputFolder(outputFolder)
+	} else {
+		configFile = common.VarFile("", common.DefaultVarFileName)
+		commonConfigFile = common.VarFile(common.GenerateRelativePath(outputFolder), "common-config")
+		out = "."
+
+	}
 
 	varFiles := []string{
 		commonConfigFile,
@@ -98,17 +108,22 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 	newPackage := common.Package{
 		Template:     templateName,
 		Ref:          gitRef,
-		OutputFolder: manifest.PackageOutputFolder(outputFolder),
+		OutputFolder: out,
 		VarFiles:     varFiles,
 	}
 
 	return newPackage, nil
 }
 
-func (a Adder) updateSchemaConfig(manifest common.PackageManifest, pkg common.Package, outputFolder string) error {
-	varFilepath := common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
+func (a Adder) updateSchemaConfig(manifest common.PackageManifest, pkg common.Package, outputFolder string, consolidatedPackageStructure bool) error {
+	var varFilePath string
+	if consolidatedPackageStructure {
+		varFilePath = common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
+	} else {
+		varFilePath = common.VarFile(outputFolder, common.DefaultVarFileName)
+	}
 
-	err := schema.SetSchemaDeclarationInVarFile(varFilepath, pkg.Ref)
+	err := schema.SetSchemaDeclarationInVarFile(varFilePath, pkg.Ref)
 	if err != nil {
 		return fmt.Errorf("creating or updating configuration file: %w", err)
 	}

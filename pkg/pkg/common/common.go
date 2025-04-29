@@ -82,19 +82,19 @@ func dirExists(path string) (bool, error) {
 
 func UseConsolidatedPackageStructure(dir string) (bool, error) {
 	packagePath := filepath.Join(dir, PackagesManifestFilename)
-	configDir := filepath.Join(dir, BoilerplatePackageTerraformConfigPrefix)
+	varFileDir := filepath.Join(dir, BoilerplatePackageTerraformConfigPrefix)
 
 	packageExists, err := fileExists(packagePath)
 	if err != nil {
 		return false, err
 	}
 
-	configDirExists, err := dirExists(configDir)
+	varFileDirExists, err := dirExists(varFileDir)
 	if err != nil {
 		return false, err
 	}
 
-	if packageExists && configDirExists {
+	if packageExists && varFileDirExists {
 		return true, nil
 	}
 

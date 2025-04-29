@@ -44,44 +44,48 @@ func TestUseConsolidatedPackageStructure(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		setup          func(baseDir string)
+		setup          func(baseDir string, t *testing.T)
 		expectedResult bool
 		expectedError  bool
 	}{
 		{
 			name: "should use existing packages.yml when packages.yml and _config found in dir",
-			setup: func(baseDir string) {
+			setup: func(baseDir string, t *testing.T) {
 				os.WriteFile(filepath.Join(baseDir, PackagesManifestFilename), []byte(""), 0644)
+				require.NoError(t, err)
 				os.MkdirAll(filepath.Join(baseDir, BoilerplatePackageTerraformConfigPrefix), 0755)
+				require.NoError(t, err)
 			},
 			expectedResult: true,
 			expectedError:  false,
 		},
 		{
 			name: "should use existing packages.yml for github actions",
-			setup: func(baseDir string) {
+			setup: func(baseDir string, t *testing.T) {
 				content := "DefaultPackagePathPrefix: " + BoilerplatePackageGitHubActionsPath
 				os.WriteFile(filepath.Join(baseDir, PackagesManifestFilename), []byte(content), 0644)
+				require.NoError(t, err)
 			},
 			expectedResult: true,
 			expectedError:  false,
 		},
 		{
 			name:           "should not use consolidated packages.yml by default",
-			setup:          func(baseDir string) {},
+			setup:          func(baseDir string, t *testing.T) {},
 			expectedResult: false,
 			expectedError:  false,
 		},
 		{
 			name:           "should not use consolidated packages.yml when only packages.yml is present in dir",
-			setup:          func(baseDir string) {},
+			setup:          func(baseDir string, t *testing.T) {},
 			expectedResult: false,
 			expectedError:  false,
 		},
 		{
 			name: "should not use consolidated packages.yml when only _config is present in dir",
-			setup: func(baseDir string) {
+			setup: func(baseDir string, t *testing.T) {
 				os.MkdirAll(filepath.Join(baseDir, BoilerplatePackageTerraformConfigPrefix), 0755)
+				require.NoError(t, err)
 			},
 			expectedResult: false,
 			expectedError:  false,
@@ -95,7 +99,7 @@ func TestUseConsolidatedPackageStructure(t *testing.T) {
 			err := os.MkdirAll(testCaseDir, 0755)
 			require.NoError(t, err)
 
-			tt.setup(testCaseDir)
+			tt.setup(testCaseDir, t)
 
 			result, err := UseConsolidatedPackageStructure(testCaseDir)
 

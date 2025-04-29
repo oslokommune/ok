@@ -20,6 +20,8 @@ const BoilerplatePackageGitHubActionsPath = "boilerplate/github-actions"
 const BoilerplatePackageGitHubActionsConfigPrefix = ""
 const BoilerplatePackageGitHubActionsOutputFolder = "../.."
 
+const DefaultVarFileName = "package-config"
+
 const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//"
 const DefaultPackagePathPrefix = BoilerplatePackageTerraformPath
 const DefaultPackageConfigPrefix = BoilerplatePackageTerraformConfigPrefix

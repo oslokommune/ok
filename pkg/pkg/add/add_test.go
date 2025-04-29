@@ -80,7 +80,7 @@ func TestCreateNewPackage(t *testing.T) {
 				Template:     "template4",
 				Ref:          "template4-v4.0.0",
 				OutputFolder: ".",
-				VarFiles:     []string{"../common-config.yml", "config.yml"},
+				VarFiles:     []string{"../common-config.yml", common.DefaultVarFileName + ".yml"},
 			},
 		},
 		{
@@ -96,7 +96,7 @@ func TestCreateNewPackage(t *testing.T) {
 				Template:     "template5",
 				Ref:          "template5-v5.0.0",
 				OutputFolder: ".",
-				VarFiles:     []string{"../../common-config.yml", "config.yml"},
+				VarFiles:     []string{"../../common-config.yml", common.DefaultVarFileName + ".yml"},
 			},
 		},
 	}
@@ -189,7 +189,7 @@ func TestUpdateSchemaConfig(t *testing.T) {
 			name:                         "non-consolidated package structure",
 			consolidatedPackageStructure: false,
 			outputFolder:                 "my-output",
-			expectedFilePath:             "my-output/config.yml",
+			expectedFilePath:             "my-output/" + common.DefaultVarFileName + ".yml",
 			expectedError:                false,
 		},
 	}

@@ -94,7 +94,7 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 		commonConfigFile = common.VarFile(manifest.PackageConfigPrefix(), "common-config")
 		out = manifest.PackageOutputFolder(outputFolder)
 	} else {
-		configFile = common.VarFile("", "config")
+		configFile = common.VarFile("", common.DefaultVarFileName)
 		commonConfigFile = common.VarFile(common.GenerateRelativePath(outputFolder), "common-config")
 		out = "."
 
@@ -120,7 +120,7 @@ func (a Adder) updateSchemaConfig(manifest common.PackageManifest, pkg common.Pa
 	if consolidatedPackageStructure {
 		varFilePath = common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
 	} else {
-		varFilePath = common.VarFile(outputFolder, "config")
+		varFilePath = common.VarFile(outputFolder, common.DefaultVarFileName)
 	}
 
 	err := schema.SetSchemaDeclarationInVarFile(varFilePath, pkg.Ref)

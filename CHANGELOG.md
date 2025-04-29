@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.11.0](https://github.com/oslokommune/ok/compare/v5.10.0...v5.11.0) (2025-04-29)
+
+
+### Features
+
+* update default location of package manifest and var files ([#429](https://github.com/oslokommune/ok/issues/429)) ([c748833](https://github.com/oslokommune/ok/commit/c7488330dd201a1c5d9c19cc8208f3518dbbdc45))
+
 ## [5.10.0](https://github.com/oslokommune/ok/compare/v5.9.0...v5.10.0) (2025-04-28)
 
 

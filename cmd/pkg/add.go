@@ -56,11 +56,13 @@ ok pkg add app ecommerce-api
 			}
 
 			slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, packagesManifestFilename, result.OutputFolder))
-			nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
-			if len(nonExistingConfigFiles) > 0 {
-				slog.Info("\nCreate the following configuration files:\n")
-				for _, configFile := range nonExistingConfigFiles {
-					slog.Info(fmt.Sprintf("- %s\n", configFile))
+			if consolidatedPackageStructure {
+				nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
+				if len(nonExistingConfigFiles) > 0 {
+					slog.Info("\nCreate the following configuration files:\n")
+					for _, configFile := range nonExistingConfigFiles {
+						slog.Info(fmt.Sprintf("- %s\n", configFile))
+					}
 				}
 			}
 			return nil

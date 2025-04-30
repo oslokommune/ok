@@ -5,12 +5,15 @@ on:
   push:
     branches:
       - main
+    # NOTE: We only trigger on specific file paths to avoid unncessarily running the workflow
     paths:
       - '**/*.go'
       - 'go.mod'
       - 'go.sum'
       - '**/*.sh'
       - '**/*.rb'
+      # NOTE: We need to trigger a release when a PR from release-please has been merged
+      - ".release-please-manifest.json"
   workflow_dispatch:
 
 jobs:

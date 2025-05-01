@@ -139,6 +139,13 @@ func prettyPrintError(err error) {
 
 		unwrappedStr := unwrapped.Error()
 
+		// Error string is:
+		// middle b that wraps a: deepest error a
+		//
+		// But we want to print:
+		// middle b that wraps a:
+		//
+		// So we remove the unwrapped string from the error string
 		text := strings.Replace(errStr, unwrappedStr, "", 1)
 		printWithSpaces(text, i)
 

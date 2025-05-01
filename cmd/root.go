@@ -142,10 +142,10 @@ func prettyPrintError(err error) {
 		// As an example, errStr is:
 		// middle b that wraps a: deepest error a
 		//
-		// But we want to print:
+		// But we want to print only one error at a time, like this:
 		// middle b that wraps a:
 		//
-		// So we remove the unwrapped string from the error string
+		// So we remove the unwrapped error from the error.
 		text := strings.Replace(errStr, unwrappedStr, "", 1)
 		printWithSpaces(text, i)
 

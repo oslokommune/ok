@@ -139,7 +139,7 @@ func prettyPrintError(err error) {
 
 		unwrappedStr := unwrapped.Error()
 
-		// Error string is:
+		// As an example, errStr is:
 		// middle b that wraps a: deepest error a
 		//
 		// But we want to print:

@@ -3,15 +3,16 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"os"
-	"path"
-
+	"github.com/charmbracelet/lipgloss"
 	"github.com/oslokommune/ok/cmd/aws"
 	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
+	"path"
+	"strings"
 )
 
 var (
@@ -44,7 +45,15 @@ func Execute() {
 	err := rootCmd.Execute()
 
 	if err != nil {
-		fmt.Println(errors.Join(fmt.Errorf("root command execution failed"), err))
+		redStyle := lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("1")) // Red text
+
+		fmt.Println()
+		fmt.Println(redStyle.Render("Error:"))
+		prettyPrintError(err)
+		fmt.Println()
+
 		os.Exit(1)
 	}
 }
@@ -114,4 +123,44 @@ func setDefaultConfigPath() {
 	viper.AddConfigPath(path.Dir(defaultConfigPath))
 	viper.SetConfigType("yaml")
 	viper.SetConfigName(path.Base(defaultConfigPath))
+}
+
+func prettyPrintError(err error) {
+	i := 0
+
+	for {
+		errStr := err.Error()
+
+		unwrapped := errors.Unwrap(err)
+		if unwrapped == nil {
+			printWithSpaces(errStr, i)
+			break
+		}
+
+		unwrappedStr := unwrapped.Error()
+
+		// As an example, errStr is:
+		// middle b that wraps a: deepest error a
+		//
+		// But we want to print only one error at a time, like this:
+		// middle b that wraps a:
+		//
+		// So we remove the unwrapped error from the error.
+		text := strings.Replace(errStr, unwrappedStr, "", 1)
+		printWithSpaces(text, i)
+
+		err = unwrapped
+		i++
+
+		if i > 100 {
+			printWithSpaces("(Too many errors to unwrap, stopping here.)", i)
+			break
+		}
+	}
+}
+
+func printWithSpaces(text string, depth int) {
+	out := strings.Repeat(" ", depth*2) + text
+	fmt.Println(out)
+
 }

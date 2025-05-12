@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.12.0](https://github.com/oslokommune/ok/compare/v5.11.0...v5.12.0) (2025-05-12)
+
+
+### Features
+
+* Pretty print errors ([#434](https://github.com/oslokommune/ok/issues/434)) ([557172a](https://github.com/oslokommune/ok/commit/557172a93f01276919a9a67cff4bff6202031dc7))
+
 ## [5.11.0](https://github.com/oslokommune/ok/compare/v5.10.0...v5.11.0) (2025-04-29)
 
 

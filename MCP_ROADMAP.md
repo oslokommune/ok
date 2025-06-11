@@ -91,6 +91,25 @@ This document outlines planned MCP tools for the ok CLI, ranked by implementatio
 - Provide consistent error response format
 - Include validation for all inputs
 
+### MCP Result Types
+Use appropriate MCP-Go result types based on tool purpose:
+
+- **JSON Results**: For structured data (`list_latest_releases`, `read_package_manifest`, `get_package_info`, `parse_package_versions`)
+  ```go
+  data := map[string]interface{}{"packages": releases}
+  return mcp.NewToolResultJSON(data)
+  ```
+
+- **Text Results**: For simple status messages (`validate_package_structure`, `download_github_file`)
+  ```go
+  return mcp.NewToolResultText("Package structure is valid")
+  ```
+
+- **Error Results**: For validation failures and system errors (all tools should handle these)
+  ```go
+  return mcp.NewToolResultError("Failed to parse manifest: " + err.Error())
+  ```
+
 ### Testing Strategy
 - Unit tests for each tool handler
 - Integration tests with real GitHub API (rate-limited)

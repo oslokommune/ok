@@ -2,7 +2,6 @@ package mcp
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/mark3labs/mcp-go/mcp"
@@ -87,11 +86,9 @@ func listLatestReleasesHandler(ctx context.Context, request mcp.CallToolRequest)
 		return mcp.NewToolResultError(fmt.Sprintf("Error getting latest releases: %v", err)), nil
 	}
 
-	// Convert to JSON for structured output
-	jsonData, err := json.MarshalIndent(releases, "", "  ")
-	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Error marshaling releases to JSON: %v", err)), nil
+	// Return structured JSON data
+	data := map[string]interface{}{
+		"packages": releases,
 	}
-
-	return mcp.NewToolResultText(string(jsonData)), nil
+	return mcp.NewToolResultJSON(data), nil
 }

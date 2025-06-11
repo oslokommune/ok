@@ -2,10 +2,12 @@ package mcp
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/oslokommune/ok/pkg/version"
 	"github.com/spf13/cobra"
 )
@@ -43,9 +45,15 @@ func runServe(cmd *cobra.Command, args []string) error {
 		mcp.WithDescription("Get version information for the ok tool"),
 	)
 
+	// Add list latest releases tool
+	listReleasesTool := mcp.NewTool("list_latest_releases",
+		mcp.WithDescription("Get latest versions of all boilerplate packages"),
+	)
+
 	// Add tool handlers
 	s.AddTool(helloTool, helloHandler)
 	s.AddTool(versionTool, versionHandler)
+	s.AddTool(listReleasesTool, listLatestReleasesHandler)
 
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
@@ -71,4 +79,19 @@ func versionHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.Call
 	}
 
 	return mcp.NewToolResultText(result), nil
+}
+
+func listLatestReleasesHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	releases, err := githubreleases.GetLatestReleases()
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Error getting latest releases: %v", err)), nil
+	}
+
+	// Convert to JSON for structured output
+	jsonData, err := json.MarshalIndent(releases, "", "  ")
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Error marshaling releases to JSON: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(string(jsonData)), nil
 }

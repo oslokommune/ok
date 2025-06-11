@@ -3,9 +3,11 @@ package mcp
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/oslokommune/ok/pkg/version"
 	"github.com/spf13/cobra"
@@ -49,10 +51,19 @@ func runServe(cmd *cobra.Command, args []string) error {
 		mcp.WithDescription("Get latest versions of all boilerplate packages"),
 	)
 
+	// Add read package manifest tool
+	readManifestTool := mcp.NewTool("read_package_manifest",
+		mcp.WithDescription("Parse and display package manifest contents"),
+		mcp.WithString("path",
+			mcp.Description("Path to packages.yml file (defaults to current directory)"),
+		),
+	)
+
 	// Add tool handlers
 	s.AddTool(helloTool, helloHandler)
 	s.AddTool(versionTool, versionHandler)
 	s.AddTool(listReleasesTool, listLatestReleasesHandler)
+	s.AddTool(readManifestTool, readPackageManifestHandler)
 
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
@@ -89,6 +100,36 @@ func listLatestReleasesHandler(ctx context.Context, request mcp.CallToolRequest)
 	// Return structured JSON data
 	data := map[string]interface{}{
 		"packages": releases,
+	}
+	return mcp.NewToolResultJSON(data), nil
+}
+
+func readPackageManifestHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	// Get path parameter, default to current directory
+	path, _ := request.GetString("path")
+	if path == "" {
+		path = "."
+	}
+
+	// If path is a directory, append packages.yml
+	manifestPath := path
+	if filepath.Ext(path) == "" {
+		manifestPath = filepath.Join(path, "packages.yml")
+	}
+
+	// Load the package manifest
+	manifest, err := common.LoadPackageManifest(manifestPath)
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Error loading package manifest: %v", err)), nil
+	}
+
+	// Return structured JSON data
+	data := map[string]interface{}{
+		"manifest_path":               manifestPath,
+		"default_package_path_prefix": manifest.DefaultPackagePathPrefix,
+		"package_prefix":              manifest.PackagePrefix(),
+		"package_config_prefix":       manifest.PackageConfigPrefix(),
+		"packages":                    manifest.Packages,
 	}
 	return mcp.NewToolResultJSON(data), nil
 }

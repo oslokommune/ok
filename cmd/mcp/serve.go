@@ -6,6 +6,7 @@ import (
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/oslokommune/ok/pkg/version"
 	"github.com/spf13/cobra"
 )
 
@@ -37,8 +38,14 @@ func runServe(cmd *cobra.Command, args []string) error {
 		),
 	)
 
-	// Add tool handler
+	// Add version tool
+	versionTool := mcp.NewTool("version",
+		mcp.WithDescription("Get version information for the ok tool"),
+	)
+
+	// Add tool handlers
 	s.AddTool(helloTool, helloHandler)
+	s.AddTool(versionTool, versionHandler)
 
 	// Start the stdio server
 	if err := server.ServeStdio(s); err != nil {
@@ -55,4 +62,13 @@ func helloHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallTo
 	}
 
 	return mcp.NewToolResultText(fmt.Sprintf("Hello, %s!", name)), nil
+}
+
+func versionHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	result, err := version.GetVersionInfo()
+	if err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("Error getting version info: %v", err)), nil
+	}
+
+	return mcp.NewToolResultText(result), nil
 }

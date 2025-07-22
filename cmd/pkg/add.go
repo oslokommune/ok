@@ -37,16 +37,19 @@ ok pkg add app ecommerce-api
 		RunE: func(cmd *cobra.Command, args []string) error {
 			templateName := getArg(args, 0, "")
 			outputFolder := getArg(args, 1, templateName)
+
 			currentDir, err := os.Getwd()
 			if err != nil {
 				cmd.PrintErrf("failed to get current dir: %s\n", err)
 				return nil
 			}
+
 			consolidatedPackageStructure, err := common.UseConsolidatedPackageStructure(currentDir)
 			if err != nil {
 				cmd.PrintErrf("failed to check if we should be using consolidated package structure: %s\n", err)
 				return nil
 			}
+
 			var packagesManifestFilename = common.PackagesManifestFilename
 			if !consolidatedPackageStructure {
 				packagesManifestFilename = filepath.Join(outputFolder, packagesManifestFilename)
@@ -60,6 +63,7 @@ ok pkg add app ecommerce-api
 			}
 
 			slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, packagesManifestFilename, result.OutputFolder))
+
 			if consolidatedPackageStructure {
 				nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
 				if len(nonExistingConfigFiles) > 0 {
@@ -69,6 +73,7 @@ ok pkg add app ecommerce-api
 					}
 				}
 			}
+
 			return nil
 		},
 	}

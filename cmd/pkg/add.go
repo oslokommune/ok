@@ -69,7 +69,7 @@ ok pkg add app ecommerce-api
 		},
 	}
 
-	cmd.Flags().BoolVar(&flagAddCommandUpdateSchema, "update-schema", true, "Update the JSON schema for affected packages")
+	cmd.Flags().BoolVar(&flagAddCommandUpdateSchema, "add-schema", true, "Update the JSON schema for affected packages")
 
 	return cmd
 }

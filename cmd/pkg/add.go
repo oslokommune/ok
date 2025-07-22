@@ -38,6 +38,10 @@ ok pkg add app ecommerce-api
 			templateName := getArg(args, 0, "")
 			outputFolder := getArg(args, 1, templateName)
 
+			if flagAddCommandVarFile != "default" && flagAddCommandNoVarFile {
+				return fmt.Errorf("cannot use both --var-file and --no-var-file flags at the same time")
+			}
+
 			currentDir, err := os.Getwd()
 			if err != nil {
 				cmd.PrintErrf("failed to get current dir: %s\n", err)
@@ -55,9 +59,15 @@ ok pkg add app ecommerce-api
 				packagesManifestFilename = filepath.Join(outputFolder, packagesManifestFilename)
 			}
 
-			addSchema := !flagAddCommandNoSchema
-
-			result, err := adder.Run(packagesManifestFilename, templateName, outputFolder, addSchema, consolidatedPackageStructure)
+			result, err := adder.Run(add.AddOptions{
+				PkgManifestFilename:          packagesManifestFilename,
+				TemplateName:                 templateName,
+				OutputFolder:                 outputFolder,
+				ConsolidatedPackageStructure: consolidatedPackageStructure,
+				AddSchema:                    !flagAddCommandNoSchema,
+				DownloadVarFile:              !flagAddCommandNoVarFile,
+				VarFile:                      flagAddCommandVarFile,
+			})
 			if err != nil {
 				return err
 			}

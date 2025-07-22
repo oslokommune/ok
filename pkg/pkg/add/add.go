@@ -11,6 +11,16 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
+type AddOptions struct {
+	PkgManifestFilename          string
+	TemplateName                 string
+	OutputFolder                 string
+	ConsolidatedPackageStructure bool
+	AddSchema                    bool
+	DownloadVarFile              bool
+	VarFile                      string
+}
+
 type AddResult struct {
 	OutputFolder    string
 	VarFiles        []string
@@ -31,19 +41,19 @@ func NewAdder() Adder {
 	return Adder{}
 }
 
-func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string, addSchema bool, consolidatedPackageStructure bool) (*AddResult, error) {
-	templateVersion, err := getTemplateVersion(templateName)
+func (a Adder) Run(opts AddOptions) (*AddResult, error) {
+	templateVersion, err := getTemplateVersion(opts.TemplateName)
 	if err != nil {
 		return nil, err
 	}
-	pkgRef := fmt.Sprintf("%s-%s", templateName, templateVersion)
+	pkgRef := fmt.Sprintf("%s-%s", opts.TemplateName, templateVersion)
 
-	manifest, err := common.LoadPackageManifest(pkgManifestFilename)
+	manifest, err := common.LoadPackageManifest(opts.PkgManifestFilename)
 	if err != nil {
 		return nil, err
 	}
 
-	newPackage, err := createNewPackage(manifest, templateName, pkgRef, outputFolder, consolidatedPackageStructure)
+	newPackage, err := createNewPackage(manifest, opts.TemplateName, pkgRef, opts.OutputFolder, opts.ConsolidatedPackageStructure)
 	if err != nil {
 		return nil, err
 	}
@@ -53,20 +63,20 @@ func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string
 	}
 
 	manifest.Packages = append(manifest.Packages, newPackage)
-	if err := common.SavePackageManifest(pkgManifestFilename, manifest); err != nil {
+	if err := common.SavePackageManifest(opts.PkgManifestFilename, manifest); err != nil {
 		return nil, err
 	}
 
-	if addSchema {
-		if err := a.addSchemaConfig(manifest, newPackage, outputFolder, consolidatedPackageStructure); err != nil {
+	if opts.AddSchema {
+		if err := a.addSchemaConfig(manifest, newPackage, opts.OutputFolder, opts.ConsolidatedPackageStructure); err != nil {
 			return nil, err
 		}
 	}
 
 	return &AddResult{
-		OutputFolder:    manifest.PackageOutputFolder(outputFolder),
+		OutputFolder:    manifest.PackageOutputFolder(opts.OutputFolder),
 		VarFiles:        newPackage.VarFiles,
-		TemplateName:    templateName,
+		TemplateName:    opts.TemplateName,
 		TemplateVersion: templateVersion,
 	}, nil
 }
@@ -97,7 +107,6 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 		configFile = common.VarFile("", common.DefaultVarFileName)
 		commonConfigFile = common.VarFile(common.GenerateRelativePath(outputFolder), "common-config")
 		out = "."
-
 	}
 
 	varFiles := []string{

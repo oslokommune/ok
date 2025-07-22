@@ -16,7 +16,9 @@ import (
 )
 
 func NewAddCommand() *cobra.Command {
-	var flagAddCommandUpdateSchema bool
+	var flagAddCommandNoSchema bool
+	var flagAddCommandNoVarFile bool
+	var flagAddCommandVarFile string
 
 	adder := add.NewAdder()
 
@@ -50,7 +52,9 @@ ok pkg add app ecommerce-api
 				packagesManifestFilename = filepath.Join(outputFolder, packagesManifestFilename)
 			}
 
-			result, err := adder.Run(packagesManifestFilename, templateName, outputFolder, flagAddCommandUpdateSchema, consolidatedPackageStructure)
+			addSchema := !flagAddCommandNoSchema
+
+			result, err := adder.Run(packagesManifestFilename, templateName, outputFolder, addSchema, consolidatedPackageStructure)
 			if err != nil {
 				return err
 			}
@@ -69,7 +73,9 @@ ok pkg add app ecommerce-api
 		},
 	}
 
-	cmd.Flags().BoolVar(&flagAddCommandUpdateSchema, "add-schema", true, "Update the JSON schema for affected packages")
+	cmd.Flags().BoolVar(&flagAddCommandNoSchema, "no-schema", false, "Do not add the JSON schema for the package ")
+	cmd.Flags().StringVarP(&flagAddCommandVarFile, "var-file", "v", "default", "Download a var file for the package with the specified name.")
+	cmd.Flags().BoolVarP(&flagAddCommandNoVarFile, "no-var-file", "s", false, "Do not download a var file for the package")
 
 	return cmd
 }

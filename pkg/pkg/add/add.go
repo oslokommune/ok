@@ -31,7 +31,7 @@ func NewAdder() Adder {
 	return Adder{}
 }
 
-func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string, updateSchema bool, consolidatedPackageStructure bool) (*AddResult, error) {
+func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string, addSchema bool, consolidatedPackageStructure bool) (*AddResult, error) {
 	templateVersion, err := getTemplateVersion(templateName)
 	if err != nil {
 		return nil, err
@@ -57,8 +57,8 @@ func (a Adder) Run(pkgManifestFilename string, templateName, outputFolder string
 		return nil, err
 	}
 
-	if updateSchema {
-		if err := a.updateSchemaConfig(manifest, newPackage, outputFolder, consolidatedPackageStructure); err != nil {
+	if addSchema {
+		if err := a.addSchemaConfig(manifest, newPackage, outputFolder, consolidatedPackageStructure); err != nil {
 			return nil, err
 		}
 	}
@@ -115,7 +115,7 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 	return newPackage, nil
 }
 
-func (a Adder) updateSchemaConfig(manifest common.PackageManifest, pkg common.Package, outputFolder string, consolidatedPackageStructure bool) error {
+func (a Adder) addSchemaConfig(manifest common.PackageManifest, pkg common.Package, outputFolder string, consolidatedPackageStructure bool) error {
 	var varFilePath string
 	if consolidatedPackageStructure {
 		varFilePath = common.VarFile(manifest.PackageConfigPrefix(), outputFolder)

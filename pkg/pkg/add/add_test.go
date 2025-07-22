@@ -219,7 +219,7 @@ func TestUpdateSchemaConfig(t *testing.T) {
 
 			// Create adder and run update
 			adder := NewAdder()
-			err = adder.updateSchemaConfig(manifest, pkg, tt.outputFolder, tt.consolidatedPackageStructure)
+			err = adder.addSchemaConfig(manifest, pkg, tt.outputFolder, tt.consolidatedPackageStructure)
 
 			// Check results
 			if tt.expectedError {

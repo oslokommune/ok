@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/oslokommune/ok/cmd/aws"
+	"github.com/oslokommune/ok/cmd/mcp"
 	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
@@ -83,6 +84,9 @@ func init() {
 	awsCommand.AddCommand(aws.EcsExecCommand)
 	awsCommand.AddCommand(aws.AdminSessionCommand)
 	awsCommand.AddCommand(aws.ConfigGeneratorCommand)
+
+	rootCmd.AddCommand(mcpCommand)
+	mcpCommand.AddCommand(mcp.ServeCommand)
 
 	initializeConfiguration()
 

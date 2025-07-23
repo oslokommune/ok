@@ -67,9 +67,20 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 		return nil, err
 	}
 
+	if opts.DownloadVarFile {
+		// ok pkg add app hello --var-file default
+		// ok pkg add databases --var-file non-serverless
+		// TODO implementer denne
+		err := downloadVarFile(newPackage, opts.VarFile, opts.OutputFolder, opts.ConsolidatedPackageStructure)
+		if err != nil {
+			return &AddResult{}, fmt.Errorf("downloading var file: %w", err)
+		}
+	}
+
 	if opts.AddSchema {
-		if err := a.addSchemaConfig(manifest, newPackage, opts.OutputFolder, opts.ConsolidatedPackageStructure); err != nil {
-			return nil, err
+		err := a.addSchemaConfig(manifest, newPackage, opts.OutputFolder, opts.ConsolidatedPackageStructure)
+		if err != nil {
+			return &AddResult{}, fmt.Errorf("adding schema config: %w", err)
 		}
 	}
 
@@ -82,6 +93,8 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 }
 
 func getTemplateVersion(templateName string) (string, error) {
+	fmt.Printf("Fetching latest releases from GitHub repository %s/%s\n", common.BoilerplateRepoOwner, common.BoilerplateRepoName)
+
 	latestReleases, err := githubreleases.GetLatestReleases()
 	if err != nil {
 		if strings.Contains(err.Error(), "secret not found in keyring") {
@@ -94,6 +107,7 @@ func getTemplateVersion(templateName string) (string, error) {
 	if templateVersion == "" {
 		return "", fmt.Errorf("template %s not found in latest releases", templateName)
 	}
+
 	return templateVersion, nil
 }
 

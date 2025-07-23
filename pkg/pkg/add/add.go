@@ -1,8 +1,10 @@
 package add
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/schema"
@@ -12,7 +14,7 @@ import (
 )
 
 type AddOptions struct {
-	PkgManifestFilename          string
+	CurrentDir                   string
 	TemplateName                 string
 	OutputFolder                 string
 	ConsolidatedPackageStructure bool
@@ -42,29 +44,42 @@ func NewAdder() Adder {
 }
 
 func (a Adder) Run(opts AddOptions) (*AddResult, error) {
+	oldPackageStructure, err := common.UseOldPackageStructure(opts.CurrentDir)
+	if err != nil {
+		return nil, fmt.Errorf("checking whether to use old or new package structure: %w", err)
+	}
+
+	var packagesManifestFilename = common.PackagesManifestFilename
+	if !oldPackageStructure {
+		packagesManifestFilename = filepath.Join(opts.OutputFolder, packagesManifestFilename)
+	}
+
 	templateVersion, err := getTemplateVersion(opts.TemplateName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting template version: %w", err)
 	}
+
 	pkgRef := fmt.Sprintf("%s-%s", opts.TemplateName, templateVersion)
 
-	manifest, err := common.LoadPackageManifest(opts.PkgManifestFilename)
+	manifest, err := common.LoadPackageManifest(packagesManifestFilename)
 	if err != nil {
 		return nil, err
 	}
 
 	newPackage, err := createNewPackage(manifest, opts.TemplateName, pkgRef, opts.OutputFolder, opts.ConsolidatedPackageStructure)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("creating new package: %w", err)
 	}
 
-	if err := allowDuplicateOutputFolder(manifest, newPackage); err != nil {
+	err = allowDuplicateOutputFolder(manifest, newPackage)
+	if err != nil {
 		return nil, err
 	}
 
 	manifest.Packages = append(manifest.Packages, newPackage)
-	if err := common.SavePackageManifest(opts.PkgManifestFilename, manifest); err != nil {
-		return nil, err
+	err = common.SavePackageManifest(packagesManifestFilename, manifest)
+	if err != nil {
+		return nil, fmt.Errorf("saving package manifest: %w", err)
 	}
 
 	if opts.DownloadVarFile {
@@ -81,6 +96,16 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 		err := a.addSchemaConfig(manifest, newPackage, opts.OutputFolder, opts.ConsolidatedPackageStructure)
 		if err != nil {
 			return &AddResult{}, fmt.Errorf("adding schema config: %w", err)
+		}
+	}
+
+	if oldPackageStructure {
+		nonExistingConfigFiles := findNonExistingConfigurationFiles(newPackage.VarFiles)
+		if len(nonExistingConfigFiles) > 0 {
+			fmt.Println("Create the following configuration files:")
+			for _, configFile := range nonExistingConfigFiles {
+				fmt.Printf("- %s\n", configFile)
+			}
 		}
 	}
 
@@ -165,4 +190,16 @@ func allowDuplicateOutputFolder(manifest common.PackageManifest, newPackage comm
 		}
 	}
 	return nil
+}
+
+func findNonExistingConfigurationFiles(varFiles []string) []string {
+	var nonExisting []string
+	for _, varFile := range varFiles {
+		_, err := os.Stat(varFile)
+		notExists := errors.Is(err, os.ErrNotExist)
+		if notExists {
+			nonExisting = append(nonExisting, varFile)
+		}
+	}
+	return nonExisting
 }

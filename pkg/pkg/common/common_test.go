@@ -101,7 +101,7 @@ func TestUseConsolidatedPackageStructure(t *testing.T) {
 
 			tt.setup(testCaseDir, t)
 
-			result, err := UseConsolidatedPackageStructure(testCaseDir)
+			result, err := UseOldPackageStructure(testCaseDir)
 
 			if tt.expectedError {
 				require.Error(t, err)

@@ -1,14 +1,9 @@
 package pkg
 
 import (
-	"errors"
 	"fmt"
-	"log/slog"
 	"os"
-	"path/filepath"
 	"strings"
-
-	"github.com/oslokommune/ok/pkg/pkg/common"
 
 	"github.com/oslokommune/ok/pkg/pkg/add"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
@@ -48,41 +43,19 @@ ok pkg add app ecommerce-api
 				return nil
 			}
 
-			consolidatedPackageStructure, err := common.UseConsolidatedPackageStructure(currentDir)
-			if err != nil {
-				cmd.PrintErrf("failed to check if we should be using consolidated package structure: %s\n", err)
-				return nil
-			}
-
-			var packagesManifestFilename = common.PackagesManifestFilename
-			if !consolidatedPackageStructure {
-				packagesManifestFilename = filepath.Join(outputFolder, packagesManifestFilename)
-			}
-
 			result, err := adder.Run(add.AddOptions{
-				PkgManifestFilename:          packagesManifestFilename,
-				TemplateName:                 templateName,
-				OutputFolder:                 outputFolder,
-				ConsolidatedPackageStructure: consolidatedPackageStructure,
-				AddSchema:                    !flagAddCommandNoSchema,
-				DownloadVarFile:              !flagAddCommandNoVarFile,
-				VarFile:                      flagAddCommandVarFile,
+				CurrentDir:      currentDir,
+				TemplateName:    templateName,
+				OutputFolder:    outputFolder,
+				AddSchema:       !flagAddCommandNoSchema,
+				DownloadVarFile: !flagAddCommandNoVarFile,
+				VarFile:         flagAddCommandVarFile,
 			})
 			if err != nil {
 				return err
 			}
 
 			fmt.Printf("Added package %s-%s to directory %s\n", result.TemplateName, result.TemplateVersion, result.OutputFolder)
-
-			if consolidatedPackageStructure {
-				nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
-				if len(nonExistingConfigFiles) > 0 {
-					slog.Info("\nCreate the following configuration files:\n")
-					for _, configFile := range nonExistingConfigFiles {
-						slog.Info(fmt.Sprintf("- %s\n", configFile))
-					}
-				}
-			}
 
 			return nil
 		},
@@ -100,18 +73,6 @@ func getArg(args []string, index int, fallback string) string {
 		return args[index]
 	}
 	return fallback
-}
-
-func findNonExistingConfigurationFiles(varFiles []string) []string {
-	var nonExisting []string
-	for _, varFile := range varFiles {
-		_, err := os.Stat(varFile)
-		notExists := errors.Is(err, os.ErrNotExist)
-		if notExists {
-			nonExisting = append(nonExisting, varFile)
-		}
-	}
-	return nonExisting
 }
 
 func addTabCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

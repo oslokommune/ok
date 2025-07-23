@@ -80,11 +80,20 @@ func dirExists(path string) (bool, error) {
 	return info.IsDir(), nil
 }
 
+// UseConsolidatedPackageStructure returns true if the current file system is using the old
+// way of organizing package files, as described here:
+//
+// https://github.com/oslokommune/ok/pull/429
+//
+// Otherwise, false is returned.
+//
+// Consolidated can be understood as "the old way", or using a centralized package manifest together with a separate
+// var file directory such as "_config".
 func UseConsolidatedPackageStructure(dir string) (bool, error) {
-	packagePath := filepath.Join(dir, PackagesManifestFilename)
+	packageManifestPath := filepath.Join(dir, PackagesManifestFilename)
 	varFileDir := filepath.Join(dir, BoilerplatePackageTerraformConfigPrefix)
 
-	packageExists, err := fileExists(packagePath)
+	packageManifestExists, err := fileExists(packageManifestPath)
 	if err != nil {
 		return false, err
 	}
@@ -94,12 +103,12 @@ func UseConsolidatedPackageStructure(dir string) (bool, error) {
 		return false, err
 	}
 
-	if packageExists && varFileDirExists {
+	if packageManifestExists && varFileDirExists {
 		return true, nil
 	}
 
-	if packageExists {
-		manifest, err := LoadPackageManifest(packagePath)
+	if packageManifestExists {
+		manifest, err := LoadPackageManifest(packageManifestPath)
 		if err != nil {
 			return false, err
 		}

@@ -3,13 +3,12 @@ package githubreleases
 import (
 	"context"
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"io"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/oslokommune/ok/pkg/pkg/common"
 
 	"github.com/Masterminds/semver"
 	"github.com/google/go-github/v63/github"
@@ -265,9 +264,15 @@ func DownloadGithubFile(ctx context.Context, client *github.Client, owner, repo,
 		return nil, fmt.Errorf("downloading file: %w", err)
 	}
 
-	// check if response headers contains "application/vnd.github.raw"
-	if !strings.Contains(response.Header.Get("Content-Type"), "application/vnd.github.raw") {
-		return nil, fmt.Errorf("response content type is not application/vnd.github.raw")
+	contentType := response.Header.Get("Content-Type")
+
+	validContentTypes := []string{
+		"application/vnd.github.raw",
+		"text/plain; charset=utf-8",
+	}
+
+	if !isValidContentType(contentType, validContentTypes) {
+		return nil, fmt.Errorf("response content type was %q, expected one of [%s]", contentType, strings.Join(validContentTypes, ", "))
 	}
 
 	defer rc.Close()
@@ -278,6 +283,15 @@ func DownloadGithubFile(ctx context.Context, client *github.Client, owner, repo,
 	}
 
 	return bodyText, nil
+}
+
+func isValidContentType(actual string, validTypes []string) bool {
+	for _, valid := range validTypes {
+		if strings.Contains(actual, valid) {
+			return true
+		}
+	}
+	return false
 }
 
 func GetTemplatePath(stackPath string, app string) string {

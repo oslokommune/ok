@@ -72,7 +72,7 @@ ok pkg add app ecommerce-api
 				return err
 			}
 
-			slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, packagesManifestFilename, result.OutputFolder))
+			fmt.Printf("Added package %s-%s to directory %s\n", result.TemplateName, result.TemplateVersion, result.OutputFolder)
 
 			if consolidatedPackageStructure {
 				nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)

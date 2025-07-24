@@ -105,7 +105,7 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 	varFilePath := getVarFilePath(oldPackageStructure, manifest, opts.OutputFolder)
 
 	if opts.DownloadVarFile {
-		err = a.downloadVarFile(newPackage, opts.VarFile, varFilePath)
+		err = a.downloadVarFile(newPackage, opts.VarFile, varFilePath, opts.OutputFolder)
 		if err != nil {
 			return &AddResult{}, fmt.Errorf("downloading var file: %w", err)
 		}

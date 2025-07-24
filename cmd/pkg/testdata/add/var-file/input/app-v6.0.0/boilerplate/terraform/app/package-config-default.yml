@@ -1,6 +1,5 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/databases-v4.0.0.schema.json
-StackName: "app-hello"
-app-data.StackName: "app-hello-data"
+StackName: "replace-me"
+app-data.StackName: "replace-me-data"
 
 AppName: "hello-world"
 AppEcsExec: true

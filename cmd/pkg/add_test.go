@@ -15,15 +15,16 @@ func TestAddCommand(t *testing.T) {
 	tests := []TestData{
 		{
 			name:            "Should add package",
-			args:            []string{"databases"},
+			args:            []string{"app", "app-hello"},
 			testdataRootDir: "testdata/add/var-file",
 			releases: map[string]string{
-				"databases": "v4.0.0",
+				"app": "v6.0.0",
 			},
 			expectFiles: []string{
-				"databases/packages.yml",
-				"databases/package-config.yml",
+				"app/packages.yml",
+				"app/package-config.yml",
 			},
+			keepTempDir: true,
 		},
 		{
 			name:            "Should fail if output directory already exists, using default dir",

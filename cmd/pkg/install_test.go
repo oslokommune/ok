@@ -21,6 +21,7 @@ func TestInstallCommand(t *testing.T) {
 				"app-hello/.boilerplate/_template_app.json",
 				"networking/.boilerplate/_template_networking.json",
 			},
+			keepTempDir: true,
 		},
 	}
 
@@ -35,10 +36,12 @@ func TestInstallCommand(t *testing.T) {
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 
 			// Remove temp dir after test run
-			defer func(path string) {
-				err := os.RemoveAll(path)
-				require.NoError(t, err)
-			}(tempDir)
+			if !tt.keepTempDir {
+				defer func(path string) {
+					err := os.RemoveAll(path)
+					require.NoError(t, err)
+				}(tempDir)
+			}
 
 			require.NoError(t, err)
 

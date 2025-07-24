@@ -41,6 +41,10 @@ func (g GitHubReleasesImpl) GetLatestReleases() (map[string]string, error) {
 	return GetLatestReleases()
 }
 
+func (g GitHubReleasesImpl) DownloadGithubFile(ctx context.Context, owner, repo, path, ref string) ([]byte, error) {
+	return DownloadGithubFile(ctx, owner, repo, path, ref)
+}
+
 type Release struct {
 	Component string
 	Version   string
@@ -258,7 +262,12 @@ func parseLatestReleases(components []Release) (map[string]string, error) {
 	return latestComponents, nil
 }
 
-func DownloadGithubFile(ctx context.Context, client *github.Client, owner, repo, path, ref string) ([]byte, error) {
+func DownloadGithubFile(ctx context.Context, owner, repo, path, ref string) ([]byte, error) {
+	client, err := GetGitHubClient()
+	if err != nil {
+		return nil, fmt.Errorf("getting GitHub client: %w", err)
+	}
+
 	rc, response, err := client.Repositories.DownloadContents(ctx, owner, repo, path, &github.RepositoryContentGetOptions{Ref: ref})
 	if err != nil {
 		return nil, fmt.Errorf("downloading file: %w", err)

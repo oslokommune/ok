@@ -10,12 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewAddCommand() *cobra.Command {
+func NewAddCommand(ghReleases add.GitHubReleases) *cobra.Command {
 	var flagAddCommandNoSchema bool
 	var flagAddCommandNoVarFile bool
 	var flagAddCommandVarFile string
-
-	adder := add.NewAdder()
 
 	cmd := &cobra.Command{
 		Use:   "add template [outputFolder]",
@@ -43,6 +41,8 @@ ok pkg add app ecommerce-api
 				return nil
 			}
 
+			adder := add.NewAdder(ghReleases)
+
 			result, err := adder.Run(add.AddOptions{
 				CurrentDir:      currentDir,
 				TemplateName:    templateName,
@@ -55,7 +55,12 @@ ok pkg add app ecommerce-api
 				return err
 			}
 
-			fmt.Printf("Added package %s-%s to directory %s\n", result.TemplateName, result.TemplateVersion, result.OutputFolder)
+			fmt.Println()
+			fmt.Printf("✅ Successfully added package %s-%s to directory %s\n",
+				result.TemplateName,
+				result.TemplateVersion,
+				result.OutputFolder,
+			)
 
 			return nil
 		},

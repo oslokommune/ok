@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewUpdateCommand(ghReleases GitHubReleases) *cobra.Command {
+func NewUpdateCommand(ghReleases update.GitHubReleases) *cobra.Command {
 	var flagDisableManifestUpdate bool
 	var flagUpdateCommandUpdateSchema bool
 	var flagMigrateConfig bool
@@ -154,8 +154,4 @@ func updateTabCompletion(cmd *cobra.Command, args []string, toComplete string) (
 		}
 	}
 	return completions, cobra.ShellCompDirectiveNoFileComp
-}
-
-type GitHubReleases interface {
-	GetLatestReleases() (map[string]string, error)
 }

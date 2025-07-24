@@ -1,6 +1,7 @@
 package add
 
 import (
+	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"os"
 	"path/filepath"
 	"testing"
@@ -155,7 +156,7 @@ func TestAllowDuplicateOutputFolder(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := allowDuplicateOutputFolder(tt.manifest, tt.newPackage)
+			err := createErrorIfOutputFolderAlreadyExists(tt.manifest, tt.newPackage)
 			if tt.expectedError {
 				require.Error(t, err)
 			} else {
@@ -172,25 +173,25 @@ func TestUpdateSchemaConfig(t *testing.T) {
 	defer os.RemoveAll(testDir)
 
 	tests := []struct {
-		name                         string
-		consolidatedPackageStructure bool
-		outputFolder                 string
-		expectedFilePath             string
-		expectedError                bool
+		name                string
+		oldPackageStructure bool
+		outputFolder        string
+		expectedFilePath    string
+		expectedError       bool
 	}{
 		{
-			name:                         "consolidated package structure",
-			consolidatedPackageStructure: true,
-			outputFolder:                 "my-output",
-			expectedFilePath:             "_config/my-output.yml",
-			expectedError:                false,
+			name:                "consolidated package structure",
+			oldPackageStructure: true,
+			outputFolder:        "my-output",
+			expectedFilePath:    "_config/my-output.yml",
+			expectedError:       false,
 		},
 		{
-			name:                         "non-consolidated package structure",
-			consolidatedPackageStructure: false,
-			outputFolder:                 "my-output",
-			expectedFilePath:             "my-output/" + common.DefaultVarFileName + ".yml",
-			expectedError:                false,
+			name:                "non-consolidated package structure",
+			oldPackageStructure: false,
+			outputFolder:        "my-output",
+			expectedFilePath:    "my-output/" + common.DefaultVarFileName + ".yml",
+			expectedError:       false,
 		},
 	}
 
@@ -206,20 +207,23 @@ func TestUpdateSchemaConfig(t *testing.T) {
 			require.NoError(t, err)
 			err = os.Chdir(testCaseDir)
 			require.NoError(t, err)
-			defer os.Chdir(originalDir) // Restore original directory at end
+			defer func(dir string) {
+				err := os.Chdir(dir)
+				require.NoError(t, err)
+			}(originalDir) // Restore the original directory at the end
 
-			// Create test manifest
+			// Create a test manifest
 			manifest := common.PackageManifest{}
 
-			// Create test package
+			// Create a test package
 			pkg := common.Package{
 				Template: "test-template",
 				Ref:      "test-template-v1.0.0",
 			}
 
 			// Create adder and run update
-			adder := NewAdder()
-			err = adder.addSchemaConfig(manifest, pkg, tt.outputFolder, tt.consolidatedPackageStructure)
+			varFilePath := getVarFilePath(tt.oldPackageStructure, manifest, tt.outputFolder)
+			err = schema.SetSchemaDeclarationInVarFile(varFilePath, pkg.Ref)
 
 			// Check results
 			if tt.expectedError {
@@ -227,14 +231,14 @@ func TestUpdateSchemaConfig(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 
-				// Verify file was created
-				fullPath := filepath.Join(testCaseDir, tt.expectedFilePath)
-				fileInfo, err := os.Stat(fullPath)
+				// Verify whether the var file was created
+				varFileFullPath := filepath.Join(testCaseDir, tt.expectedFilePath)
+				varFileInfo, err := os.Stat(varFileFullPath)
 				require.NoError(t, err)
-				require.False(t, fileInfo.IsDir())
+				require.False(t, varFileInfo.IsDir())
 
-				// Read file content and verify it contains schema reference
-				content, err := os.ReadFile(fullPath)
+				// Read the var file's content and verify whether it contains a schema reference
+				content, err := os.ReadFile(varFileFullPath)
 				require.NoError(t, err)
 				require.Contains(t, string(content), "schema")
 				require.Contains(t, string(content), pkg.Ref)

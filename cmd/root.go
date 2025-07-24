@@ -68,7 +68,7 @@ func init() {
 
 	// Create dependencies
 	ghReleases := githubreleases.NewGitHubReleases()
-	addCommand := pkg.NewAddCommand()
+	addCommand := pkg.NewAddCommand(ghReleases)
 	updateCommand := pkg.NewUpdateCommand(ghReleases)
 	installCommand := pkg.NewInstallCommand()
 

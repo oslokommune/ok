@@ -1,0 +1,6 @@
+StackName: "databases-fra-template-non-serverless"
+
+Serverless:
+  Enable: false
+Terragrunt:
+  Enable: true

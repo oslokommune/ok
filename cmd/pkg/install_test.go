@@ -17,7 +17,7 @@ func TestInstallCommand(t *testing.T) {
 			name:            "Should install ok packages recursively",
 			args:            []string{"--recursive"},
 			testdataRootDir: "testdata/install/recursive",
-			expectedFiles: []string{
+			expectFiles: []string{
 				"app-hello/.boilerplate/_template_app.json",
 				"networking/.boilerplate/_template_networking.json",
 			},
@@ -71,7 +71,7 @@ func TestInstallCommand(t *testing.T) {
 			require.NoError(t, err)
 
 			// Compare package manifest file
-			for _, expectedFile := range tt.expectedFiles {
+			for _, expectedFile := range tt.expectFiles {
 				actualBytes, err := os.ReadFile(filepath.Join(tempDir, expectedFile))
 				require.NoError(t, err)
 				actual := string(actualBytes)

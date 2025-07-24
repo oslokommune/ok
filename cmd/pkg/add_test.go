@@ -16,14 +16,29 @@ func TestAddCommand(t *testing.T) {
 		{
 			name:            "Should add package",
 			args:            []string{"databases"},
-			testdataRootDir: "testdata/add/standard-case",
+			testdataRootDir: "testdata/add/var-file",
 			releases: map[string]string{
 				"databases": "v4.0.0",
 			},
-			expectedFiles: []string{
+			expectFiles: []string{
 				"databases/packages.yml",
 				"databases/package-config.yml",
 			},
+		},
+		{
+			name:            "Should add package without var file",
+			args:            []string{"databases", "--no-var-file"},
+			testdataRootDir: "testdata/add/var-file-disabled",
+			releases: map[string]string{
+				"databases": "v4.0.0",
+			},
+			expectFiles: []string{
+				"databases/packages.yml",
+			},
+			expectNoFiles: []string{
+				"databases/package-config.yml",
+			},
+			keepTempDir: true,
 		},
 		{
 			name:            "Should fail if output directory already exists, using default dir",
@@ -32,7 +47,7 @@ func TestAddCommand(t *testing.T) {
 			releases: map[string]string{
 				"databases": "v4.0.0",
 			},
-			expectedFiles: []string{
+			expectFiles: []string{
 				"databases/packages.yml",
 				"databases/package-config.yml",
 			},
@@ -46,7 +61,7 @@ func TestAddCommand(t *testing.T) {
 			releases: map[string]string{
 				"databases": "v4.0.0",
 			},
-			expectedFiles: []string{
+			expectFiles: []string{
 				"packages.yml",
 				"_config/databases.yml",
 			},
@@ -58,7 +73,7 @@ func TestAddCommand(t *testing.T) {
 			releases: map[string]string{
 				"app": "v6.0.0",
 			},
-			expectedFiles: []string{
+			expectFiles: []string{
 				"packages.yml",
 				"_config/app-hello.yml",
 			},
@@ -67,7 +82,7 @@ func TestAddCommand(t *testing.T) {
 			name:            "Should fail if output directory already exists, using dir from argument",
 			args:            []string{"app", "app-hello"},
 			testdataRootDir: "testdata/add/dir-already-exists",
-			expectedFiles: []string{
+			expectFiles: []string{
 				"app/packages.yml",
 				"app/package-config.yml",
 			},
@@ -81,7 +96,7 @@ func TestAddCommand(t *testing.T) {
 			releases: map[string]string{
 				"databases": "v4.0.0",
 			},
-			expectedFiles: []string{
+			expectFiles: []string{
 				"databases/packages.yml",
 				"databases/package-config.yml",
 			},
@@ -150,18 +165,28 @@ func TestAddCommand(t *testing.T) {
 			err = os.Chdir(testWorkingDirectory)
 			require.NoError(t, err)
 
-			// Compare package manifest file
-			for _, expectedFile := range tt.expectedFiles {
-				actualBytes, err := os.ReadFile(filepath.Join(tempDir, expectedFile))
+			for _, expectFile := range tt.expectFiles {
+				actualBytes, err := os.ReadFile(filepath.Join(tempDir, expectFile))
 				require.NoError(t, err)
 				actual := string(actualBytes)
 
-				expectedFileFullPath := filepath.Join(tt.testdataRootDir, "expected", expectedFile)
-				expectedBytes, err := os.ReadFile(expectedFileFullPath)
+				expectFileFullPath := filepath.Join(tt.testdataRootDir, "expected", expectFile)
+				expectBytes, err := os.ReadFile(expectFileFullPath)
 				require.NoError(t, err)
-				expected := string(expectedBytes)
+				expected := string(expectBytes)
 
 				assert.Equal(t, expected, actual)
+			}
+
+			for _, expectNoFile := range tt.expectNoFiles {
+				expectNoFilePath := filepath.Join(tempDir, expectNoFile)
+
+				_, err := os.Stat(expectNoFilePath)
+				assert.True(
+					t,
+					os.IsNotExist(err),
+					"expected file %s to NOT exist, but it does", expectNoFilePath,
+				)
 			}
 		})
 	}

@@ -51,8 +51,10 @@ func NewAdder(ghReleases GitHubReleases) Adder {
 	}
 }
 
-// TODO: support no-var-file
 func (a Adder) Run(opts AddOptions) (*AddResult, error) {
+	// TODO: opts.DownloadVarFile && opts.AddSchema validate combination
+	// TODO: opts.DownloadVarFile && opts.NoVarifile validate combination
+
 	oldPackageStructure, err := common.UseOldPackageStructure(opts.CurrentDir)
 	if err != nil {
 		return nil, fmt.Errorf("checking whether to use old or new package structure: %w", err)
@@ -109,7 +111,7 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 		}
 	}
 
-	if opts.AddSchema {
+	if opts.DownloadVarFile && opts.AddSchema {
 		err = schema.SetSchemaDeclarationInVarFile(varFilePath, newPackage.Ref)
 		if err != nil {
 			return &AddResult{}, fmt.Errorf("creating or updating configuration file: %w", err)

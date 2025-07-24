@@ -14,8 +14,8 @@ type TestData struct {
 	releases        map[string]string
 	keepTempDir     bool
 
-	expectedFiles []string
-	expectNoDir   string
+	expectFiles   []string
+	expectNoFiles []string
 
 	expectError        bool
 	expectErrorMessage string

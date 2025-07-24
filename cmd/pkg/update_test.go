@@ -22,7 +22,7 @@ func TestUpdateCommand(t *testing.T) {
 				"app-common":         "v7.0.0",
 			},
 			expectError: false,
-			expectedFiles: []string{
+			expectFiles: []string{
 				"packages.yml",
 				"config/app-hello.yml",
 				"config/common-config.yml",
@@ -33,7 +33,7 @@ func TestUpdateCommand(t *testing.T) {
 			args:            []string{},
 			testdataRootDir: "testdata/update/bump-ref-field-semver-only",
 			expectError:     false,
-			expectedFiles: []string{
+			expectFiles: []string{
 				"packages.yml",
 			},
 			releases: map[string]string{
@@ -45,7 +45,7 @@ func TestUpdateCommand(t *testing.T) {
 			args:            []string{"app-hello"},
 			testdataRootDir: "testdata/update/bump-schema-version",
 			expectError:     false,
-			expectedFiles: []string{
+			expectFiles: []string{
 				"packages.yml",
 				"config/app-hello.yml",
 				"common-config.yml",
@@ -59,7 +59,7 @@ func TestUpdateCommand(t *testing.T) {
 			args:            []string{"app-hello"},
 			testdataRootDir: "testdata/update/migrate-schema-declaration-format",
 			expectError:     false,
-			expectedFiles: []string{
+			expectFiles: []string{
 				"packages.yml",
 				"config/app-hello.yml",
 				"common-config.yml",
@@ -73,7 +73,7 @@ func TestUpdateCommand(t *testing.T) {
 			args:            []string{"--recursive"},
 			testdataRootDir: "testdata/update/recursive",
 			expectError:     false,
-			expectedFiles: []string{
+			expectFiles: []string{
 				"app-common/packages.yml",
 				"app-common/config.yml",
 				"app-hello/packages.yml",
@@ -134,7 +134,7 @@ func TestUpdateCommand(t *testing.T) {
 			require.NoError(t, err)
 
 			// Compare package manifest file
-			for _, expectedFile := range tt.expectedFiles {
+			for _, expectedFile := range tt.expectFiles {
 				actualBytes, err := os.ReadFile(filepath.Join(tempDir, expectedFile))
 				require.NoError(t, err)
 				actual := string(actualBytes)

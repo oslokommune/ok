@@ -1,4 +1,4 @@
 StackName: "databases"
 
 Serverless:
-  Enable: true
+  Enable: false

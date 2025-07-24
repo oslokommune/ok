@@ -51,6 +51,7 @@ func NewAdder(ghReleases GitHubReleases) Adder {
 	}
 }
 
+// TODO: support no-var-file
 func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 	oldPackageStructure, err := common.UseOldPackageStructure(opts.CurrentDir)
 	if err != nil {

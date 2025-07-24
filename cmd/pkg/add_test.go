@@ -76,7 +76,7 @@ func TestAddCommand(t *testing.T) {
 		},
 		{
 			name:            "Should add package with specified var file",
-			args:            []string{"databases", "--var-file"},
+			args:            []string{"databases", "--var-file", "non-serverless"},
 			testdataRootDir: "testdata/add/specified-var-file",
 			releases: map[string]string{
 				"databases": "v4.0.0",
@@ -85,6 +85,17 @@ func TestAddCommand(t *testing.T) {
 				"databases/packages.yml",
 				"databases/package-config.yml",
 			},
+		},
+		{
+			name:            "Should show error if var file does not exist",
+			args:            []string{"databases", "--var-file", "some-missing-var-file"},
+			testdataRootDir: "testdata/add/var-file-missing",
+			releases: map[string]string{
+				"databases": "v4.0.0",
+			},
+			expectError:        true,
+			expectErrorMessage: "package-config-some-missing-var-file.yml: no such file or directory",
+			keepTempDir:        true,
 		},
 	}
 

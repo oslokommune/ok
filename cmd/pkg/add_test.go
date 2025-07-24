@@ -14,30 +14,6 @@ import (
 func TestAddCommand(t *testing.T) {
 	tests := []TestData{
 		{
-			name:            "Should add package with the old package manifest structure",
-			args:            []string{"databases"},
-			testdataRootDir: "testdata/add/old-structure",
-			releases: map[string]string{
-				"databases": "v4.0.0",
-			},
-			expectedFiles: []string{
-				"packages.yml",
-				"_config/databases.yml",
-			},
-		},
-		{
-			name:            "Should add package with the old package manifest structure with custom name",
-			args:            []string{"app", "app-hello"},
-			testdataRootDir: "testdata/add/old-structure-custom-stack-name",
-			releases: map[string]string{
-				"app": "v6.0.0",
-			},
-			expectedFiles: []string{
-				"packages.yml",
-				"_config/app-hello.yml",
-			},
-		},
-		{
 			name:            "Should add package",
 			args:            []string{"databases"},
 			testdataRootDir: "testdata/add/standard-case",
@@ -64,6 +40,30 @@ func TestAddCommand(t *testing.T) {
 			expectErrorMessage: "folder already exists: databases",
 		},
 		{
+			name:            "Should add package with the old package manifest structure",
+			args:            []string{"databases"},
+			testdataRootDir: "testdata/add/old-structure",
+			releases: map[string]string{
+				"databases": "v4.0.0",
+			},
+			expectedFiles: []string{
+				"packages.yml",
+				"_config/databases.yml",
+			},
+		},
+		{
+			name:            "Should add package with the old package manifest structure with custom name",
+			args:            []string{"app", "app-hello"},
+			testdataRootDir: "testdata/add/old-structure-custom-stack-name",
+			releases: map[string]string{
+				"app": "v6.0.0",
+			},
+			expectedFiles: []string{
+				"packages.yml",
+				"_config/app-hello.yml",
+			},
+		},
+		{
 			name:            "Should fail if output directory already exists, using dir from argument",
 			args:            []string{"app", "app-hello"},
 			testdataRootDir: "testdata/add/dir-already-exists",
@@ -73,6 +73,18 @@ func TestAddCommand(t *testing.T) {
 			},
 			expectError:        true,
 			expectErrorMessage: "folder already exists: app-hello",
+		},
+		{
+			name:            "Should add package with specified var file",
+			args:            []string{"databases", "--var-file"},
+			testdataRootDir: "testdata/add/specified-var-file",
+			releases: map[string]string{
+				"databases": "v4.0.0",
+			},
+			expectedFiles: []string{
+				"databases/packages.yml",
+				"databases/package-config.yml",
+			},
 		},
 	}
 

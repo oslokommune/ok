@@ -28,7 +28,7 @@ func TestInstallCommand(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Given
-			testDir, err := os.Getwd()
+			testWorkingDirectory, err := os.Getwd()
 			require.NoError(t, err)
 
 			command := pkg.NewInstallCommand() // figure out which parameters to pass here, if any
@@ -46,7 +46,7 @@ func TestInstallCommand(t *testing.T) {
 			require.NoError(t, err)
 
 			fmt.Println("tempDir: ", tempDir)
-			copyTestdataRootDirToTempDir(t, tt, tempDir)
+			copyTestdataRootDirToTempDir(t, tt, testWorkingDirectory, tempDir)
 			command.SetArgs(tt.args)
 
 			err = os.Setenv("BASE_URL", "../boilerplate-repo")
@@ -54,6 +54,9 @@ func TestInstallCommand(t *testing.T) {
 
 			err = os.Chdir(tempDir) // Works, but disables the possibility for parallel tests.
 			require.NoError(t, err)
+			defer func() {
+				err = os.Chdir(testWorkingDirectory)
+			}()
 
 			// When
 			err = command.Execute()
@@ -65,16 +68,17 @@ func TestInstallCommand(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			err = os.Chdir(testDir)
+			err = os.Chdir(testWorkingDirectory)
 			require.NoError(t, err)
 
 			// Compare package manifest file
-			for _, file := range tt.expectedFiles {
-				actualBytes, err := os.ReadFile(filepath.Join(tempDir, file))
+			for _, expectedFile := range tt.expectedFiles {
+				actualBytes, err := os.ReadFile(filepath.Join(tempDir, expectedFile))
 				require.NoError(t, err)
 				actual := string(actualBytes)
 
-				expectedBytes, err := os.ReadFile(filepath.Join(tt.testdataRootDir, "expected", file))
+				expectedFileFullPath := filepath.Join(tt.testdataRootDir, "expected", expectedFile)
+				expectedBytes, err := os.ReadFile(expectedFileFullPath)
 				require.NoError(t, err)
 				expected := string(expectedBytes)
 

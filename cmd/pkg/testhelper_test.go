@@ -21,15 +21,16 @@ type TestData struct {
 const inputDir = "input"
 const inputRootDir = "root"
 
-func copyTestdataRootDirToTempDir(t *testing.T, tt TestData, tempDir string) {
-	configDir := filepath.Join(tt.testdataRootDir, inputDir, inputRootDir)
+func copyTestdataRootDirToTempDir(t *testing.T, tt TestData, testWorkingDirectory string, tempDir string) {
+	var err error
+	rootDir := filepath.Join(tt.testdataRootDir, inputDir, inputRootDir)
 
-	_, err := os.Stat(configDir)
-	if os.IsNotExist(err) {
-		require.FailNow(t, "required test data dir does not exist", "configDir: %s", configDir)
-	}
+	//_, err := os.Stat(rootDir)
+	//if os.IsNotExist(err) {
+	//	require.FailNow(t, "required dir does not exist", "rootDir: %s", rootDir)
+	//}
 
-	srcDir := os.DirFS(configDir)
+	srcDir := os.DirFS(rootDir)
 	dstDir := tempDir
 
 	err = os.CopyFS(dstDir, srcDir)

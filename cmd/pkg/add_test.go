@@ -14,7 +14,7 @@ import (
 func TestAddCommand(t *testing.T) {
 	tests := []TestData{
 		{
-			name:            "Should add new package with the old package manifest structure",
+			name:            "Should add package with the old package manifest structure",
 			args:            []string{"databases"},
 			testdataRootDir: "testdata/add/old-structure",
 			releases: map[string]string{
@@ -27,9 +27,9 @@ func TestAddCommand(t *testing.T) {
 			keepTempDir: true,
 		},
 		{
-			name:            "Should add new package with custom name with the old package manifest structure",
+			name:            "Should add package with the old package manifest structure with custom name",
 			args:            []string{"app", "app-hello"},
-			testdataRootDir: "testdata/add/old-structure",
+			testdataRootDir: "testdata/add/old-structure-custom-stack-name",
 			releases: map[string]string{
 				"app": "v6.0.0",
 			},
@@ -37,10 +37,10 @@ func TestAddCommand(t *testing.T) {
 				"packages.yml",
 				"_config/app-hello.yml",
 			},
-			keepTempDir: true,
+			keepTempDir: false,
 		},
 		{
-			name:            "Should add new package",
+			name:            "Should add package",
 			args:            []string{"databases"},
 			testdataRootDir: "testdata/add/standard-case",
 			releases: map[string]string{
@@ -50,7 +50,7 @@ func TestAddCommand(t *testing.T) {
 				"databases/packages.yml",
 				"databases/package-config.yml",
 			},
-			keepTempDir: true,
+			keepTempDir: false,
 		},
 	}
 

@@ -5,3 +5,9 @@ Packages:
       VarFiles:
         - _config/common-config.yml
         - _config/load-balancing-alb-main.yml
+    - OutputFolder: databases
+      Template: databases
+      Ref: databases-v4.0.0
+      VarFiles:
+        - _config/common-config.yml
+        - _config/databases.yml

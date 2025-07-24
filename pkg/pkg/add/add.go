@@ -15,13 +15,12 @@ import (
 )
 
 type AddOptions struct {
-	CurrentDir                   string
-	TemplateName                 string
-	OutputFolder                 string
-	ConsolidatedPackageStructure bool
-	AddSchema                    bool
-	DownloadVarFile              bool
-	VarFile                      string
+	CurrentDir      string
+	TemplateName    string
+	OutputFolder    string
+	AddSchema       bool
+	DownloadVarFile bool
+	VarFile         string
 }
 
 type AddResult struct {
@@ -77,7 +76,7 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 		return nil, err
 	}
 
-	newPackage, err := createNewPackage(manifest, opts.TemplateName, pkgRef, opts.OutputFolder, opts.ConsolidatedPackageStructure)
+	newPackage, err := createNewPackage(manifest, opts.TemplateName, pkgRef, opts.OutputFolder, oldPackageStructure)
 	if err != nil {
 		return nil, fmt.Errorf("creating new package: %w", err)
 	}

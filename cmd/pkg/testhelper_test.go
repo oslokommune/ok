@@ -23,12 +23,12 @@ const inputRootDir = "root"
 
 func copyTestdataRootDirToTempDir(t *testing.T, tt TestData, testWorkingDirectory string, tempDir string) {
 	var err error
-	rootDir := filepath.Join(tt.testdataRootDir, inputDir, inputRootDir)
+	rootDir := filepath.Join(testWorkingDirectory, tt.testdataRootDir, inputDir, inputRootDir)
 
-	//_, err := os.Stat(rootDir)
-	//if os.IsNotExist(err) {
-	//	require.FailNow(t, "required dir does not exist", "rootDir: %s", rootDir)
-	//}
+	_, err = os.Stat(rootDir)
+	if os.IsNotExist(err) {
+		require.FailNow(t, "required dir does not exist", "rootDir: %s", rootDir)
+	}
 
 	srcDir := os.DirFS(rootDir)
 	dstDir := tempDir

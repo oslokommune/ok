@@ -64,6 +64,16 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 		packagesManifestFilename = filepath.Join(opts.OutputFolder, common.PackagesManifestFilename)
 	}
 
+	manifest, err := common.LoadPackageManifest(packagesManifestFilename)
+	if err != nil {
+		return nil, err
+	}
+
+	err = createErrorIfOutputFolderExists(manifest, opts.OutputFolder)
+	if err != nil {
+		return nil, err
+	}
+
 	templateVersion, err := a.getTemplateVersion(opts.TemplateName)
 	if err != nil {
 		return nil, fmt.Errorf("getting template version: %w", err)
@@ -71,17 +81,12 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 
 	pkgRef := fmt.Sprintf("%s-%s", opts.TemplateName, templateVersion)
 
-	manifest, err := common.LoadPackageManifest(packagesManifestFilename)
-	if err != nil {
-		return nil, err
-	}
-
 	newPackage, err := createNewPackage(manifest, opts.TemplateName, pkgRef, opts.OutputFolder, oldPackageStructure)
 	if err != nil {
 		return nil, fmt.Errorf("creating new package: %w", err)
 	}
 
-	err = createErrorIfOutputFolderAlreadyExists(manifest, newPackage)
+	err = createErrorIfPackageExistsInManifest(manifest, newPackage)
 	if err != nil {
 		return nil, err
 	}
@@ -126,6 +131,24 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 		TemplateName:    opts.TemplateName,
 		TemplateVersion: templateVersion,
 	}, nil
+}
+
+func createErrorIfOutputFolderExists(manifest common.PackageManifest, outputFolder string) error {
+	// If we are generating GHA there is no restriction on output folder
+	if manifest.PackagePrefix() == common.BoilerplatePackageGitHubActionsPath {
+		return nil
+	}
+
+	info, err := os.Stat(outputFolder)
+	if err == nil && info.IsDir() {
+		return fmt.Errorf("folder already exists: %s", outputFolder)
+	}
+
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("unable to verify folder existence: %w", err)
+	}
+
+	return nil
 }
 
 func (a Adder) getTemplateVersion(templateName string) (string, error) {
@@ -182,7 +205,7 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 	return newPackage, nil
 }
 
-func createErrorIfOutputFolderAlreadyExists(manifest common.PackageManifest, newPackage common.Package) error {
+func createErrorIfPackageExistsInManifest(manifest common.PackageManifest, newPackage common.Package) error {
 	// If we are generating GHA there is no restriction on output folder
 	if manifest.PackagePrefix() == common.BoilerplatePackageGitHubActionsPath {
 		return nil

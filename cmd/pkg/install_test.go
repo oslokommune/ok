@@ -21,7 +21,6 @@ func TestInstallCommand(t *testing.T) {
 				"app-hello/.boilerplate/_template_app.json",
 				"networking/.boilerplate/_template_networking.json",
 			},
-			keepTempDir: true,
 		},
 	}
 

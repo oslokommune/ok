@@ -24,7 +24,6 @@ func TestAddCommand(t *testing.T) {
 				"packages.yml",
 				"_config/databases.yml",
 			},
-			keepTempDir: true,
 		},
 		{
 			name:            "Should add package with the old package manifest structure with custom name",
@@ -37,7 +36,6 @@ func TestAddCommand(t *testing.T) {
 				"packages.yml",
 				"_config/app-hello.yml",
 			},
-			keepTempDir: false,
 		},
 		{
 			name:            "Should add package",
@@ -50,7 +48,31 @@ func TestAddCommand(t *testing.T) {
 				"databases/packages.yml",
 				"databases/package-config.yml",
 			},
-			keepTempDir: false,
+		},
+		{
+			name:            "Should fail if output directory already exists, using default dir",
+			args:            []string{"databases"},
+			testdataRootDir: "testdata/add/dir-already-exists",
+			releases: map[string]string{
+				"databases": "v4.0.0",
+			},
+			expectedFiles: []string{
+				"databases/packages.yml",
+				"databases/package-config.yml",
+			},
+			expectError:        true,
+			expectErrorMessage: "folder already exists: databases",
+		},
+		{
+			name:            "Should fail if output directory already exists, using dir from argument",
+			args:            []string{"app", "app-hello"},
+			testdataRootDir: "testdata/add/dir-already-exists",
+			expectedFiles: []string{
+				"app/packages.yml",
+				"app/package-config.yml",
+			},
+			expectError:        true,
+			expectErrorMessage: "folder already exists: app-hello",
 		},
 	}
 
@@ -96,6 +118,8 @@ func TestAddCommand(t *testing.T) {
 			// Then
 			if tt.expectError {
 				assert.Error(t, err, "expected an error")
+				assert.Contains(t, err.Error(), tt.expectErrorMessage)
+
 				return
 			}
 			require.NoError(t, err)

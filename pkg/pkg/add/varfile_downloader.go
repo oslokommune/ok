@@ -13,7 +13,6 @@ func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFil
 	// - [x] ok pkg add app hello --var-file default
 	// - [ ] ok pkg add databases --var-file non-serverless
 
-	// TODO: Validate this earlier.
 	if _, err := os.Stat(varFilePath); err == nil {
 		return fmt.Errorf("file already exists: %s", varFilePath)
 	}

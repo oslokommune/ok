@@ -16,7 +16,7 @@ func NewAddCommand(ghReleases add.GitHubReleases) *cobra.Command {
 	var flagAddCommandVarFile string
 
 	cmd := &cobra.Command{
-		Use:   "add template [outputFolder]",
+		Use:   "add <template> [outputFolder]",
 		Short: "Add the Boilerplate template to the package manifest with an optional output folder",
 		Long: `Add the Boilerplate template to the package manifest with an optional output folder.
 The template version is fetched from the latest GitHub release in the template repository.

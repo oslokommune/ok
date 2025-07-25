@@ -70,19 +70,19 @@ func TestUseOldPackageStructure(t *testing.T) {
 			expectedError:  false,
 		},
 		{
-			name:           "should not use consolidated packages.yml by default",
+			name:           "should not use old packages.yml by default",
 			setup:          func(baseDir string, t *testing.T) {},
 			expectedResult: false,
 			expectedError:  false,
 		},
 		{
-			name:           "should not use consolidated packages.yml when only packages.yml is present in dir",
+			name:           "should not use old packages.yml when only packages.yml is present in dir",
 			setup:          func(baseDir string, t *testing.T) {},
 			expectedResult: false,
 			expectedError:  false,
 		},
 		{
-			name: "should not use consolidated packages.yml when only _config is present in dir",
+			name: "should not use old packages.yml when only _config is present in dir",
 			setup: func(baseDir string, t *testing.T) {
 				os.MkdirAll(filepath.Join(baseDir, BoilerplatePackageTerraformConfigPrefix), 0755)
 				require.NoError(t, err)

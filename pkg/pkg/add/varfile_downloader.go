@@ -42,7 +42,7 @@ func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFil
 		newPackage.Ref,
 	)
 	if err != nil && strings.Contains(err.Error(), "no file named") {
-		return createErrorDetails(err, newPackage)
+		return createErrorDetails(err, varFileUrl, varFilePath)
 	} else if err != nil {
 		return fmt.Errorf("downloading file from GitHub: %w", err)
 	}
@@ -96,20 +96,22 @@ func updateStackName(fileString, outputFolder string) string {
 	return fileString
 }
 
-func createErrorDetails(sourceError error, newPackage common.Package) error {
+func createErrorDetails(
+	sourceError error, varFileUrl string, varFilePath string,
+) error {
 
 	var errorDetails string
 	errorDetails += fmt.Sprintf(
-		"Template %s is missing var file %s.\n",
-		error_user_msg.StyleHighlight.Render(newPackage.Template),
-		error_user_msg.StyleHighlight.Render("package-config-default.yml"),
+		"Could not find var file in central repository: %s.\n",
+		varFileUrl,
 	)
 
 	errorDetails += fmt.Sprintln()
 	errorDetails += fmt.Sprintln(error_user_msg.StyleTitle.Render("Possible solutions:"))
 	errorDetails += fmt.Sprintf(
-		"- Use flag %s to remove this error.\n",
+		"- Use flag %s to remove this error. Then create file %s manually.\n",
 		error_user_msg.StyleHighlight.Render("--"+FlagNoVar),
+		error_user_msg.StyleHighlight.Render(varFilePath),
 	)
 	errorDetails += fmt.Sprintf("- Ask maintainers to fix this error.\n")
 

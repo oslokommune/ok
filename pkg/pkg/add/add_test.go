@@ -12,23 +12,23 @@ import (
 
 func TestCreateNewPackage(t *testing.T) {
 	tests := []struct {
-		name                         string
-		manifest                     common.PackageManifest
-		templateName                 string
-		gitRef                       string
-		outputFolder                 string
-		consolidatedPackageStructure bool
-		expected                     common.Package
+		name                string
+		manifest            common.PackageManifest
+		templateName        string
+		gitRef              string
+		outputFolder        string
+		oldPackageStructure bool
+		expected            common.Package
 	}{
 		{
 			name: "default package",
 			manifest: common.PackageManifest{
 				DefaultPackagePathPrefix: "",
 			},
-			templateName:                 "template1",
-			gitRef:                       "template1-v1.0.0",
-			outputFolder:                 "folder1",
-			consolidatedPackageStructure: true,
+			templateName:        "template1",
+			gitRef:              "template1-v1.0.0",
+			outputFolder:        "folder1",
+			oldPackageStructure: true,
 			expected: common.Package{
 				Template:     "template1",
 				Ref:          "template1-v1.0.0",
@@ -41,10 +41,10 @@ func TestCreateNewPackage(t *testing.T) {
 			manifest: common.PackageManifest{
 				DefaultPackagePathPrefix: common.BoilerplatePackageGitHubActionsPath,
 			},
-			templateName:                 "template2",
-			gitRef:                       "template2-v2.0.0",
-			outputFolder:                 "folder2",
-			consolidatedPackageStructure: true,
+			templateName:        "template2",
+			gitRef:              "template2-v2.0.0",
+			outputFolder:        "folder2",
+			oldPackageStructure: true,
 			expected: common.Package{
 				Template:     "template2",
 				Ref:          "template2-v2.0.0",
@@ -57,10 +57,10 @@ func TestCreateNewPackage(t *testing.T) {
 			manifest: common.PackageManifest{
 				DefaultPackagePathPrefix: "custom/prefix",
 			},
-			templateName:                 "template3",
-			gitRef:                       "template3-v3.0.0",
-			outputFolder:                 "folder3",
-			consolidatedPackageStructure: true,
+			templateName:        "template3",
+			gitRef:              "template3-v3.0.0",
+			outputFolder:        "folder3",
+			oldPackageStructure: true,
 			expected: common.Package{
 				Template:     "template3",
 				Ref:          "template3-v3.0.0",
@@ -73,10 +73,10 @@ func TestCreateNewPackage(t *testing.T) {
 			manifest: common.PackageManifest{
 				DefaultPackagePathPrefix: "",
 			},
-			templateName:                 "template4",
-			gitRef:                       "template4-v4.0.0",
-			outputFolder:                 "folder4",
-			consolidatedPackageStructure: false,
+			templateName:        "template4",
+			gitRef:              "template4-v4.0.0",
+			outputFolder:        "folder4",
+			oldPackageStructure: false,
 			expected: common.Package{
 				Template:     "template4",
 				Ref:          "template4-v4.0.0",
@@ -89,10 +89,10 @@ func TestCreateNewPackage(t *testing.T) {
 			manifest: common.PackageManifest{
 				DefaultPackagePathPrefix: "",
 			},
-			templateName:                 "template5",
-			gitRef:                       "template5-v5.0.0",
-			outputFolder:                 "dir/folder5",
-			consolidatedPackageStructure: false,
+			templateName:        "template5",
+			gitRef:              "template5-v5.0.0",
+			outputFolder:        "dir/folder5",
+			oldPackageStructure: false,
 			expected: common.Package{
 				Template:     "template5",
 				Ref:          "template5-v5.0.0",
@@ -104,7 +104,7 @@ func TestCreateNewPackage(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := createNewPackage(tt.manifest, tt.templateName, tt.gitRef, tt.outputFolder, tt.consolidatedPackageStructure)
+			result, err := createNewPackage(tt.manifest, tt.templateName, tt.gitRef, tt.outputFolder, tt.oldPackageStructure)
 			require.NoError(t, err)
 			require.Equal(t, tt.expected, result)
 		})

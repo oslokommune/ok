@@ -55,9 +55,6 @@ func NewAdder(ghReleases GitHubReleases) Adder {
 }
 
 func (a Adder) Run(opts AddOptions) error {
-	// TODO: opts.DownloadVarFile && opts.AddSchema validate combination
-	// TODO: opts.DownloadVarFile && opts.NoVarifile validate combination
-
 	oldPackageStructure, err := common.UseOldPackageStructure(opts.CurrentDir)
 	if err != nil {
 		return fmt.Errorf("checking whether to use old or new package structure: %w", err)

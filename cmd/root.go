@@ -59,7 +59,6 @@ func Execute() {
 			fmt.Println()
 			fmt.Println(error_user_msg.StyleTitle.Render("Details:"))
 			fmt.Println(userError.Details())
-			//fmt.Println()
 		}
 
 		os.Exit(1)

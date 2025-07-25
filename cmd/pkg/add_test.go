@@ -15,8 +15,21 @@ func TestAddCommand(t *testing.T) {
 	tests := []TestData{
 		{
 			name:            "Should add package",
+			args:            []string{"databases"},
+			testdataRootDir: "testdata/add/databases",
+			releases: map[string]string{
+				"databases": "v4.0.0",
+			},
+			expectFiles: []string{
+				"databases/packages.yml",
+				"databases/package-config.yml",
+			},
+			keepTempDir: true,
+		},
+		{
+			name:            "Should add package in output folder",
 			args:            []string{"app", "app-hello"},
-			testdataRootDir: "testdata/add/var-file",
+			testdataRootDir: "testdata/add/app-hello",
 			releases: map[string]string{
 				"app": "v6.0.0",
 			},
@@ -24,7 +37,6 @@ func TestAddCommand(t *testing.T) {
 				"app-hello/packages.yml",
 				"app-hello/package-config.yml",
 			},
-			keepTempDir: true,
 		},
 		{
 			name:            "Should fail if output directory already exists, using default dir",
@@ -96,7 +108,6 @@ func TestAddCommand(t *testing.T) {
 			},
 			expectError:        true,
 			expectErrorMessage: "package-config-some-missing-var-file.yml: no such file or directory",
-			keepTempDir:        true,
 		},
 		{
 			name:            "Should add package without var file",
@@ -111,7 +122,6 @@ func TestAddCommand(t *testing.T) {
 			expectNoFiles: []string{
 				"databases/package-config.yml",
 			},
-			keepTempDir: true,
 		},
 	}
 

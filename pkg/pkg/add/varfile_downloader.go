@@ -2,7 +2,9 @@ package add
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/oslokommune/ok/pkg/error_user_msg"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"os"
 	"path/filepath"
@@ -40,16 +42,18 @@ func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFil
 		newPackage.Ref,
 	)
 	if err != nil && strings.Contains(err.Error(), "no file named") {
-		_, _ = fmt.Fprintln(os.Stderr, "")
-		_, _ = fmt.Fprintf(
-			os.Stderr,
-			"Template '%s' is missing var file: %s\n",
+		errorDetails := fmt.Sprintf(
+			"Template '%s' is missing var file %s.\n",
 			newPackage.Template,
 			varFileDownloadFilename,
 		)
-		_, _ = fmt.Fprintf(os.Stderr, "Use flag --%s to remove this error.\n", FlagNoVar)
+		errorDetails += fmt.Sprintf("Use flag --%s to remove this error.", FlagNoVar)
 
-		return fmt.Errorf("var file missing for template")
+		// Replace error with a new error that has the same error message and sub error, but
+		// some nice error details alongside.
+		errWithMsg := error_user_msg.NewError(err.Error(), errorDetails, errors.Unwrap(err))
+		return &errWithMsg
+
 	} else if err != nil {
 		return fmt.Errorf("downloading file from GitHub: %w", err)
 	}

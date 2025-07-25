@@ -24,7 +24,6 @@ func TestAddCommand(t *testing.T) {
 				"databases/packages.yml",
 				"databases/package-config.yml",
 			},
-			keepTempDir: true,
 		},
 		{
 			name:            "Should add package in output folder",
@@ -36,6 +35,18 @@ func TestAddCommand(t *testing.T) {
 			expectFiles: []string{
 				"app-hello/packages.yml",
 				"app-hello/package-config.yml",
+			},
+		},
+		{
+			name:            "Should add package in output folder, without data folder",
+			args:            []string{"databases", "my-db"},
+			testdataRootDir: "testdata/add/my-db",
+			releases: map[string]string{
+				"databases": "v4.0.0",
+			},
+			expectFiles: []string{
+				"my-db/packages.yml",
+				"my-db/package-config.yml",
 			},
 		},
 		{

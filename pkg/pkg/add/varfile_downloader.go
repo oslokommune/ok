@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFilePath string, outputFolder string) error {
@@ -38,7 +39,18 @@ func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFil
 		path,
 		newPackage.Ref,
 	)
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), "no file named") {
+		_, _ = fmt.Fprintln(os.Stderr, "")
+		_, _ = fmt.Fprintf(
+			os.Stderr,
+			"Template '%s' is missing var file: %s\n",
+			newPackage.Template,
+			varFileDownloadFilename,
+		)
+		_, _ = fmt.Fprintf(os.Stderr, "Use flag --%s to remove this error.\n", FlagNoVar)
+
+		return fmt.Errorf("var file missing for template")
+	} else if err != nil {
 		return fmt.Errorf("downloading file from GitHub: %w", err)
 	}
 

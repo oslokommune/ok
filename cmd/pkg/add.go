@@ -32,7 +32,7 @@ ok pkg add app ecommerce-api
 			outputFolder := getArg(args, 1, templateName)
 
 			if flagAddCommandVarFile != "default" && flagAddCommandNoVarFile {
-				return fmt.Errorf("cannot use both --var-file and --no-var-file flags")
+				return fmt.Errorf("cannot use both --var-file and --%s flags", add.FlagNoVar)
 			}
 
 			currentDir, err := os.Getwd()
@@ -68,7 +68,7 @@ ok pkg add app ecommerce-api
 
 	cmd.Flags().BoolVar(&flagAddCommandNoSchema, "no-schema", false, "Do not add the JSON schema for the package ")
 	cmd.Flags().StringVarP(&flagAddCommandVarFile, "var-file", "v", "default", "Download a var file for the package with the specified name.")
-	cmd.Flags().BoolVarP(&flagAddCommandNoVarFile, "no-var-file", "s", false, "Do not download a var file for the package")
+	cmd.Flags().BoolVarP(&flagAddCommandNoVarFile, add.FlagNoVar, "s", false, "Do not download a var file for the package")
 
 	return cmd
 }

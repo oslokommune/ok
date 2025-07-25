@@ -50,20 +50,16 @@ func Execute() {
 			Bold(true).
 			Foreground(lipgloss.Color("1")) // Red text
 
-		blueStyle := lipgloss.NewStyle().
-			Bold(true).
-			Foreground(lipgloss.Color("4"))
-
 		fmt.Println()
 		fmt.Println(redStyle.Render("Error:"))
 		prettyPrintError(err)
-		fmt.Println()
 
 		var userError *error_user_msg.ErrorUserMessage
 		if errors.As(err, &userError) {
-			fmt.Println(blueStyle.Render("Details:"))
-			fmt.Println(userError.Details())
 			fmt.Println()
+			fmt.Println(error_user_msg.StyleTitle.Render("Details:"))
+			fmt.Println(userError.Details())
+			//fmt.Println()
 		}
 
 		os.Exit(1)

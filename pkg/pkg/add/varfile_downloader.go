@@ -42,18 +42,7 @@ func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFil
 		newPackage.Ref,
 	)
 	if err != nil && strings.Contains(err.Error(), "no file named") {
-		errorDetails := fmt.Sprintf(
-			"Template '%s' is missing var file %s.\n",
-			newPackage.Template,
-			varFileDownloadFilename,
-		)
-		errorDetails += fmt.Sprintf("Use flag --%s to remove this error.", FlagNoVar)
-
-		// Replace error with a new error that has the same error message and sub error, but
-		// some nice error details alongside.
-		errWithMsg := error_user_msg.NewError(err.Error(), errorDetails, errors.Unwrap(err))
-		return &errWithMsg
-
+		return createErrorDetails(err, newPackage)
 	} else if err != nil {
 		return fmt.Errorf("downloading file from GitHub: %w", err)
 	}
@@ -105,4 +94,27 @@ func updateStackName(fileString, outputFolder string) string {
 	})
 
 	return fileString
+}
+
+func createErrorDetails(sourceError error, newPackage common.Package) error {
+
+	var errorDetails string
+	errorDetails += fmt.Sprintf(
+		"Template %s is missing var file %s.\n",
+		error_user_msg.StyleHighlight.Render(newPackage.Template),
+		error_user_msg.StyleHighlight.Render("package-config-default.yml"),
+	)
+
+	errorDetails += fmt.Sprintln()
+	errorDetails += fmt.Sprintln(error_user_msg.StyleTitle.Render("Possible solutions:"))
+	errorDetails += fmt.Sprintf(
+		"- Use flag %s to remove this error.\n",
+		error_user_msg.StyleHighlight.Render("--"+FlagNoVar),
+	)
+	errorDetails += fmt.Sprintf("- Ask maintainers to fix this error.\n")
+
+	// Replace error with a new error that has the same error message and sub error, but
+	// some nice error details alongside.
+	errWithMsg := error_user_msg.NewError(sourceError.Error(), errorDetails, errors.Unwrap(sourceError))
+	return &errWithMsg
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 )
 
-const FlagNoVar = "no-var"
+const FlagNoVar = "no-var-file"
 
 type AddOptions struct {
 	CurrentDir      string

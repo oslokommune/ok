@@ -60,7 +60,7 @@ ok pkg add app ecommerce-api
 	}
 
 	cmd.Flags().BoolVar(&flagAddCommandNoSchema, "no-schema", false, "Do not add the JSON schema for the package ")
-	cmd.Flags().StringVarP(&flagAddCommandVarFile, "var-file", "v", "default", "Download a var file for the package with the specified name.")
+	cmd.Flags().StringVarP(&flagAddCommandVarFile, "var-file", "v", "default", "Download a var file for the package with the specified name")
 	cmd.Flags().BoolVarP(&flagAddCommandNoVarFile, add.FlagNoVar, "s", false, "Do not download a var file for the package")
 
 	return cmd

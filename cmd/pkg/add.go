@@ -32,7 +32,7 @@ ok pkg add app ecommerce-api
 			outputFolder := getArg(args, 1, templateName)
 
 			if flagAddCommandVarFile != "default" && flagAddCommandNoVarFile {
-				return fmt.Errorf("cannot use both --var-file and --no-var-file flags at the same time")
+				return fmt.Errorf("cannot use both --var-file and --no-var-file flags")
 			}
 
 			currentDir, err := os.Getwd()

@@ -33,8 +33,8 @@ func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFil
 
 	fileBytes, err := a.ghReleases.DownloadGithubFile(
 		context.Background(),
-		"oslokommune",
-		"golden-path-boilerplate",
+		common.BoilerplateRepoOwner,
+		common.BoilerplateRepoName,
 		path,
 		newPackage.Ref,
 	)
@@ -43,38 +43,50 @@ func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFil
 	}
 
 	fileString := string(fileBytes)
+	fileString = updateStackName(fileString, outputFolder)
+	fileBytes = []byte(fileString)
 
+	err = os.WriteFile(varFilePath, fileBytes, 0644)
+	if err != nil {
+		return fmt.Errorf("writing to file: %w", err)
+	}
+
+	return nil
+}
+
+var regexStackName = regexp.MustCompile(`StackName:\s*"[\w\-]*"`)
+var regexStackNameForData = regexp.MustCompile(`([\w\-]+)\.StackName:\s*"[\w\-]*"`)
+
+// updateStackName sets StackName in a var file.
+func updateStackName(fileString, outputFolder string) string {
 	/*
-		StackName: "load-balancing-alb-main"
-		load-balancing-alb-data.StackName: "load-balancing-alb-main-data"
+		Here are some examples of which cases to support.
 
+		Example 1: Single stack, no data-stack.
 		StackName: "backup"
 
+		Example 2: Main stack and data stack.
 		StackName: "app-km"
 		app-data.StackName: "app-km-data"
 	*/
 
 	var replacement string
 
+	// Replace StackName on line 1
 	replacement = fmt.Sprintf(`StackName: "%s"`, outputFolder)
 	fileString = regexStackName.ReplaceAllString(fileString, replacement)
 
+	// Replace StackName on line 2, the one with "-data" in it
 	fileString = regexStackNameForData.ReplaceAllStringFunc(fileString, func(m string) string {
 		submatches := regexStackNameForData.FindStringSubmatch(m)
+
 		if len(submatches) >= 2 {
 			templateNameWithData := submatches[1]
 			return fmt.Sprintf(`%s.StackName: "%s"`, templateNameWithData, outputFolder+"-data")
 		}
+
 		return m
 	})
 
-	fileBytes = []byte(fileString)
-	err = os.WriteFile(varFilePath, fileBytes, 0644)
-	if err != nil {
-		return fmt.Errorf("writing to file: %w", err)
-	}
-	return err
+	return fileString
 }
-
-var regexStackName = regexp.MustCompile(`StackName:\s*"[\w\-]*"`)
-var regexStackNameForData = regexp.MustCompile(`([\w\-]+)\.StackName:\s*"[\w\-]*"`)

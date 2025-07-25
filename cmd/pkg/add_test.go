@@ -21,8 +21,8 @@ func TestAddCommand(t *testing.T) {
 				"app": "v6.0.0",
 			},
 			expectFiles: []string{
-				"app/packages.yml",
-				"app/package-config.yml",
+				"app-hello/packages.yml",
+				"app-hello/package-config.yml",
 			},
 			keepTempDir: true,
 		},

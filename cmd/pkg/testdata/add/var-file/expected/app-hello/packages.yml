@@ -1,7 +1,7 @@
 Packages:
     - OutputFolder: .
-      Template: databases
-      Ref: databases-v4.0.0
+      Template: app
+      Ref: app-v6.0.0
       VarFiles:
         - ../common-config.yml
         - package-config.yml

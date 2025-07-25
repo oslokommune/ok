@@ -156,7 +156,7 @@ func TestAllowDuplicateOutputFolder(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := createErrorIfPackageExistsInManifest(tt.manifest, tt.newPackage)
+			err := createErrorIfPackageExistsInManifest(tt.manifest, "packages.yml", tt.newPackage)
 			if tt.expectedError {
 				require.Error(t, err)
 			} else {

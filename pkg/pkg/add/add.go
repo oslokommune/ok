@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/oslokommune/ok/pkg/error_user_msg"
 	"os"
 	"path/filepath"
 	"strings"
@@ -53,13 +54,13 @@ func NewAdder(ghReleases GitHubReleases) Adder {
 	}
 }
 
-func (a Adder) Run(opts AddOptions) (*AddResult, error) {
+func (a Adder) Run(opts AddOptions) error {
 	// TODO: opts.DownloadVarFile && opts.AddSchema validate combination
 	// TODO: opts.DownloadVarFile && opts.NoVarifile validate combination
 
 	oldPackageStructure, err := common.UseOldPackageStructure(opts.CurrentDir)
 	if err != nil {
-		return nil, fmt.Errorf("checking whether to use old or new package structure: %w", err)
+		return fmt.Errorf("checking whether to use old or new package structure: %w", err)
 	}
 
 	var packagesManifestFilename string
@@ -71,29 +72,29 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 
 	manifest, err := common.LoadPackageManifest(packagesManifestFilename)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = createErrorIfOutputFolderExists(manifest, opts.OutputFolder)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	templateVersion, err := a.getTemplateVersion(opts.TemplateName)
 	if err != nil {
-		return nil, fmt.Errorf("getting template version: %w", err)
+		return fmt.Errorf("getting template version: %w", err)
 	}
 
 	pkgRef := fmt.Sprintf("%s-%s", opts.TemplateName, templateVersion)
 
 	newPackage, err := createNewPackage(manifest, opts.TemplateName, pkgRef, opts.OutputFolder, oldPackageStructure)
 	if err != nil {
-		return nil, fmt.Errorf("creating new package: %w", err)
+		return fmt.Errorf("creating new package: %w", err)
 	}
 
-	err = createErrorIfPackageExistsInManifest(manifest, newPackage)
+	err = createErrorIfPackageExistsInManifest(manifest, packagesManifestFilename, newPackage)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	manifest.Packages = append(manifest.Packages, newPackage)
@@ -101,7 +102,7 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 	fmt.Printf("Creating package manifest %s\n", packagesManifestFilename)
 	err = common.SavePackageManifest(packagesManifestFilename, manifest)
 	if err != nil {
-		return nil, fmt.Errorf("saving package manifest: %w", err)
+		return fmt.Errorf("saving package manifest: %w", err)
 	}
 
 	varFilePath := getVarFilePath(oldPackageStructure, manifest, opts.OutputFolder)
@@ -109,33 +110,31 @@ func (a Adder) Run(opts AddOptions) (*AddResult, error) {
 	if opts.DownloadVarFile {
 		err = a.downloadVarFile(newPackage, opts.VarFile, varFilePath, opts.OutputFolder)
 		if err != nil {
-			return &AddResult{}, fmt.Errorf("downloading var file: %w", err)
+			return fmt.Errorf("downloading var file: %w", err)
 		}
 	}
 
 	if opts.DownloadVarFile && opts.AddSchema {
 		err = schema.SetSchemaDeclarationInVarFile(varFilePath, newPackage.Ref)
 		if err != nil {
-			return &AddResult{}, fmt.Errorf("creating or updating configuration file: %w", err)
+			return fmt.Errorf("creating or updating configuration file: %w", err)
 		}
 	}
 
-	if oldPackageStructure {
-		nonExistingConfigFiles := findNonExistingConfigurationFiles(newPackage.VarFiles)
-		if len(nonExistingConfigFiles) > 0 {
-			fmt.Println("Create the following configuration files:")
-			for _, configFile := range nonExistingConfigFiles {
-				fmt.Printf("- %s\n", configFile)
-			}
-		}
-	}
+	fmt.Println()
+	fmt.Printf("✅ Successfully added package %s to directory %s.\n",
+		error_user_msg.StyleHighlight.Render(
+			fmt.Sprintf("%s-%s", opts.TemplateName, templateVersion),
+		),
+		error_user_msg.StyleHighlight.Render(manifest.PackageOutputFolder(opts.OutputFolder)),
+	)
+	fmt.Println()
+	fmt.Printf("%sOpen %s to configure your stack.\n",
+		error_user_msg.StyleHighlight.Render("Next step: "),
+		error_user_msg.StyleHighlight.Render(varFilePath),
+	)
 
-	return &AddResult{
-		OutputFolder:    manifest.PackageOutputFolder(opts.OutputFolder),
-		VarFiles:        newPackage.VarFiles,
-		TemplateName:    opts.TemplateName,
-		TemplateVersion: templateVersion,
-	}, nil
+	return nil
 }
 
 func createErrorIfOutputFolderExists(manifest common.PackageManifest, outputFolder string) error {
@@ -210,7 +209,9 @@ func createNewPackage(manifest common.PackageManifest, templateName, gitRef, out
 	return newPackage, nil
 }
 
-func createErrorIfPackageExistsInManifest(manifest common.PackageManifest, newPackage common.Package) error {
+func createErrorIfPackageExistsInManifest(
+	manifest common.PackageManifest, packagesManifestFilename string, newPackage common.Package,
+) error {
 	// If we are generating GHA there is no restriction on output folder
 	if manifest.PackagePrefix() == common.BoilerplatePackageGitHubActionsPath {
 		return nil
@@ -218,7 +219,11 @@ func createErrorIfPackageExistsInManifest(manifest common.PackageManifest, newPa
 
 	for _, pkg := range manifest.Packages {
 		if pkg.OutputFolder == newPackage.OutputFolder {
-			return fmt.Errorf("output folder %s already exists in packages manifest", newPackage.OutputFolder)
+			return fmt.Errorf(
+				"output folder %s already exists in package manifest %s",
+				newPackage.OutputFolder,
+				packagesManifestFilename,
+			)
 		}
 	}
 	return nil

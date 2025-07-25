@@ -43,7 +43,7 @@ ok pkg add app ecommerce-api
 
 			adder := add.NewAdder(ghReleases)
 
-			result, err := adder.Run(add.AddOptions{
+			err = adder.Run(add.AddOptions{
 				CurrentDir:      currentDir,
 				TemplateName:    templateName,
 				OutputFolder:    outputFolder,
@@ -54,13 +54,6 @@ ok pkg add app ecommerce-api
 			if err != nil {
 				return err
 			}
-
-			fmt.Println()
-			fmt.Printf("✅ Successfully added package %s-%s to directory %s\n",
-				result.TemplateName,
-				result.TemplateVersion,
-				result.OutputFolder,
-			)
 
 			return nil
 		},

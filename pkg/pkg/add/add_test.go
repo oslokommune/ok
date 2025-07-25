@@ -180,14 +180,14 @@ func TestUpdateSchemaConfig(t *testing.T) {
 		expectedError       bool
 	}{
 		{
-			name:                "consolidated package structure",
+			name:                "old package structure",
 			oldPackageStructure: true,
 			outputFolder:        "my-output",
 			expectedFilePath:    "_config/my-output.yml",
 			expectedError:       false,
 		},
 		{
-			name:                "non-consolidated package structure",
+			name:                "non-old package structure",
 			oldPackageStructure: false,
 			outputFolder:        "my-output",
 			expectedFilePath:    "my-output/" + common.DefaultVarFileName + ".yml",

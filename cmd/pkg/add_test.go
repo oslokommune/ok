@@ -2,6 +2,7 @@ package pkg_test
 
 import (
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"os"
 	"path/filepath"
 	"testing"
@@ -161,6 +162,16 @@ func TestAddCommand(t *testing.T) {
 				"databases/package-config.yml",
 			},
 		},
+		{
+			name:            "Should use base URI",
+			args:            []string{"databases"},
+			testdataRootDir: "testdata/add/base-url",
+			baseUrl:         "boilerplate-repo",
+			expectFiles: []string{
+				"databases/packages.yml",
+				"databases/package-config.yml",
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -192,6 +203,11 @@ func TestAddCommand(t *testing.T) {
 			fmt.Println("tempDir: ", tempDir)
 			copyTestdataRootDirToTempDir(t, tt, testWorkingDirectory, tempDir)
 			command.SetArgs(tt.args)
+
+			if len(tt.baseUrl) > 0 {
+				err = os.Setenv(common.BaseUrlEnvName, tt.baseUrl)
+				require.NoError(t, err)
+			}
 
 			var workingDirectory string
 			if len(tt.workingDirectoryFromRootDir) == 0 {

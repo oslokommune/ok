@@ -1,0 +1,7 @@
+Packages:
+    - OutputFolder: .
+      Template: databases
+      Ref: databases-using-base-url-not-relevant
+      VarFiles:
+        - ../common-config.yml
+        - package-config.yml

@@ -16,20 +16,14 @@ import (
 
 const FlagNoVar = "no-var-file"
 
-type AddOptions struct {
+type Options struct {
+	BaseUrl         string
 	CurrentDir      string
 	TemplateName    string
 	OutputFolder    string
 	AddSchema       bool
 	DownloadVarFile bool
 	VarFile         string
-}
-
-type AddResult struct {
-	OutputFolder    string
-	VarFiles        []string
-	TemplateName    string
-	TemplateVersion string
 }
 
 /**
@@ -53,7 +47,7 @@ func NewAdder(ghReleases GitHubReleases) Adder {
 	}
 }
 
-func (a Adder) Run(opts AddOptions) error {
+func (a Adder) Run(opts Options) error {
 	consolidatedPackageStructure, err := common.UseConsolidatedPackageStructure(opts.CurrentDir)
 	if err != nil {
 		return fmt.Errorf("checking whether to use old or new package structure: %w", err)
@@ -76,9 +70,14 @@ func (a Adder) Run(opts AddOptions) error {
 		return err
 	}
 
-	templateVersion, err := a.getTemplateVersion(opts.TemplateName)
-	if err != nil {
-		return fmt.Errorf("getting template version: %w", err)
+	var templateVersion string
+	if len(opts.BaseUrl) == 0 {
+		templateVersion, err = a.getTemplateVersion(opts.TemplateName)
+		if err != nil {
+			return fmt.Errorf("getting template version: %w", err)
+		}
+	} else {
+		templateVersion = "using-base-url-not-relevant"
 	}
 
 	pkgRef := fmt.Sprintf("%s-%s", opts.TemplateName, templateVersion)
@@ -104,7 +103,7 @@ func (a Adder) Run(opts AddOptions) error {
 	varFilePath := getVarFilePath(consolidatedPackageStructure, manifest, opts.OutputFolder)
 
 	if opts.DownloadVarFile {
-		err = a.downloadVarFile(manifest, newPackage, opts.VarFile, varFilePath, opts.OutputFolder)
+		err = a.downloadVarFile(manifest, newPackage, opts.BaseUrl, opts.VarFile, varFilePath, opts.OutputFolder)
 		if err != nil {
 			return fmt.Errorf("downloading var file: %w", err)
 		}
@@ -117,18 +116,19 @@ func (a Adder) Run(opts AddOptions) error {
 		}
 	}
 
-	var msg string
+	var partMsg string
 	if consolidatedPackageStructure {
-		msg = "✅ Successfully added package %s with output directory %s.\n"
+		partMsg = "with output"
 	} else {
-		msg = "✅ Successfully added package %s to directory %s.\n"
+		partMsg = "to"
 	}
 
 	fmt.Println()
-	fmt.Printf(msg,
+	fmt.Printf("✅ Successfully added package %s %s directory %s.\n",
 		common.StyleHighlight.Render(
 			fmt.Sprintf("%s-%s", opts.TemplateName, templateVersion),
 		),
+		partMsg,
 		common.StyleHighlight.Render(manifest.PackageOutputFolder(opts.OutputFolder)),
 	)
 	fmt.Println()

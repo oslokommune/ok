@@ -13,6 +13,7 @@ type TestData struct {
 	testdataRootDir             string
 	workingDirectoryFromRootDir string
 	releases                    map[string]string
+	baseUrl                     string
 	keepTempDir                 bool
 
 	expectFiles   []string

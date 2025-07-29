@@ -2,6 +2,7 @@ package pkg_test
 
 import (
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"os"
 	"path/filepath"
 	"testing"
@@ -48,7 +49,7 @@ func TestInstallCommand(t *testing.T) {
 			copyTestdataRootDirToTempDir(t, tt, testWorkingDirectory, tempDir)
 			command.SetArgs(tt.args)
 
-			err = os.Setenv("BASE_URL", "../boilerplate-repo")
+			err = os.Setenv(common.BaseUrlEnvName, "../boilerplate-repo")
 			require.NoError(t, err)
 
 			err = os.Chdir(tempDir) // Works, but disables the possibility for parallel tests.

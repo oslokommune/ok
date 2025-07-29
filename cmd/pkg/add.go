@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"os"
 	"strings"
 
@@ -24,6 +25,7 @@ The output folder is useful when you need multiple instances of the same templat
 		Example: `ok pkg add databases my-postgres-database
 ok pkg add app ecommerce-website
 ok pkg add app ecommerce-api
+BASE_URL=../boilerplate/terraform ok pkg add networking
 	`,
 		ValidArgsFunction: addTabCompletion,
 		Args:              cobra.RangeArgs(1, 2),
@@ -43,7 +45,8 @@ ok pkg add app ecommerce-api
 
 			adder := add.NewAdder(ghReleases)
 
-			err = adder.Run(add.AddOptions{
+			err = adder.Run(add.Options{
+				BaseUrl:         os.Getenv(common.BaseUrlEnvName),
 				CurrentDir:      currentDir,
 				TemplateName:    templateName,
 				OutputFolder:    outputFolder,

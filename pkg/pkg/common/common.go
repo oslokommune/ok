@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+const BaseUrlEnvName = "BASE_URL"
+
 const PackagesManifestFilename = "packages.yml"
 const BoilerplateRepoOwner = "oslokommune"
 const BoilerplateRepoName = "golden-path-boilerplate"

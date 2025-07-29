@@ -1,0 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/databases-using-base-url-not-relevant.schema.json
+StackName: "databases"
+
+Serverless:
+  Enable: true

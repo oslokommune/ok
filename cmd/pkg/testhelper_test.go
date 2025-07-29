@@ -8,11 +8,12 @@ import (
 )
 
 type TestData struct {
-	name            string
-	args            []string
-	testdataRootDir string
-	releases        map[string]string
-	keepTempDir     bool
+	name                        string
+	args                        []string
+	testdataRootDir             string
+	workingDirectoryFromRootDir string
+	releases                    map[string]string
+	keepTempDir                 bool
 
 	expectFiles   []string
 	expectNoFiles []string

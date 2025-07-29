@@ -8,6 +8,7 @@ import (
 	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
 	"github.com/oslokommune/ok/pkg/error_user_msg"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -57,7 +58,7 @@ func Execute() {
 		var userError *error_user_msg.ErrorUserMessage
 		if errors.As(err, &userError) {
 			fmt.Println()
-			fmt.Println(error_user_msg.StyleTitle.Render("Details:"))
+			fmt.Println(common.StyleTitle.Render("Details:"))
 			fmt.Println(userError.Details())
 		}
 

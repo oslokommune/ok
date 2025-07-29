@@ -14,7 +14,7 @@ import (
 func TestAddCommand(t *testing.T) {
 	tests := []TestData{
 		{
-			name:            "Should add package",
+			name:            "Should add Terraform package",
 			args:            []string{"databases"},
 			testdataRootDir: "testdata/add/databases",
 			releases: map[string]string{
@@ -35,6 +35,33 @@ func TestAddCommand(t *testing.T) {
 			expectFiles: []string{
 				"app-hello/packages.yml",
 				"app-hello/package-config.yml",
+			},
+		},
+		{
+			name:                        "Should add GitHub actions package",
+			args:                        []string{"docker-build-push"},
+			testdataRootDir:             "testdata/add/docker-build-push",
+			workingDirectoryFromRootDir: "workflows/_config/dev",
+			releases: map[string]string{
+				"docker-build-push": "v2.3.2",
+			},
+			expectFiles: []string{
+				"workflows/_config/dev/packages.yml",
+				"workflows/_config/dev/docker-build-push.yml",
+			},
+			keepTempDir: true,
+		},
+		{
+			name:                        "Should add GitHub actions package with named var file",
+			args:                        []string{"docker-build-push", "my-app-docker-build-push"},
+			testdataRootDir:             "testdata/add/docker-build-push-named",
+			workingDirectoryFromRootDir: "workflows/_config/dev",
+			releases: map[string]string{
+				"docker-build-push": "v2.3.2",
+			},
+			expectFiles: []string{
+				"workflows/_config/dev/packages.yml",
+				"workflows/_config/dev/my-app-docker-build-push.yml",
 			},
 		},
 		{
@@ -166,11 +193,18 @@ func TestAddCommand(t *testing.T) {
 			copyTestdataRootDirToTempDir(t, tt, testWorkingDirectory, tempDir)
 			command.SetArgs(tt.args)
 
-			err = os.Chdir(tempDir) // Works, but disables the possibility for parallel tests.
+			var workingDirectory string
+			if len(tt.workingDirectoryFromRootDir) == 0 {
+				workingDirectory = tempDir
+			} else {
+				workingDirectory = filepath.Join(tempDir, tt.workingDirectoryFromRootDir)
+			}
+			err = os.Chdir(workingDirectory) // Works, but disables the possibility for parallel tests.
 			require.NoError(t, err)
 			defer func() {
 				err = os.Chdir(testWorkingDirectory)
 			}()
+			fmt.Println("workingDirectory: ", workingDirectory)
 
 			// When
 			err = command.Execute()

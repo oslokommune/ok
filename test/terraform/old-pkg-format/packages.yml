@@ -23,3 +23,9 @@ Packages:
       VarFiles:
         - _config/common-config.yml
         - _config/databases.yml
+    - OutputFolder: app-hi
+      Template: app
+      Ref: app-v9.18.0
+      VarFiles:
+        - _config/common-config.yml
+        - _config/app-hi.yml

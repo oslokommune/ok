@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFilePath string, outputFolder string) error {
+func (a Adder) downloadVarFile(manifest common.PackageManifest, newPackage common.Package, varFile string, varFilePath string, outputFolder string) error {
 	if _, err := os.Stat(varFilePath); err == nil {
 		return fmt.Errorf("file already exists: %s", varFilePath)
 	}
@@ -20,15 +20,22 @@ func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFil
 	// https://github.com/oslokommune/golden-path-boilerplate/tree/databases-v4.0.3/boilerplate/terraform/databases/package-config-default.yml
 	varFileDownloadFilename := fmt.Sprintf("package-config-%s.yml", varFile)
 
-	// boilerplate/terraform/{pkg.Template}/package-config-default.yml
-	path := filepath.Join(common.BoilerplatePackageTerraformPath, newPackage.Template, varFileDownloadFilename)
+	var packagePath string
+	if manifest.PackagePrefix() == common.BoilerplatePackageGitHubActionsPath {
+		// boilerplate/github-cations/{pkg.Template}/package-config-default.yml
+		packagePath = common.BoilerplatePackageGitHubActionsPath
+	} else {
+		packagePath = common.BoilerplatePackageTerraformPath
+	}
+	// Example: boilerplate/terraform/app/package-config-default.yml
+	path := filepath.Join(packagePath, newPackage.Template, varFileDownloadFilename)
 
 	// Show URL to the user
 	varFileUrl := fmt.Sprintf("https://github.com/%s/%s/tree/%s/%s/%s/%s",
 		common.BoilerplateRepoOwner,
 		common.BoilerplateRepoName,
 		newPackage.Ref,
-		common.BoilerplatePackageTerraformPath,
+		packagePath,
 		newPackage.Template,
 		varFileDownloadFilename,
 	)
@@ -41,7 +48,9 @@ func (a Adder) downloadVarFile(newPackage common.Package, varFile string, varFil
 		path,
 		newPackage.Ref,
 	)
-	if err != nil && strings.Contains(err.Error(), "no file named") {
+	if err != nil &&
+		(strings.Contains(err.Error(), "no file named") ||
+			strings.Contains(err.Error(), "404 Not Found")) {
 		return createErrorDetails(err, varFileUrl, varFilePath)
 	} else if err != nil {
 		return fmt.Errorf("downloading file from GitHub: %w", err)
@@ -107,11 +116,11 @@ func createErrorDetails(
 	)
 
 	errorDetails += fmt.Sprintln()
-	errorDetails += fmt.Sprintln(error_user_msg.StyleTitle.Render("Possible solutions:"))
+	errorDetails += fmt.Sprintln(common.StyleTitle.Render("Possible solutions:"))
 	errorDetails += fmt.Sprintf(
 		"- Use flag %s to remove this error. Then create file %s manually.\n",
-		error_user_msg.StyleHighlight.Render("--"+FlagNoVar),
-		error_user_msg.StyleHighlight.Render(varFilePath),
+		common.StyleHighlight.Render("--"+FlagNoVar),
+		common.StyleHighlight.Render(varFilePath),
 	)
 	errorDetails += fmt.Sprintf("- Ask maintainers to fix this error.\n")
 

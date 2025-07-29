@@ -12,3 +12,75 @@ Packages:
       VarFiles:
         - my-app-b-receive_dispatch_event.yml
         - common-config.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push2.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - too-tikki_docker-build-push.yml

@@ -1,0 +1,16 @@
+AppName: too-tikki
+Dispatch:
+  Enable: false
+OnPushPaths:
+  - "main.go"
+OnPushBranches:
+  - "main"
+Cache:
+  Enable: false
+Ecr:
+  Enable: true
+  Login: true
+  Push: true
+Ghcr:
+  Enable: false
+DockerfilePath: Dockerfile

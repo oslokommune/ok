@@ -1,4 +1,4 @@
-package error_user_msg
+package common
 
 import "github.com/charmbracelet/lipgloss"
 

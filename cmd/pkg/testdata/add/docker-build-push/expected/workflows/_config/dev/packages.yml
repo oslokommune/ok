@@ -1,0 +1,8 @@
+DefaultPackagePathPrefix: boilerplate/github-actions
+Packages:
+    - OutputFolder: ../..
+      Template: docker-build-push
+      Ref: docker-build-push-v2.3.2
+      VarFiles:
+        - common-config.yml
+        - docker-build-push.yml

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/oslokommune/ok/pkg/error_user_msg"
 	"os"
 	"path/filepath"
 	"strings"
@@ -105,7 +104,7 @@ func (a Adder) Run(opts AddOptions) error {
 	varFilePath := getVarFilePath(oldPackageStructure, manifest, opts.OutputFolder)
 
 	if opts.DownloadVarFile {
-		err = a.downloadVarFile(newPackage, opts.VarFile, varFilePath, opts.OutputFolder)
+		err = a.downloadVarFile(manifest, newPackage, opts.VarFile, varFilePath, opts.OutputFolder)
 		if err != nil {
 			return fmt.Errorf("downloading var file: %w", err)
 		}
@@ -118,17 +117,24 @@ func (a Adder) Run(opts AddOptions) error {
 		}
 	}
 
+	var msg string
+	if oldPackageStructure {
+		msg = "✅ Successfully added package %s with output directory %s.\n"
+	} else {
+		msg = "✅ Successfully added package %s to directory %s.\n"
+	}
+
 	fmt.Println()
-	fmt.Printf("✅ Successfully added package %s to directory %s.\n",
-		error_user_msg.StyleHighlight.Render(
+	fmt.Printf(msg,
+		common.StyleHighlight.Render(
 			fmt.Sprintf("%s-%s", opts.TemplateName, templateVersion),
 		),
-		error_user_msg.StyleHighlight.Render(manifest.PackageOutputFolder(opts.OutputFolder)),
+		common.StyleHighlight.Render(manifest.PackageOutputFolder(opts.OutputFolder)),
 	)
 	fmt.Println()
 	fmt.Printf("%sOpen %s to configure your stack.\n",
-		error_user_msg.StyleHighlight.Render("Next step: "),
-		error_user_msg.StyleHighlight.Render(varFilePath),
+		common.StyleHighlight.Render("Next step: "),
+		common.StyleHighlight.Render(varFilePath),
 	)
 
 	return nil

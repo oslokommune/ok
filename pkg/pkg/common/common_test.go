@@ -37,7 +37,7 @@ func TestConfigFile(t *testing.T) {
 	}
 }
 
-func TestUseOldPackageStructure(t *testing.T) {
+func TestUseConsolidatedPackageStructure(t *testing.T) {
 	testDir, err := os.MkdirTemp("", "package-structure-test")
 	require.NoError(t, err)
 	defer os.RemoveAll(testDir)
@@ -101,7 +101,7 @@ func TestUseOldPackageStructure(t *testing.T) {
 
 			tt.setup(testCaseDir, t)
 
-			result, err := UseOldPackageStructure(testCaseDir)
+			result, err := UseConsolidatedPackageStructure(testCaseDir)
 
 			if tt.expectedError {
 				require.Error(t, err)

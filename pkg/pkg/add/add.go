@@ -54,13 +54,13 @@ func NewAdder(ghReleases GitHubReleases) Adder {
 }
 
 func (a Adder) Run(opts AddOptions) error {
-	oldPackageStructure, err := common.UseOldPackageStructure(opts.CurrentDir)
+	consolidatedPackageStructure, err := common.UseConsolidatedPackageStructure(opts.CurrentDir)
 	if err != nil {
 		return fmt.Errorf("checking whether to use old or new package structure: %w", err)
 	}
 
 	var packagesManifestFilename string
-	if oldPackageStructure {
+	if consolidatedPackageStructure {
 		packagesManifestFilename = common.PackagesManifestFilename
 	} else {
 		packagesManifestFilename = filepath.Join(opts.OutputFolder, common.PackagesManifestFilename)
@@ -83,7 +83,7 @@ func (a Adder) Run(opts AddOptions) error {
 
 	pkgRef := fmt.Sprintf("%s-%s", opts.TemplateName, templateVersion)
 
-	newPackage, err := createNewPackage(manifest, opts.TemplateName, pkgRef, opts.OutputFolder, oldPackageStructure)
+	newPackage, err := createNewPackage(manifest, opts.TemplateName, pkgRef, opts.OutputFolder, consolidatedPackageStructure)
 	if err != nil {
 		return fmt.Errorf("creating new package: %w", err)
 	}
@@ -101,7 +101,7 @@ func (a Adder) Run(opts AddOptions) error {
 		return fmt.Errorf("saving package manifest: %w", err)
 	}
 
-	varFilePath := getVarFilePath(oldPackageStructure, manifest, opts.OutputFolder)
+	varFilePath := getVarFilePath(consolidatedPackageStructure, manifest, opts.OutputFolder)
 
 	if opts.DownloadVarFile {
 		err = a.downloadVarFile(manifest, newPackage, opts.VarFile, varFilePath, opts.OutputFolder)
@@ -118,7 +118,7 @@ func (a Adder) Run(opts AddOptions) error {
 	}
 
 	var msg string
-	if oldPackageStructure {
+	if consolidatedPackageStructure {
 		msg = "✅ Successfully added package %s with output directory %s.\n"
 	} else {
 		msg = "✅ Successfully added package %s to directory %s.\n"
@@ -177,17 +177,17 @@ func (a Adder) getTemplateVersion(templateName string) (string, error) {
 	return templateVersion, nil
 }
 
-func getVarFilePath(oldPackageStructure bool, manifest common.PackageManifest, outputFolder string) string {
-	if oldPackageStructure {
+func getVarFilePath(consolidatedPackageStructure bool, manifest common.PackageManifest, outputFolder string) string {
+	if consolidatedPackageStructure {
 		return common.VarFile(manifest.PackageConfigPrefix(), outputFolder)
 	} else {
 		return common.VarFile(outputFolder, common.DefaultVarFileName)
 	}
 }
 
-func createNewPackage(manifest common.PackageManifest, templateName, gitRef, outputFolderCmdArgument string, oldPackageStructure bool) (common.Package, error) {
+func createNewPackage(manifest common.PackageManifest, templateName, gitRef, outputFolderCmdArgument string, consolidatedPackageStructure bool) (common.Package, error) {
 	var mainVarFile, commonVarFile, outputFolder string
-	if oldPackageStructure {
+	if consolidatedPackageStructure {
 		mainVarFile = common.VarFile(manifest.PackageConfigPrefix(), outputFolderCmdArgument)
 		commonVarFile = common.VarFile(manifest.PackageConfigPrefix(), "common-config")
 		outputFolder = manifest.PackageOutputFolder(outputFolderCmdArgument)

@@ -2,15 +2,15 @@ package common
 
 import "path/filepath"
 
-// UseOldPackageStructure returns true if the current file system is using the old
-// way of organizing package files, as described here:
-//
+// UseConsolidatedPackageStructure returns true if the current file system is either
+// - using the old way of organizing package files for Terraform, as described here:
 // https://github.com/oslokommune/ok/pull/429
+// - the package manifest is using DefaultPackagePrefix: "boilerplate/github-actions"
 //
 // Otherwise, false is returned.
 //
 // The "old" means using a centralized package manifest together with a separate var file directory such as "_config".
-func UseOldPackageStructure(dir string) (bool, error) {
+func UseConsolidatedPackageStructure(dir string) (bool, error) {
 	packageManifestPath := filepath.Join(dir, PackagesManifestFilename)
 	varFileDir := filepath.Join(dir, BoilerplatePackageTerraformConfigPrefix)
 

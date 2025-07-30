@@ -2,6 +2,7 @@ package pkg_test
 
 import (
 	"fmt"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"os"
 	"path/filepath"
 	"testing"
@@ -17,7 +18,7 @@ func TestInstallCommand(t *testing.T) {
 			name:            "Should install ok packages recursively",
 			args:            []string{"--recursive"},
 			testdataRootDir: "testdata/install/recursive",
-			expectedFiles: []string{
+			expectFiles: []string{
 				"app-hello/.boilerplate/_template_app.json",
 				"networking/.boilerplate/_template_networking.json",
 			},
@@ -27,7 +28,7 @@ func TestInstallCommand(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Given
-			testDir, err := os.Getwd()
+			testWorkingDirectory, err := os.Getwd()
 			require.NoError(t, err)
 
 			command := pkg.NewInstallCommand() // figure out which parameters to pass here, if any
@@ -35,22 +36,27 @@ func TestInstallCommand(t *testing.T) {
 			tempDir, err := os.MkdirTemp(os.TempDir(), "ok-"+tt.name)
 
 			// Remove temp dir after test run
-			defer func(path string) {
-				err := os.RemoveAll(path)
-				require.NoError(t, err)
-			}(tempDir)
+			if !tt.keepTempDir {
+				defer func(path string) {
+					err := os.RemoveAll(path)
+					require.NoError(t, err)
+				}(tempDir)
+			}
 
 			require.NoError(t, err)
 
 			fmt.Println("tempDir: ", tempDir)
-			copyTestdataRootDirToTempDir(t, tt, tempDir)
+			copyTestdataRootDirToTempDir(t, tt, testWorkingDirectory, tempDir)
 			command.SetArgs(tt.args)
 
-			err = os.Setenv("BASE_URL", "../boilerplate-repo")
+			err = os.Setenv(common.BaseUrlEnvName, "../boilerplate-repo")
 			require.NoError(t, err)
 
 			err = os.Chdir(tempDir) // Works, but disables the possibility for parallel tests.
 			require.NoError(t, err)
+			defer func() {
+				err = os.Chdir(testWorkingDirectory)
+			}()
 
 			// When
 			err = command.Execute()
@@ -62,16 +68,17 @@ func TestInstallCommand(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			err = os.Chdir(testDir)
+			err = os.Chdir(testWorkingDirectory)
 			require.NoError(t, err)
 
 			// Compare package manifest file
-			for _, file := range tt.expectedFiles {
-				actualBytes, err := os.ReadFile(filepath.Join(tempDir, file))
+			for _, expectedFile := range tt.expectFiles {
+				actualBytes, err := os.ReadFile(filepath.Join(tempDir, expectedFile))
 				require.NoError(t, err)
 				actual := string(actualBytes)
 
-				expectedBytes, err := os.ReadFile(filepath.Join(tt.testdataRootDir, "expected", file))
+				expectedFileFullPath := filepath.Join(tt.testdataRootDir, "expected", expectedFile)
+				expectedBytes, err := os.ReadFile(expectedFileFullPath)
 				require.NoError(t, err)
 				expected := string(expectedBytes)
 

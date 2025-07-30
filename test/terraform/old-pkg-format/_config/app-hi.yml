@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/app-v9.18.0.schema.json
+StackName: "app-hi"
+app-data.StackName: "app-hi-data"
+AppName: "hello-world"
+AppEcsExec: true
+AppReadOnlyRootFileSystem: true
+
+ExampleImage:
+  Enable: true
+Ecr:
+  Enable: true
+ServiceConnect:
+  Enable: true
+AlbHostRouting:
+  Enable: true
+  Internal: true
+  Subdomain:
+    Enable: false
+    TargetGroupTargetStickiness: true
+  ApexDomain:
+    Enable: true
+    TargetGroupTargetStickiness: true
+DatabaseConnectivity:
+  Enable: true
+VpcEndpoints:
+  Enable: true
+Xray:
+  Enable: false
+DailyShutdown:
+  Enable: true
+IamForCicd:
+  Enable: true
+  AppGitHubRepo: some-app-repo
+  IacGitHubRepo: some-iac-repo
+TelemetryCollection:
+  Enable: true
+  AutoInstrumentation:
+    Enable: true
+    Runtime: java
+OpenTelemetrySidecar:
+  Enable: true

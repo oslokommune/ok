@@ -3,9 +3,10 @@ package common
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 )
+
+const BaseUrlEnvName = "BASE_URL"
 
 const PackagesManifestFilename = "packages.yml"
 const BoilerplateRepoOwner = "oslokommune"
@@ -78,36 +79,4 @@ func dirExists(path string) (bool, error) {
 		return false, err
 	}
 	return info.IsDir(), nil
-}
-
-func UseConsolidatedPackageStructure(dir string) (bool, error) {
-	packagePath := filepath.Join(dir, PackagesManifestFilename)
-	varFileDir := filepath.Join(dir, BoilerplatePackageTerraformConfigPrefix)
-
-	packageExists, err := fileExists(packagePath)
-	if err != nil {
-		return false, err
-	}
-
-	varFileDirExists, err := dirExists(varFileDir)
-	if err != nil {
-		return false, err
-	}
-
-	if packageExists && varFileDirExists {
-		return true, nil
-	}
-
-	if packageExists {
-		manifest, err := LoadPackageManifest(packagePath)
-		if err != nil {
-			return false, err
-		}
-
-		if manifest.DefaultPackagePathPrefix == BoilerplatePackageGitHubActionsPath {
-			return true, nil
-		}
-	}
-
-	return false, nil
 }

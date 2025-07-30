@@ -7,6 +7,8 @@ import (
 	"github.com/oslokommune/ok/cmd/aws"
 	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
+	"github.com/oslokommune/ok/pkg/error_user_msg"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -52,7 +54,13 @@ func Execute() {
 		fmt.Println()
 		fmt.Println(redStyle.Render("Error:"))
 		prettyPrintError(err)
-		fmt.Println()
+
+		var userError *error_user_msg.ErrorUserMessage
+		if errors.As(err, &userError) {
+			fmt.Println()
+			fmt.Println(common.StyleTitle.Render("Details:"))
+			fmt.Println(userError.Details())
+		}
 
 		os.Exit(1)
 	}
@@ -68,7 +76,7 @@ func init() {
 
 	// Create dependencies
 	ghReleases := githubreleases.NewGitHubReleases()
-	addCommand := pkg.NewAddCommand()
+	addCommand := pkg.NewAddCommand(ghReleases)
 	updateCommand := pkg.NewUpdateCommand(ghReleases)
 	installCommand := pkg.NewInstallCommand()
 
@@ -145,7 +153,7 @@ func prettyPrintError(err error) {
 		// But we want to print only one error at a time, like this:
 		// middle b that wraps a:
 		//
-		// So we remove the unwrapped error from the error.
+		// So we search for "deepest error a" (the unwrapped error) from the complete error string, and remove it.
 		text := strings.Replace(errStr, unwrappedStr, "", 1)
 		printWithSpaces(text, i)
 

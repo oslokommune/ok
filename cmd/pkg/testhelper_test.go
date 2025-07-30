@@ -8,20 +8,31 @@ import (
 )
 
 type TestData struct {
-	name            string
-	args            []string
-	testdataRootDir string
+	name                        string
+	args                        []string
+	testdataRootDir             string
+	workingDirectoryFromRootDir string
+	releases                    map[string]string
+	baseUrl                     string
+	keepTempDir                 bool
 
-	expectError   bool
-	expectedFiles []string
+	expectFiles   []string
+	expectNoFiles []string
+
+	expectError        bool
+	expectErrorMessage string
 }
 
-func copyTestdataRootDirToTempDir(t *testing.T, tt TestData, tempDir string) {
-	configDir := filepath.Join(tt.testdataRootDir, "input", "root")
+const inputDir = "input"
+const inputRootDir = "root"
 
-	srcDir := os.DirFS(configDir)
+func copyTestdataRootDirToTempDir(t *testing.T, tt TestData, testWorkingDirectory string, tempDir string) {
+	var err error
+	rootDir := filepath.Join(testWorkingDirectory, tt.testdataRootDir, inputDir, inputRootDir)
+
+	srcDir := os.DirFS(rootDir)
 	dstDir := tempDir
 
-	err := os.CopyFS(dstDir, srcDir)
+	err = os.CopyFS(dstDir, srcDir)
 	require.NoError(t, err)
 }

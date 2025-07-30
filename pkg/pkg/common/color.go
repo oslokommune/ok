@@ -1,0 +1,11 @@
+package common
+
+import "github.com/charmbracelet/lipgloss"
+
+var StyleHighlight = lipgloss.NewStyle().
+	Bold(true).
+	Foreground(lipgloss.Color("15"))
+
+var StyleTitle = lipgloss.NewStyle().
+	Bold(true).
+	Foreground(lipgloss.Color("4"))

@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.13.0](https://github.com/oslokommune/ok/compare/v5.12.0...v5.13.0) (2025-07-30)
+
+
+### Features
+
+* add default var file for`ok pkg add`  ([#445](https://github.com/oslokommune/ok/issues/445)) ([aa7f9ee](https://github.com/oslokommune/ok/commit/aa7f9eeb91020a016b24b97da09e5d8333a69d7a))
+
 ## [5.12.0](https://github.com/oslokommune/ok/compare/v5.11.0...v5.12.0) (2025-05-12)
 
 

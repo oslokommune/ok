@@ -6,8 +6,6 @@ updates:
     directory: "/" # This should be / rather than .github/workflows
     schedule:
       interval: "daily"
-    reviewers:
-      - "oslokommune/kjoremiljo"
     groups:
       github-actions-all:
         patterns:

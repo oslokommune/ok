@@ -1,5 +1,33 @@
 # Changelog
 
+## [5.13.0](https://github.com/oslokommune/ok/compare/v5.12.0...v5.13.0) (2025-07-30)
+
+
+### Features
+
+* add default var file for`ok pkg add`  ([#445](https://github.com/oslokommune/ok/issues/445)) ([aa7f9ee](https://github.com/oslokommune/ok/commit/aa7f9eeb91020a016b24b97da09e5d8333a69d7a))
+
+## [5.12.0](https://github.com/oslokommune/ok/compare/v5.11.0...v5.12.0) (2025-05-12)
+
+
+### Features
+
+* Pretty print errors ([#434](https://github.com/oslokommune/ok/issues/434)) ([557172a](https://github.com/oslokommune/ok/commit/557172a93f01276919a9a67cff4bff6202031dc7))
+
+## [5.11.0](https://github.com/oslokommune/ok/compare/v5.10.0...v5.11.0) (2025-04-29)
+
+
+### Features
+
+* update default location of package manifest and var files ([#429](https://github.com/oslokommune/ok/issues/429)) ([c748833](https://github.com/oslokommune/ok/commit/c7488330dd201a1c5d9c19cc8208f3518dbbdc45))
+
+## [5.10.0](https://github.com/oslokommune/ok/compare/v5.9.0...v5.10.0) (2025-04-28)
+
+
+### Features
+
+* Add `ok pk install` experimental subcommand for new package file format ([#425](https://github.com/oslokommune/ok/issues/425)) ([ef33ddf](https://github.com/oslokommune/ok/commit/ef33ddf854f9f53487079f7f2666511e57a8c475))
+
 ## [5.9.0](https://github.com/oslokommune/ok/compare/v5.8.0...v5.9.0) (2025-03-04)
 
 

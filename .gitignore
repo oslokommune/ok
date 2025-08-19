@@ -22,7 +22,7 @@ go.work
 
 # Other
 ok
-.idea
+.idea/
 
 # Output from goreleaser
 /completions/

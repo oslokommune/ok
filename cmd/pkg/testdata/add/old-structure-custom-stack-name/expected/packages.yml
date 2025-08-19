@@ -1,0 +1,13 @@
+Packages:
+    - OutputFolder: load-balancing-alb-main
+      Template: load-balancing-alb
+      Ref: load-balancing-alb-v3.4.0
+      VarFiles:
+        - _config/common-config.yml
+        - _config/load-balancing-alb-main.yml
+    - OutputFolder: app-hello
+      Template: app
+      Ref: app-v6.0.0
+      VarFiles:
+        - _config/common-config.yml
+        - _config/app-hello.yml

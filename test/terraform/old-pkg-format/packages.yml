@@ -1,0 +1,31 @@
+Packages:
+    - OutputFolder: out/app-hello
+      Template: app
+      Ref: app-v6.1.1
+      VarFiles:
+        - _config/common-config.yml
+        - _config/app-hello.yml
+    - OutputFolder: out/app-common
+      Template: app-common
+      Ref: app-common-v3.0.2
+      VarFiles:
+        - _config/common-config.yml
+        - _config/app-common.yml
+    - OutputFolder: out/networking
+      Template: networking
+      Ref: main
+      VarFiles:
+        - _config/common-config.yml
+        - _config/networking.yml
+    - OutputFolder: out/databases
+      Template: databases
+      Ref: main
+      VarFiles:
+        - _config/common-config.yml
+        - _config/databases.yml
+    - OutputFolder: app-hi
+      Template: app
+      Ref: app-v9.18.0
+      VarFiles:
+        - _config/common-config.yml
+        - _config/app-hi.yml

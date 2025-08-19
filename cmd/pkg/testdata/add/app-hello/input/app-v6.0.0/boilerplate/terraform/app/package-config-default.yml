@@ -1,0 +1,27 @@
+StackName: "replace-me"
+app-data.StackName: "replace-me-data"
+
+AppName: "hello-world"
+AppEcsExec: true
+AppReadOnlyRootFileSystem: true
+ExampleImage:
+  Enable: true
+ServiceConnect:
+  Enable: true
+AlbHostRouting:
+  Enable: true
+DatabaseConnectivity:
+  Enable: true
+OpenTelemetrySidecar:
+  Enable: true
+VpcEndpoints:
+  Enable: true
+Xray:
+  Enable: true
+DailyShutdown:
+  Enable: true
+IamForCicd:
+  Enable: true
+  AppGitHubRepo: pirates-apps
+  IacGitHubRepo: pirates-iac
+  #AssumableCdRole: false

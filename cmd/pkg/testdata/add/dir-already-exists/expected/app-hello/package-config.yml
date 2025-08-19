@@ -1,22 +1,15 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/app-v9.11.0.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/app-v6.0.0.schema.json
 StackName: "app-hello"
 app-data.StackName: "app-hello-data"
 AppName: "hello"
 AppEcsExec: true
 AppReadOnlyRootFileSystem: true
-#ExampleImage:
-#  Enable: true
+ExampleImage:
+  Enable: true
 ServiceConnect:
   Enable: true
 AlbHostRouting:
   Enable: true
-  Internal: false
-  Subdomain:
-    Enable: true
-    TargetGroupTargetStickiness: false
-  ApexDomain:
-    Enable: false
-    TargetGroupTargetStickiness: false
 DatabaseConnectivity:
   Enable: true
 OpenTelemetrySidecar:

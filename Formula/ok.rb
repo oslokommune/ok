@@ -5,15 +5,15 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "5.9.0"
+  version "5.13.0"
 
   depends_on "fzf"
   depends_on "yq"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v5.9.0/ok_5.9.0_darwin_amd64.tar.gz"
-      sha256 "b9e371f9c99c695811a15a024b43b2099f0c99c911757e45aab6780956ab8596"
+      url "https://github.com/oslokommune/ok/releases/download/v5.13.0/ok_5.13.0_darwin_amd64.tar.gz"
+      sha256 "2210db23f707333c1a21edc6b960387f938a74ba8a86677c2be689c2293c108e"
 
       def install
         bin.install "ok"
@@ -23,8 +23,8 @@ class Ok < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/oslokommune/ok/releases/download/v5.9.0/ok_5.9.0_darwin_arm64.tar.gz"
-      sha256 "d07e1660b7db86b5f785c63012ac0624db4a04040d7a6d0d804c97bbfd078119"
+      url "https://github.com/oslokommune/ok/releases/download/v5.13.0/ok_5.13.0_darwin_arm64.tar.gz"
+      sha256 "69eb0e74048ad832172a11b048f1aee209301450c77b8ec84464b5e29d847057"
 
       def install
         bin.install "ok"
@@ -36,30 +36,24 @@ class Ok < Formula
   end
 
   on_linux do
-    if Hardware::CPU.intel?
-      if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v5.9.0/ok_5.9.0_linux_amd64.tar.gz"
-        sha256 "433d988f74004ceed79ab14cfc4c595804c0ba031f3e34ccbc69c50258148997"
-
-        def install
-          bin.install "ok"
-          bash_completion.install "completions/ok.bash" => "ok"
-          zsh_completion.install "completions/ok.zsh" => "_ok"
-          fish_completion.install "completions/ok.fish"
-        end
+    if Hardware::CPU.intel? and Hardware::CPU.is_64_bit?
+      url "https://github.com/oslokommune/ok/releases/download/v5.13.0/ok_5.13.0_linux_amd64.tar.gz"
+      sha256 "9e0846b72160190af1799fef6831ff9af3b1a91880bce49df2b9c5835010f2c8"
+      def install
+        bin.install "ok"
+        bash_completion.install "completions/ok.bash" => "ok"
+        zsh_completion.install "completions/ok.zsh" => "_ok"
+        fish_completion.install "completions/ok.fish"
       end
     end
-    if Hardware::CPU.arm?
-      if Hardware::CPU.is_64_bit?
-        url "https://github.com/oslokommune/ok/releases/download/v5.9.0/ok_5.9.0_linux_arm64.tar.gz"
-        sha256 "ce4850e439484fc3d3ab0f1b7956bbe82d2483217e5b59b87d64c9e97983c99f"
-
-        def install
-          bin.install "ok"
-          bash_completion.install "completions/ok.bash" => "ok"
-          zsh_completion.install "completions/ok.zsh" => "_ok"
-          fish_completion.install "completions/ok.fish"
-        end
+    if Hardware::CPU.arm? and Hardware::CPU.is_64_bit?
+      url "https://github.com/oslokommune/ok/releases/download/v5.13.0/ok_5.13.0_linux_arm64.tar.gz"
+      sha256 "ace8af27378fc4a05a13aba4426b4e6b57e14c6eab04e4489ca423c78b5cf02d"
+      def install
+        bin.install "ok"
+        bash_completion.install "completions/ok.bash" => "ok"
+        zsh_completion.install "completions/ok.zsh" => "_ok"
+        fish_completion.install "completions/ok.fish"
       end
     end
   end

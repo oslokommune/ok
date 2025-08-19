@@ -14,7 +14,7 @@ import (
 func Run(packagesToInstall []common.Package, manifest common.PackageManifest, workingDirectory string) error {
 	cmds, err := CreateBoilerplateCommands(packagesToInstall, CreateBoilerPlateCommandsOpts{
 		PackagePathPrefix: manifest.PackagePrefix(),
-		BaseUrlOrPath:     os.Getenv("BASE_URL"),
+		BaseUrlOrPath:     os.Getenv(common.BaseUrlEnvName),
 		WorkingDirectory:  workingDirectory,
 	})
 

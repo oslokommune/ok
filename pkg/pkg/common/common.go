@@ -1,6 +1,12 @@
 package common
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"strings"
+)
+
+const BaseUrlEnvName = "BASE_URL"
 
 const PackagesManifestFilename = "packages.yml"
 const BoilerplateRepoOwner = "oslokommune"
@@ -14,6 +20,8 @@ const BoilerplatePackageTerraformConfigPrefix = "_config"
 const BoilerplatePackageGitHubActionsPath = "boilerplate/github-actions"
 const BoilerplatePackageGitHubActionsConfigPrefix = ""
 const BoilerplatePackageGitHubActionsOutputFolder = "../.."
+
+const DefaultVarFileName = "package-config"
 
 const DefaultBaseUrl = "git@github.com:oslokommune/golden-path-boilerplate.git//"
 const DefaultPackagePathPrefix = BoilerplatePackageTerraformPath
@@ -37,4 +45,38 @@ func PrintProcessedPackages(update []Package, action string) {
 	for _, pkg := range update {
 		fmt.Printf("  - %s\n", pkg.String())
 	}
+}
+
+// GenerateRelativePath creates a path to navigate back to the root directory
+// from the specified outputFolder
+func GenerateRelativePath(outputFolder string) string {
+	outputFolder = strings.TrimRight(outputFolder, "/")
+	dirCount := strings.Count(outputFolder, "/") + 1
+	path := ""
+	for i := 0; i < dirCount; i++ {
+		path += "../"
+	}
+	return strings.TrimRight(path, "/")
+}
+
+func fileExists(path string) (bool, error) {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return !info.IsDir(), nil
+}
+
+func dirExists(path string) (bool, error) {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return info.IsDir(), nil
 }

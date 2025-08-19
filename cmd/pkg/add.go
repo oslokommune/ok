@@ -1,10 +1,8 @@
 package pkg
 
 import (
-	"errors"
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/common"
-	"log/slog"
 	"os"
 	"strings"
 
@@ -13,13 +11,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewAddCommand() *cobra.Command {
-	var flagAddCommandUpdateSchema bool
-
-	adder := add.NewAdder()
+func NewAddCommand(ghReleases add.GitHubReleases) *cobra.Command {
+	var flagAddCommandNoSchema bool
+	var flagAddCommandNoVarFile bool
+	var flagAddCommandVarFile string
 
 	cmd := &cobra.Command{
-		Use:   "add template [outputFolder]",
+		Use:   "add <template> [outputFolder]",
 		Short: "Add the Boilerplate template to the package manifest with an optional output folder",
 		Long: `Add the Boilerplate template to the package manifest with an optional output folder.
 The template version is fetched from the latest GitHub release in the template repository.
@@ -27,6 +25,7 @@ The output folder is useful when you need multiple instances of the same templat
 		Example: `ok pkg add databases my-postgres-database
 ok pkg add app ecommerce-website
 ok pkg add app ecommerce-api
+BASE_URL=../boilerplate/terraform ok pkg add networking
 	`,
 		ValidArgsFunction: addTabCompletion,
 		Args:              cobra.RangeArgs(1, 2),
@@ -34,24 +33,38 @@ ok pkg add app ecommerce-api
 			templateName := getArg(args, 0, "")
 			outputFolder := getArg(args, 1, templateName)
 
-			result, err := adder.Run(common.PackagesManifestFilename, templateName, outputFolder, flagAddCommandUpdateSchema)
+			if flagAddCommandVarFile != "default" && flagAddCommandNoVarFile {
+				return fmt.Errorf("cannot use both --var-file and --%s flags", add.FlagNoVar)
+			}
+
+			currentDir, err := os.Getwd()
+			if err != nil {
+				cmd.PrintErrf("failed to get current dir: %s\n", err)
+				return nil
+			}
+
+			adder := add.NewAdder(ghReleases)
+
+			err = adder.Run(add.Options{
+				BaseUrl:         os.Getenv(common.BaseUrlEnvName),
+				CurrentDir:      currentDir,
+				TemplateName:    templateName,
+				OutputFolder:    outputFolder,
+				AddSchema:       !flagAddCommandNoSchema,
+				DownloadVarFile: !flagAddCommandNoVarFile,
+				VarFile:         flagAddCommandVarFile,
+			})
 			if err != nil {
 				return err
 			}
 
-			slog.Info(fmt.Sprintf("%s (%s) added to %s with output folder name %s\n", result.TemplateName, result.TemplateVersion, common.PackagesManifestFilename, result.OutputFolder))
-			nonExistingConfigFiles := findNonExistingConfigurationFiles(result.VarFiles)
-			if len(nonExistingConfigFiles) > 0 {
-				slog.Info("\nCreate the following configuration files:\n")
-				for _, configFile := range nonExistingConfigFiles {
-					slog.Info(fmt.Sprintf("- %s\n", configFile))
-				}
-			}
 			return nil
 		},
 	}
 
-	cmd.Flags().BoolVar(&flagAddCommandUpdateSchema, "update-schema", true, "Update the JSON schema for affected packages")
+	cmd.Flags().BoolVar(&flagAddCommandNoSchema, "no-schema", false, "Do not add the JSON schema for the package ")
+	cmd.Flags().StringVarP(&flagAddCommandVarFile, "var-file", "v", "default", "Download a var file for the package with the specified name")
+	cmd.Flags().BoolVarP(&flagAddCommandNoVarFile, add.FlagNoVar, "s", false, "Do not download a var file for the package")
 
 	return cmd
 }
@@ -61,18 +74,6 @@ func getArg(args []string, index int, fallback string) string {
 		return args[index]
 	}
 	return fallback
-}
-
-func findNonExistingConfigurationFiles(varFiles []string) []string {
-	var nonExisting []string
-	for _, varFile := range varFiles {
-		_, err := os.Stat(varFile)
-		notExists := errors.Is(err, os.ErrNotExist)
-		if notExists {
-			nonExisting = append(nonExisting, varFile)
-		}
-	}
-	return nonExisting
 }
 
 func addTabCompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

@@ -13,10 +13,10 @@ const (
 )
 
 type Package struct {
-	OutputFolder string   `yaml:"OutputFolder"`
-	Template     string   `yaml:"Template"`
-	Ref          string   `yaml:"Ref"`
-	VarFiles     []string `yaml:"VarFiles"`
+	OutputFolder string   `yaml:"OutputFolder"` // Example: app-hello
+	Template     string   `yaml:"Template"`     // Example: app
+	Ref          string   `yaml:"Ref"`          // Example: app-v1.2.3
+	VarFiles     []string `yaml:"VarFiles"`     // Example: [ "common.yml", "package-config.yml" ]
 }
 
 func (p Package) String() string {

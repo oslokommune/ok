@@ -1,13 +1,14 @@
 package add_path_based_routing
 
 import (
-	"github.com/Masterminds/semver"
-	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"regexp"
 	"testing"
+
+	"github.com/Masterminds/semver"
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
+	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -33,6 +34,12 @@ func TestMigrateToNewConfigStructure(t *testing.T) {
 			name:         "Don't add ApexDomain if it's not set",
 			inputFile:    "app-too-tikki-no-apex-domain.yml",
 			expectedFile: "app-too-tikki-no-apex-domain-expected.yml",
+			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse("10.0.0")},
+		},
+		{
+			name:         "Enabled must be same as in original",
+			inputFile:    "app-too-tikki-alb-disabled.yml",
+			expectedFile: "app-too-tikki-alb-disabled-expected.yml",
 			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse("10.0.0")},
 		},
 	}

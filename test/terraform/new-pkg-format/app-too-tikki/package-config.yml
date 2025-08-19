@@ -7,15 +7,16 @@ ExampleImage:
   Enable: false
 ServiceConnect:
   Enable: true
-AlbHostRouting:
+ApplicationLoadBalancer:
   Enable: true
   Internal: false
-  Subdomain:
-    Enable: true
-    TargetGroupTargetStickiness: true
-  ApexDomain:
-    Enable: false
-    TargetGroupTargetStickiness: false
+  HostRouting:
+    Subdomain:
+      Enable: true
+      TargetGroupTargetStickiness: true
+    ApexDomain:
+      Enable: false
+      TargetGroupTargetStickiness: false
 DatabaseConnectivity:
   Enable: true
 OpenTelemetrySidecar:

@@ -28,19 +28,19 @@ func TestMigrateToNewConfigStructure(t *testing.T) {
 			name:         "Basic transformation",
 			inputFile:    "app-too-tikki.yml",
 			expectedFile: "app-too-tikki-expected.yml",
-			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse("10.0.0")},
+			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse(RequiredVersion)},
 		},
 		{
 			name:         "Don't add ApexDomain if it's not set",
 			inputFile:    "app-too-tikki-no-apex-domain.yml",
 			expectedFile: "app-too-tikki-no-apex-domain-expected.yml",
-			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse("10.0.0")},
+			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse(RequiredVersion)},
 		},
 		{
 			name:         "Enabled must be same as in original",
 			inputFile:    "app-too-tikki-alb-disabled.yml",
 			expectedFile: "app-too-tikki-alb-disabled-expected.yml",
-			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse("10.0.0")},
+			jsonSchema:   metadata.JsonSchema{Template: "app", Version: semver.MustParse(RequiredVersion)},
 		},
 	}
 

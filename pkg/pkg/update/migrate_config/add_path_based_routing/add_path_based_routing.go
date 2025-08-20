@@ -13,6 +13,8 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
+const RequiredVersion = "11.0.0"
+
 func AddPathBasedRouting(varFile string, varFileJsonSchema metadata.JsonSchema) error {
 	slog.Debug("adding support for path based routing",
 		slog.String("varFile", varFile),
@@ -21,10 +23,10 @@ func AddPathBasedRouting(varFile string, varFileJsonSchema metadata.JsonSchema) 
 
 	/*
 	 * Check that var file supports the new feature.
-	 * https://github.com/oslokommune/golden-path-boilerplate/releases/tag/app-v10.0.0
+	 * https://github.com/oslokommune/golden-path-boilerplate/releases/tag/app-v11.0.0
 	 */
 
-	requiredVersion, err := semver.NewVersion("11.0.0")
+	requiredVersion, err := semver.NewVersion(RequiredVersion)
 	if err != nil {
 		return fmt.Errorf("creating semver: %w", err)
 	}

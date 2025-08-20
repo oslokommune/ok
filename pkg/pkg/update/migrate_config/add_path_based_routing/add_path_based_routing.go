@@ -24,7 +24,7 @@ func AddPathBasedRouting(varFile string, varFileJsonSchema metadata.JsonSchema) 
 	 * https://github.com/oslokommune/golden-path-boilerplate/releases/tag/app-v10.0.0
 	 */
 
-	requiredVersion, err := semver.NewVersion("10.0.0")
+	requiredVersion, err := semver.NewVersion("11.0.0")
 	if err != nil {
 		return fmt.Errorf("creating semver: %w", err)
 	}

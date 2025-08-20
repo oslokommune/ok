@@ -61,7 +61,7 @@ func TestMigrateToNewConfigStructure(t *testing.T) {
 
 			tempInputFile := filepath.Join(tempDir, tc.inputFile)
 			err = copyFile(inputFile, tempInputFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			// When
 			err = AddPathBasedRouting(tempInputFile, tc.jsonSchema)
@@ -73,7 +73,6 @@ func TestMigrateToNewConfigStructure(t *testing.T) {
 
 			expectedContent, err := os.ReadFile(expectedFile)
 			assert.NoError(t, err)
-
 			assert.Equal(t, string(expectedContent), string(modifiedContent))
 		})
 	}

@@ -2,11 +2,13 @@ package add_path_based_routing
 
 import (
 	"fmt"
-	"github.com/Masterminds/semver"
-	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
 	"log/slog"
+	"os"
 	"strconv"
 	"strings"
+
+	"github.com/Masterminds/semver"
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
 
 	"github.com/magefile/mage/sh"
 )
@@ -80,6 +82,42 @@ func isMigrated(varFile string) (bool, error) {
 func migrate(varFile string) error {
 	fmt.Printf("Changing var file from using 'AlbHostRouting' to 'ApplicationLoadBalancer'. File: %s\n", varFile)
 
+	hasMetadata := false
+	firstLine, err := metadata.ReadFirstLine(varFile)
+	if err != nil {
+		return fmt.Errorf("reading file %s: %w", varFile, err)
+	}
+
+	_, err = metadata.ParseMetadataLine(firstLine)
+	if err == nil {
+		hasMetadata = true
+	}
+
+	args := getArgs(varFile)
+
+	err = sh.RunV("yq", args...)
+	if err != nil {
+		return fmt.Errorf("error transforming YAML: %w", err)
+	}
+
+	if hasMetadata {
+		// The yq command will remove the json schema declaration, so let's write it back.
+		content, err := os.ReadFile(varFile)
+		if err != nil {
+			return fmt.Errorf("reading file to restore metadata: %w", err)
+		}
+
+		newContent := firstLine + "\n" + string(content)
+		err = os.WriteFile(varFile, []byte(newContent), 0644)
+		if err != nil {
+			return fmt.Errorf("writing file with restored metadata: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func getArgs(varFile string) []string {
 	/*
 		    # yq command to test the transformation logic:
 			yq '
@@ -165,11 +203,5 @@ func migrate(varFile string) error {
     `,
 		varFile,
 	}
-
-	err := sh.RunV("yq", args...)
-	if err != nil {
-		return fmt.Errorf("error transforming YAML: %w", err)
-	}
-
-	return nil
+	return args
 }

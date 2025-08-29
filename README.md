@@ -7,7 +7,7 @@
 
 
 <p align="center">
-  <img width="200" src="https://github.com/oslokommune/ok/assets/1691190/7c705072-4971-4b48-811d-ee31550dea82">
+  <img width="400" src="https://github.com/user-attachments/assets/ca520d82-f8c8-45fc-95a6-c993117f1d29">
 </p>
 
 ## Install with Homebrew

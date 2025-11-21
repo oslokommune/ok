@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.14.0](https://github.com/oslokommune/ok/compare/v5.13.0...v5.14.0) (2025-11-21)
+
+
+### Features
+
+* improve root help description ([#456](https://github.com/oslokommune/ok/issues/456)) ([b9952c5](https://github.com/oslokommune/ok/commit/b9952c53c897000d61c0af19448a1647570df4f3))
+
 ## [5.13.0](https://github.com/oslokommune/ok/compare/v5.12.0...v5.13.0) (2025-07-30)
 
 

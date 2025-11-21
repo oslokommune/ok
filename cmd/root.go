@@ -19,18 +19,14 @@ import (
 
 var (
 	// rootCmd represents the base command when called without any subcommands.
-	okString = "`ok`"
-	rootCmd  = &cobra.Command{
+	rootCmd = &cobra.Command{
 		Use:   "ok",
-		Short: "The `ok` infrastructure toolbox.",
-		Long: fmt.Sprintf(`The %s tool is a comprehensive infrastructure management toolbox designed to streamline the setup and maintenance of Terraform environments. It provides a variety of commands to bootstrap infrastructure, manage environment configurations, handle AWS operations, and more.
-
-Key functionalities include:
-
-- Executing AWS-specific commands.
-- Managing and updating Boilerplate templates.
-
-Whether you're setting up a new environment or maintaining an existing one, %s simplifies and automates many of the repetitive tasks involved in infrastructure management.`, okString, okString),
+		Short: "Manage infrastructure and project templates.",
+		Long: "\nThis toolbox helps you with:\n\n" +
+			"- Infrastructure setup\n" +
+			"- Terraform & CI/CD templates\n" +
+			"- AWS tasks\n\n" +
+			"[Get started](https://km.oslo.systems/setup/infrastructure/initialize-environment/)!",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}

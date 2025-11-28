@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.15.1](https://github.com/oslokommune/ok/compare/v5.15.0...v5.15.1) (2025-11-28)
+
+
+### Bug Fixes
+
+* Use SSH instead of HTTPS for databricks template url ([ab68083](https://github.com/oslokommune/ok/commit/ab680832f8862a2150f5bb1acf02a8a4a66817ee))
+
 ## [5.15.0](https://github.com/oslokommune/ok/compare/v5.14.0...v5.15.0) (2025-11-28)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.15.0](https://github.com/oslokommune/ok/compare/v5.14.0...v5.15.0) (2025-11-28)
+
+
+### Features
+
+* Add ([e2d28da](https://github.com/oslokommune/ok/commit/e2d28da9800563c06fdcd6c63e5ad901034b9252))
+
 ## [5.14.0](https://github.com/oslokommune/ok/compare/v5.13.0...v5.14.0) (2025-11-21)
 
 

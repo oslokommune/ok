@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/oslokommune/ok/cmd/aws"
+	"github.com/oslokommune/ok/cmd/data"
 	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
 	"github.com/oslokommune/ok/pkg/error_user_msg"
@@ -87,6 +88,9 @@ func init() {
 	awsCommand.AddCommand(aws.EcsExecCommand)
 	awsCommand.AddCommand(aws.AdminSessionCommand)
 	awsCommand.AddCommand(aws.ConfigGeneratorCommand)
+
+	rootCmd.AddCommand(dataCommand)
+	dataCommand.AddCommand(data.InitCommand)
 
 	initializeConfiguration()
 

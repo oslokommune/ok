@@ -62,7 +62,7 @@ func checkDatabricksInstalled() error {
 // determineTemplate selects which template to use based on priority:
 // 1. User-provided template (highest priority)
 // 2. Environment variable override
-// 3. Default Oslo Kommune template
+// 3. Default Oslo kommune template
 func determineTemplate(userTemplate string) string {
 	// 1. User explicitly provided template (highest priority)
 	if userTemplate != "" {
@@ -74,7 +74,7 @@ func determineTemplate(userTemplate string) string {
 		return envTemplate
 	}
 
-	// 3. Default Oslo Kommune template
+	// 3. Default Oslo kommune template
 	return DefaultTemplateURL
 }
 

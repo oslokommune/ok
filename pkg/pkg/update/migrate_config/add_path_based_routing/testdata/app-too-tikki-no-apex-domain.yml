@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oslokommune/golden-path-boilerplate-schemas/refs/heads/main/schemas/app-v2.0.0.schema.json
+StackName: "app-too-tikki"
+app-data.StackName: "app-too-tikki-data"
+AppName: "too-tikki"
+AppEcsExec: false
+AppReadOnlyRootFileSystem: true
+ExampleImage:
+  Enable: false
+ServiceConnect:
+  Enable: true
+AlbHostRouting:
+  Enable: true
+  Internal: false
+  Subdomain:
+    Enable: true
+    TargetGroupTargetStickiness: true
+DatabaseConnectivity:
+  Enable: true
+OpenTelemetrySidecar:
+  Enable: false
+VpcEndpoints:
+  Enable: true
+Xray:
+  Enable: true
+DailyShutdown:
+  Enable: true
+IamForCicd:
+  Enable: true
+  AppGitHubRepo: pirates-apps
+  IacGitHubRepo: pirates-iac
+  AssumableCdRole: false
+  EcsDeployFromAppRepo: false
+Terragrunt:
+  Enable: false
+  DefaultDependenciesPaths: []
+  DependenciesPaths: []
+terragrunt.DefaultDependenciesPaths: []
+IncludeLockFile: false

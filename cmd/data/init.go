@@ -13,19 +13,19 @@ var (
 	flagTemplateDir string
 )
 
-// InitCommand initializes a new Databricks bundle using Oslo Kommune template
+// InitCommand initializes a new Databricks bundle using Oslo kommune template
 var InitCommand = &cobra.Command{
 	Use:   "init [TEMPLATE_PATH]",
-	Short: "Initialize a new Databricks bundle using Oslo Kommune template",
-	Long: `Initialize a new Databricks bundle with the Oslo Kommune template as default.
+	Short: "Initialize a new Databricks bundle using Oslo kommune template",
+	Long: `Initialize a new Databricks bundle with the Oslo kommune template as default.
 
-The TEMPLATE_PATH is optional. If not provided, uses the Oslo Kommune custom template.
+The TEMPLATE_PATH is optional. If not provided, uses the Oslo kommune custom template.
 You can override the default template URL with the DATA_TEMPLATE_URL environment variable.
 
-This command is a wrapper around 'databricks bundle init' that uses Oslo Kommune's
+This command is a wrapper around 'databricks bundle init' that uses Oslo kommune's
 standard Databricks project template by default, while still allowing you to use
 any other template (built-in or custom) by specifying it explicitly.`,
-	Example: `  # Use Oslo Kommune template (default)
+	Example: `  # Use Oslo kommune template (default)
   ok data init
 
   # Use built-in Python template

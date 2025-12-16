@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.15.2](https://github.com/oslokommune/ok/compare/v5.15.1...v5.15.2) (2025-12-16)
+
+
+### Bug Fixes
+
+* update Go version to 1.25.3 for CI compatibility ([e65e9e6](https://github.com/oslokommune/ok/commit/e65e9e67ae58490efb75131d454a5b8913f0fccb))
+* update terragrunt hclfmt to hcl fmt for new CLI syntax ([dddee70](https://github.com/oslokommune/ok/commit/dddee701399965ac4225be40e63cfd3e969e45cf))
+
 ## [5.15.1](https://github.com/oslokommune/ok/compare/v5.15.0...v5.15.1) (2025-11-28)
 
 

@@ -5,15 +5,15 @@
 class Ok < Formula
   desc "A CLI called ok"
   homepage "https://github.com/oslokommune/ok"
-  version "5.15.2"
+  version "5.15.3"
 
   depends_on "fzf"
   depends_on "yq"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/oslokommune/ok/releases/download/v5.15.2/ok_5.15.2_darwin_amd64.tar.gz"
-      sha256 "e8f2f0f36dd958822b98d8609e81297c89dd8a02a47738f2890f88233aab9376"
+      url "https://github.com/oslokommune/ok/releases/download/v5.15.3/ok_5.15.3_darwin_amd64.tar.gz"
+      sha256 "a2cbac61ddac17bc1520438289d0981c07aee7dd92c4818e89ef4f311e2fcf42"
 
       def install
         bin.install "ok"
@@ -23,8 +23,8 @@ class Ok < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/oslokommune/ok/releases/download/v5.15.2/ok_5.15.2_darwin_arm64.tar.gz"
-      sha256 "246f382f9c53219ef59b3a05b0698b833d1c7c2a9715bfa941b957a3f8840f71"
+      url "https://github.com/oslokommune/ok/releases/download/v5.15.3/ok_5.15.3_darwin_arm64.tar.gz"
+      sha256 "eb22662b2d9661ae63a1fa81fe17258b3fc34e26c7c41ccfa2b7f58e55f74f72"
 
       def install
         bin.install "ok"
@@ -37,8 +37,8 @@ class Ok < Formula
 
   on_linux do
     if Hardware::CPU.intel? && Hardware::CPU.is_64_bit?
-      url "https://github.com/oslokommune/ok/releases/download/v5.15.2/ok_5.15.2_linux_amd64.tar.gz"
-      sha256 "c4ddf71ccb1a1afe6fc3079c0805c3dad2b297b4c3459ffd0415eaf4f4e00b36"
+      url "https://github.com/oslokommune/ok/releases/download/v5.15.3/ok_5.15.3_linux_amd64.tar.gz"
+      sha256 "34dc48eb35c37b0f332f973284c5a7e1544d3851a6c3134ba561bdacf65714dd"
       def install
         bin.install "ok"
         bash_completion.install "completions/ok.bash" => "ok"
@@ -47,8 +47,8 @@ class Ok < Formula
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/oslokommune/ok/releases/download/v5.15.2/ok_5.15.2_linux_arm64.tar.gz"
-      sha256 "b52575283b96c01bf7f69bfc978fd0999e8ebf07dcd022fa6bd8074d949aa0aa"
+      url "https://github.com/oslokommune/ok/releases/download/v5.15.3/ok_5.15.3_linux_arm64.tar.gz"
+      sha256 "9652ca03be2dbe9ee2da5f93ff6f06004f1dd8365a9fbbbfa4369d78ad370b2e"
       def install
         bin.install "ok"
         bash_completion.install "completions/ok.bash" => "ok"

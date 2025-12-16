@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.15.3](https://github.com/oslokommune/ok/compare/v5.15.2...v5.15.3) (2025-12-16)
+
+
+### Bug Fixes
+
+* support passing flags to port-forward ([#465](https://github.com/oslokommune/ok/issues/465)) ([d3dc248](https://github.com/oslokommune/ok/commit/d3dc248146c4cfcb4a92bd7f42dad85e24264ab1))
+
 ## [5.15.2](https://github.com/oslokommune/ok/compare/v5.15.1...v5.15.2) (2025-12-16)
 
 

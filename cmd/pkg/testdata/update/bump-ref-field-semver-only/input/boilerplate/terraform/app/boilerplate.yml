@@ -226,7 +226,8 @@ hooks:
       dir: '{{ outputFolder }}'
     - command: terragrunt
       args:
-        - hclfmt
+        - hcl
+        - fmt
       dir: '{{ outputFolder }}'
       skip: '{{ if not .Terragrunt.Enable }}true{{ else }}false{{ end }}'
     - command: sh

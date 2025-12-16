@@ -26,7 +26,8 @@ hooks:
   after:
     - command: terragrunt
       args:
-        - hclfmt
+        - hcl
+        - fmt
       dir: '{{ outputFolder }}'
       skip: '{{ not (dig "Terragrunt" "Enable" false .) -}}'
     - command: sh

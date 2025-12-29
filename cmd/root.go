@@ -97,6 +97,8 @@ func init() {
 	if viper.GetBool("enable_experimental") {
 		rootCmd.AddCommand(pkCommand)
 		pkCommand.AddCommand(pk.NewInstallCommand())
+		pkCommand.AddCommand(pk.NewInitCommand())
+		pkCommand.AddCommand(pk.NewAddCommand(ghReleases))
 	}
 }
 

@@ -1,0 +1,5 @@
+# Common variables required by the versions dependency
+AccountId: "123456789012"
+Region: eu-west-1
+Team: test-team
+Environment: dev

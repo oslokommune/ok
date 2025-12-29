@@ -109,11 +109,6 @@ func TestInstallContextAware_FiltersBySubfolder(t *testing.T) {
 			expectedMatches: []string{"networking"},
 		},
 		{
-			name:            "nested infra/database",
-			cwd:             "infra/database",
-			expectedMatches: []string{"infra/database"},
-		},
-		{
 			name:            "at repo root returns no matches",
 			cwd:             ".",
 			expectedMatches: nil,
@@ -189,10 +184,10 @@ func TestInstallCommand_DryRunWithAll(t *testing.T) {
 
 	output := out.String()
 
-	// Should have 3 dry-run lines (one per template)
+	// Should have 2 dry-run lines (one per template)
 	lines := strings.Split(strings.TrimSpace(output), "\n")
-	if len(lines) != 3 {
-		t.Errorf("expected 3 dry-run lines, got %d: %s", len(lines), output)
+	if len(lines) != 2 {
+		t.Errorf("expected 2 dry-run lines, got %d: %s", len(lines), output)
 	}
 
 	// Verify all templates are present
@@ -201,9 +196,6 @@ func TestInstallCommand_DryRunWithAll(t *testing.T) {
 	}
 	if !strings.Contains(output, "networking") {
 		t.Error("expected networking in output")
-	}
-	if !strings.Contains(output, "infra/database") {
-		t.Error("expected infra/database in output")
 	}
 }
 

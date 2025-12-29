@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.16.0](https://github.com/oslokommune/ok/compare/v5.15.3...v5.16.0) (2025-12-29)
+
+
+### Features
+
+* **pk:** add context-aware install behavior ([66e5849](https://github.com/oslokommune/ok/commit/66e584964d1ac8c6ccf8ba3212ff7c0580815dbc)), closes [#420](https://github.com/oslokommune/ok/issues/420)
+
+
+### Bug Fixes
+
+* **pk:** avoid dropping duplicate templates in picker ([3899dea](https://github.com/oslokommune/ok/commit/3899deacfe0102da88a87fa95b8203fd436004e1))
+
 ## [5.15.3](https://github.com/oslokommune/ok/compare/v5.15.2...v5.15.3) (2025-12-16)
 
 

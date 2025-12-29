@@ -25,7 +25,7 @@ func TestAdd_AddsTemplate(t *testing.T) {
 	okDir := filepath.Join(tmpDir, ".ok")
 
 	// Initialize first
-	if err := Init(okDir); err != nil {
+	if err := Init(okDir, InitOptions{}); err != nil {
 		t.Fatalf("Init failed: %v", err)
 	}
 
@@ -85,7 +85,7 @@ func TestAdd_UsesTemplateNameAsSubfolderDefault(t *testing.T) {
 
 	okDir := filepath.Join(tmpDir, ".ok")
 
-	if err := Init(okDir); err != nil {
+	if err := Init(okDir, InitOptions{}); err != nil {
 		t.Fatalf("Init failed: %v", err)
 	}
 
@@ -125,7 +125,7 @@ func TestAdd_WithExplicitRef(t *testing.T) {
 
 	okDir := filepath.Join(tmpDir, ".ok")
 
-	if err := Init(okDir); err != nil {
+	if err := Init(okDir, InitOptions{}); err != nil {
 		t.Fatalf("Init failed: %v", err)
 	}
 
@@ -166,7 +166,7 @@ func TestAdd_FailsOnDuplicateSubfolder(t *testing.T) {
 
 	okDir := filepath.Join(tmpDir, ".ok")
 
-	if err := Init(okDir); err != nil {
+	if err := Init(okDir, InitOptions{}); err != nil {
 		t.Fatalf("Init failed: %v", err)
 	}
 
@@ -202,7 +202,7 @@ func TestAdd_MultipleTemplates(t *testing.T) {
 
 	okDir := filepath.Join(tmpDir, ".ok")
 
-	if err := Init(okDir); err != nil {
+	if err := Init(okDir, InitOptions{}); err != nil {
 		t.Fatalf("Init failed: %v", err)
 	}
 
@@ -230,6 +230,58 @@ func TestAdd_MultipleTemplates(t *testing.T) {
 
 	if len(configs[0].Templates) != 2 {
 		t.Fatalf("expected 2 templates, got %d", len(configs[0].Templates))
+	}
+}
+
+func TestAdd_InheritsBaseOutputFolder(t *testing.T) {
+	tmpDir, err := os.MkdirTemp("", "pk-add-test-*")
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	okDir := filepath.Join(tmpDir, ".ok")
+
+	// Initialize with custom base_output_folder
+	if err := Init(okDir, InitOptions{
+		ConfigFileName:   "dev.yaml",
+		BaseOutputFolder: "stacks/dev",
+	}); err != nil {
+		t.Fatalf("Init failed: %v", err)
+	}
+
+	mock := &mockGitHubReleases{
+		releases: map[string]string{
+			"app": "v10.2.2",
+		},
+	}
+
+	// Add template to the dev.yaml config
+	opts := AddOptions{
+		TemplateName: "app",
+		Subfolder:    "my-app",
+		ConfigFile:   filepath.Join(okDir, "dev.yaml"),
+	}
+
+	err = Add(okDir, opts, mock)
+	if err != nil {
+		t.Fatalf("Add failed: %v", err)
+	}
+
+	// Load and verify base_output_folder is preserved
+	configs, err := LoadConfigs(okDir)
+	if err != nil {
+		t.Fatalf("failed to load configs: %v", err)
+	}
+
+	cfg := configs[0]
+	if cfg.Common.BaseOutputFolder != "stacks/dev" {
+		t.Errorf("expected base_output_folder %q, got %q", "stacks/dev", cfg.Common.BaseOutputFolder)
+	}
+
+	// Template should have been added
+	if len(cfg.Templates) != 1 {
+		t.Fatalf("expected 1 template, got %d", len(cfg.Templates))
 	}
 }
 

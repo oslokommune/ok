@@ -13,6 +13,12 @@ const (
 	DefaultRepo           = "git@github.com:oslokommune/golden-path-boilerplate.git"
 )
 
+// InitOptions contains options for the Init function.
+type InitOptions struct {
+	ConfigFileName   string // e.g., "dev.yaml" or "config.yaml"
+	BaseOutputFolder string // e.g., "stacks/dev" or "."
+}
+
 // DefaultConfig returns a Config with sensible default values for the common section.
 func DefaultConfig() Config {
 	return Config{
@@ -25,19 +31,45 @@ func DefaultConfig() Config {
 	}
 }
 
-// Init creates the .ok directory and a default config.yaml file.
-// Returns an error if the .ok directory already exists.
-func Init(okDir string) error {
-	if _, err := os.Stat(okDir); err == nil {
-		return fmt.Errorf(".ok directory already exists at %s", okDir)
+// ConfigWithBase returns a Config with a custom base_output_folder.
+func ConfigWithBase(baseOutputFolder string) Config {
+	return Config{
+		Common: Template{
+			Repo:             DefaultRepo,
+			NonInteractive:   true,
+			BaseOutputFolder: baseOutputFolder,
+		},
+		Templates: []Template{},
 	}
+}
 
+// Init creates the .ok directory and a config file.
+func Init(okDir string, opts InitOptions) error {
+	// Create .ok directory if it doesn't exist
 	if err := os.MkdirAll(okDir, 0755); err != nil {
 		return fmt.Errorf("creating .ok directory: %w", err)
 	}
 
-	configPath := filepath.Join(okDir, DefaultConfigFileName)
-	return WriteConfig(configPath, DefaultConfig())
+	// Determine config filename
+	configFileName := opts.ConfigFileName
+	if configFileName == "" {
+		configFileName = DefaultConfigFileName
+	}
+
+	configPath := filepath.Join(okDir, configFileName)
+
+	// Check if config file already exists
+	if _, err := os.Stat(configPath); err == nil {
+		return fmt.Errorf("config file already exists: %s", configPath)
+	}
+
+	// Determine base output folder
+	baseOutputFolder := opts.BaseOutputFolder
+	if baseOutputFolder == "" {
+		baseOutputFolder = "."
+	}
+
+	return WriteConfig(configPath, ConfigWithBase(baseOutputFolder))
 }
 
 // WriteConfig writes a Config to the specified file path.

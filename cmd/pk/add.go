@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/charmbracelet/huh"
 	"github.com/oslokommune/ok/pkg/pk"
@@ -55,10 +56,21 @@ If no subfolder is provided, the template name is used.`,
 					return fmt.Errorf("cannot add template without .ok directory")
 				}
 
-				if err := pk.Init(okDir); err != nil {
+				// Prompt for init options
+				initOpts, err := promptInitOptions()
+				if err != nil {
+					return err
+				}
+
+				if err := pk.Init(okDir, initOpts); err != nil {
 					return errors.Join(fmt.Errorf("initializing .ok directory"), err)
 				}
 				fmt.Fprintf(cmd.OutOrStdout(), "✅ Initialized .ok directory\n\n")
+
+				// If a specific config file was created, use it
+				if initOpts.ConfigFileName != "" {
+					file = filepath.Join(okDir, initOpts.ConfigFileName)
+				}
 			}
 
 			opts := pk.AddOptions{

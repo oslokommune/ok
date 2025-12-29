@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/charmbracelet/huh"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"gopkg.in/yaml.v3"
 )
@@ -143,22 +144,23 @@ func selectOrCreateConfigFile(okDir string) (string, error) {
 
 // selectConfigFileInteractively prompts the user to select a config file.
 func selectConfigFileInteractively(files []string) (string, error) {
-	fmt.Println("Multiple config files found. Select one:")
-	for i, f := range files {
-		fmt.Printf("  [%d] %s\n", i+1, filepath.Base(f))
+	options := make([]huh.Option[string], 0, len(files))
+	for _, f := range files {
+		options = append(options, huh.NewOption(filepath.Base(f), f))
 	}
 
-	var choice int
-	fmt.Print("Enter number: ")
-	if _, err := fmt.Scanf("%d", &choice); err != nil {
-		return "", fmt.Errorf("reading choice: %w", err)
+	var selected string
+	err := huh.NewSelect[string]().
+		Title("Select config file").
+		Options(options...).
+		Value(&selected).
+		Run()
+
+	if err != nil {
+		return "", fmt.Errorf("selecting config file: %w", err)
 	}
 
-	if choice < 1 || choice > len(files) {
-		return "", fmt.Errorf("invalid choice: %d", choice)
-	}
-
-	return files[choice-1], nil
+	return selected, nil
 }
 
 // loadSingleConfig loads a single config file.

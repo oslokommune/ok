@@ -193,14 +193,16 @@ func SelectTemplatesInteractively(templates []Template) ([]Template, error) {
 	options := make([]huh.Option[string], 0, len(templates))
 	templateMap := make(map[string]Template)
 
-	for _, tpl := range templates {
-		key := tpl.Subfolder
-		if key == "" {
-			key = tpl.Name
+	for i, tpl := range templates {
+		label := tpl.Subfolder
+		if label == "" {
+			label = tpl.Name
 		}
-		displayText := fmt.Sprintf("%s (%s)", key, tpl.Path)
-		options = append(options, huh.NewOption(displayText, key))
-		templateMap[key] = tpl
+		outputPath := filepath.Clean(filepath.Join(tpl.BaseOutputFolder, tpl.Subfolder))
+		optionKey := fmt.Sprintf("%s|%s|%s|%d", outputPath, tpl.Repo, tpl.Path, i)
+		displayText := fmt.Sprintf("%s (%s)", label, tpl.Path)
+		options = append(options, huh.NewOption(displayText, optionKey))
+		templateMap[optionKey] = tpl
 	}
 
 	var selectedKeys []string

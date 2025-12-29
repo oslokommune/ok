@@ -3,6 +3,7 @@ package pk
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -282,6 +283,46 @@ func TestAdd_InheritsBaseOutputFolder(t *testing.T) {
 	// Template should have been added
 	if len(cfg.Templates) != 1 {
 		t.Fatalf("expected 1 template, got %d", len(cfg.Templates))
+	}
+}
+
+func TestAdd_FailsOnInvalidTemplate(t *testing.T) {
+	tmpDir, err := os.MkdirTemp("", "pk-add-test-*")
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	okDir := filepath.Join(tmpDir, ".ok")
+
+	if err := Init(okDir, InitOptions{}); err != nil {
+		t.Fatalf("Init failed: %v", err)
+	}
+
+	mock := &mockGitHubReleases{
+		releases: map[string]string{
+			"app":        "v10.2.2",
+			"networking": "v3.0.1",
+		},
+	}
+
+	// Try to add non-existent template
+	opts := AddOptions{
+		TemplateName: "cloudfront-deploy", // doesn't exist
+		Subfolder:    "my-app",
+	}
+
+	err = Add(okDir, opts, mock)
+	if err == nil {
+		t.Fatal("expected Add to fail for non-existent template")
+	}
+
+	// Should mention the template name and available templates
+	if !strings.Contains(err.Error(), "cloudfront-deploy") {
+		t.Errorf("error should mention the invalid template name: %v", err)
+	}
+	if !strings.Contains(err.Error(), "app") {
+		t.Errorf("error should list available templates: %v", err)
 	}
 }
 

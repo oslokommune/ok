@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/charmbracelet/huh"
@@ -47,22 +48,25 @@ func Add(okDir string, opts AddOptions, ghReleases GitHubReleases) error {
 		return fmt.Errorf("loading config: %w", err)
 	}
 
+	// Always fetch releases to validate template exists
+	fmt.Printf("Fetching latest releases from GitHub repository %s/%s\n",
+		common.BoilerplateRepoOwner, common.BoilerplateRepoName)
+
+	releases, err := ghReleases.GetLatestReleases()
+	if err != nil {
+		return fmt.Errorf("fetching releases: %w", err)
+	}
+
+	// Validate template exists
+	version, ok := releases[opts.TemplateName]
+	if !ok {
+		return fmt.Errorf("template %q not found. Available templates: %s",
+			opts.TemplateName, availableTemplates(releases))
+	}
+
 	// Determine ref (version)
 	ref := opts.Ref
 	if ref == "" {
-		fmt.Printf("Fetching latest releases from GitHub repository %s/%s\n",
-			common.BoilerplateRepoOwner, common.BoilerplateRepoName)
-
-		releases, err := ghReleases.GetLatestReleases()
-		if err != nil {
-			return fmt.Errorf("fetching releases: %w", err)
-		}
-
-		version, ok := releases[opts.TemplateName]
-		if !ok {
-			return fmt.Errorf("template %q not found in releases", opts.TemplateName)
-		}
-
 		ref = fmt.Sprintf("%s-%s", opts.TemplateName, version)
 	} else {
 		// Normalize ref: if user provided "v1.0.0", convert to "template-v1.0.0"
@@ -103,6 +107,16 @@ func Add(okDir string, opts AddOptions, ghReleases GitHubReleases) error {
 	fmt.Printf("  ok pk install  - Install the template\n")
 
 	return nil
+}
+
+// availableTemplates returns a comma-separated list of template names.
+func availableTemplates(releases map[string]string) string {
+	names := make([]string, 0, len(releases))
+	for name := range releases {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return strings.Join(names, ", ")
 }
 
 // normalizeRef ensures the ref is in the format "template-vX.Y.Z".

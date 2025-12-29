@@ -16,23 +16,29 @@ func NewAddCommand(ghReleases pk.GitHubReleases) *cobra.Command {
 	var file string
 
 	cmd := &cobra.Command{
-		Use:   "add <template> [subfolder]",
+		Use:   "add [template] [subfolder]",
 		Short: "Add a template to the .ok configuration",
 		Long: `Add a template to the .ok configuration file.
 
+If no template is specified, prompts interactively to select from available templates.
 The template version is fetched from the latest GitHub release unless --ref is specified.
-If no subfolder is provided, the template name is used.`,
-		Example: `  ok pk add app
-  ok pk add app my-app
+If no subfolder is provided, prompts for one (defaults to template name).`,
+		Example: `  ok pk add                         # interactive
+  ok pk add app                     # prompts for subfolder
+  ok pk add app my-app              # non-interactive
   ok pk add app my-app --ref v10.0.0
   ok pk add networking --file .ok/infra.yaml`,
-		Args: cobra.RangeArgs(1, 2),
+		Args: cobra.RangeArgs(0, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 
-			templateName := args[0]
-			subfolder := ""
-			if len(args) > 1 {
+			var templateName string
+			var subfolder string
+
+			if len(args) >= 1 {
+				templateName = args[0]
+			}
+			if len(args) >= 2 {
 				subfolder = args[1]
 			}
 
@@ -71,6 +77,24 @@ If no subfolder is provided, the template name is used.`,
 				if initOpts.ConfigFileName != "" {
 					file = filepath.Join(okDir, initOpts.ConfigFileName)
 				}
+			}
+
+			// If no template specified, prompt to select one
+			if templateName == "" {
+				selected, err := promptTemplateSelection(ghReleases)
+				if err != nil {
+					return err
+				}
+				templateName = selected
+			}
+
+			// If no subfolder specified, prompt for one
+			if subfolder == "" {
+				prompted, err := promptSubfolder(templateName)
+				if err != nil {
+					return err
+				}
+				subfolder = prompted
 			}
 
 			opts := pk.AddOptions{
@@ -120,4 +144,55 @@ func dirExists(path string) (bool, error) {
 		return false, err
 	}
 	return info.IsDir(), nil
+}
+
+func promptTemplateSelection(ghReleases pk.GitHubReleases) (string, error) {
+	fmt.Println("Fetching available templates...")
+
+	releases, err := ghReleases.GetLatestReleases()
+	if err != nil {
+		return "", fmt.Errorf("fetching releases: %w", err)
+	}
+
+	// Build options from available templates
+	options := make([]huh.Option[string], 0, len(releases))
+	for template, version := range releases {
+		label := fmt.Sprintf("%s (%s)", template, version)
+		options = append(options, huh.NewOption(label, template))
+	}
+
+	var selected string
+	err = huh.NewSelect[string]().
+		Title("Select a template").
+		Options(options...).
+		Value(&selected).
+		Run()
+
+	if err != nil {
+		return "", fmt.Errorf("selecting template: %w", err)
+	}
+
+	return selected, nil
+}
+
+func promptSubfolder(templateName string) (string, error) {
+	var subfolder string
+
+	err := huh.NewInput().
+		Title("Subfolder name").
+		Description("Where the template will be generated").
+		Placeholder(templateName).
+		Value(&subfolder).
+		Run()
+
+	if err != nil {
+		return "", fmt.Errorf("prompting for subfolder: %w", err)
+	}
+
+	// Use template name as default if empty
+	if subfolder == "" {
+		subfolder = templateName
+	}
+
+	return subfolder, nil
 }

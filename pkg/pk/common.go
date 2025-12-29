@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"dario.cat/mergo"
+	"github.com/charmbracelet/huh"
 	"gopkg.in/yaml.v3"
 )
 
@@ -151,4 +152,76 @@ func RunBoilerplateCommand(ctx context.Context, args []string, workingDir string
 	cmd.Dir = workingDir
 
 	return cmd.Run()
+}
+
+// FilterTemplatesByWorkingDir returns templates whose output path contains the current working directory.
+// If cwd is within or equals a template's output path (baseOutputFolder/subfolder), that template is included.
+func FilterTemplatesByWorkingDir(templates []Template, cwd, repoRoot string) []Template {
+	var matched []Template
+
+	// Make cwd relative to repo root for comparison
+	relCwd, err := filepath.Rel(repoRoot, cwd)
+	if err != nil {
+		return nil
+	}
+
+	// Normalize to handle "." for repo root
+	if relCwd == "." {
+		return nil // At repo root, no filtering - caller should show picker
+	}
+
+	for _, tpl := range templates {
+		outputPath := filepath.Join(tpl.BaseOutputFolder, tpl.Subfolder)
+		// Clean both paths for consistent comparison
+		outputPath = filepath.Clean(outputPath)
+
+		// Check if cwd is within or equals the output path
+		if relCwd == outputPath || strings.HasPrefix(relCwd, outputPath+string(filepath.Separator)) {
+			matched = append(matched, tpl)
+		}
+	}
+
+	return matched
+}
+
+// SelectTemplatesInteractively shows a multi-select picker for templates.
+func SelectTemplatesInteractively(templates []Template) ([]Template, error) {
+	if len(templates) == 0 {
+		return nil, nil
+	}
+
+	options := make([]huh.Option[string], 0, len(templates))
+	templateMap := make(map[string]Template)
+
+	for _, tpl := range templates {
+		key := tpl.Subfolder
+		if key == "" {
+			key = tpl.Name
+		}
+		displayText := fmt.Sprintf("%s (%s)", key, tpl.Path)
+		options = append(options, huh.NewOption(displayText, key))
+		templateMap[key] = tpl
+	}
+
+	var selectedKeys []string
+
+	s := huh.NewMultiSelect[string]().
+		Options(options...).
+		Title("Select template(s) to install").
+		Value(&selectedKeys)
+
+	err := huh.NewForm(huh.NewGroup(s)).Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("running template selection: %w", err)
+	}
+
+	var selected []Template
+	for _, key := range selectedKeys {
+		selected = append(selected, templateMap[key])
+	}
+
+	return selected, nil
 }

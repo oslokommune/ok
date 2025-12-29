@@ -1,0 +1,29 @@
+common:
+  repo: "git@github.com:oslokommune/golden-path-boilerplate.git"
+  non_interactive: true
+  base_output_folder: "."
+
+templates:
+  - name: "app"
+    path: "boilerplate/terraform/app"
+    ref: "app-v6.1.1"
+    subfolder: "app-hello"
+    var_files:
+      - ".ok/common.yml"
+      - ".ok/app-hello.yml"
+
+  - name: "networking"
+    path: "boilerplate/terraform/networking"
+    ref: "networking-v3.0.0"
+    subfolder: "networking"
+    var_files:
+      - ".ok/common.yml"
+      - ".ok/networking.yml"
+
+  - name: "database"
+    path: "boilerplate/terraform/database"
+    ref: "database-v2.0.0"
+    subfolder: "infra/database"
+    var_files:
+      - ".ok/common.yml"
+      - ".ok/database.yml"

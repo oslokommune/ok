@@ -1,0 +1,7 @@
+Packages:
+    - OutputFolder: .
+      Template: app
+      Ref: app-v10.1.0
+      VarFiles:
+        - ../common-config.yml
+        - package-config.yml

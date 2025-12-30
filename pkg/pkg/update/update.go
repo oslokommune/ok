@@ -3,13 +3,14 @@ package update
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path"
+	"strings"
+
 	"github.com/Masterminds/semver"
 	"github.com/oslokommune/ok/pkg/pkg/schema"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
-	"os"
-	"path"
-	"strings"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"

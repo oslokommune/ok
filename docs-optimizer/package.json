@@ -13,10 +13,10 @@
   "license": "ISC",
   "dependencies": {
     "glob": "^13.0.0",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
     "unified": "^11.0.5",
-    "unist-util-visit": "^5.0.0"
+    "unist-util-visit": "^5.1.0"
   }
 }

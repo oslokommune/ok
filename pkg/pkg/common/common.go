@@ -59,6 +59,13 @@ func GenerateRelativePath(outputFolder string) string {
 	return strings.TrimRight(path, "/")
 }
 
+// IsUrl checks if a string is a URL (http://, https://, or git@).
+func IsUrl(str string) bool {
+	return strings.HasPrefix(str, "http://") ||
+		strings.HasPrefix(str, "https://") ||
+		strings.HasPrefix(str, "git@")
+}
+
 func fileExists(path string) (bool, error) {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {

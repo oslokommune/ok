@@ -182,7 +182,7 @@ func TestIsUrl(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := isUrl(tt.input)
+			result := common.IsUrl(tt.input)
 			require.Equal(t, tt.expected, result)
 		})
 	}

@@ -2,12 +2,13 @@ package install
 
 import (
 	"fmt"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/oslokommune/ok/pkg/pkg/common"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/charmbracelet/lipgloss"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 )
 
 // Run runs Boilerplate for the specified packages.
@@ -75,7 +76,7 @@ func CreateBoilerplateCommands(packages []common.Package, opts CreateBoilerPlate
 		}
 
 		var templateURL string
-		if isUrl(opts.BaseUrlOrPath) {
+		if common.IsUrl(opts.BaseUrlOrPath) {
 			pathz := strings.Join(
 				[]string{opts.PackagePathPrefix, pkg.Template}, "/")
 
@@ -100,12 +101,6 @@ func CreateBoilerplateCommands(packages []common.Package, opts CreateBoilerPlate
 	}
 
 	return cmds, nil
-}
-
-func isUrl(str string) bool {
-	return strings.HasPrefix(str, "http://") ||
-		strings.HasPrefix(str, "https://") ||
-		strings.HasPrefix(str, "git@")
 }
 
 type CreateBoilerPlateCommandsOpts struct {

@@ -28,17 +28,11 @@ func buildTemplateURL(templateName string) string {
 
 	templatePath := strings.Join([]string{BoilerplateGitHubActionsPath, templateName}, "/")
 
-	if isUrl(baseURL) {
+	if common.IsUrl(baseURL) {
 		return fmt.Sprintf("%s%s?ref=%s", baseURL, templatePath, TemplateRefDefault)
 	}
 
 	return path.Join(baseURL, templatePath)
-}
-
-func isUrl(str string) bool {
-	return strings.HasPrefix(str, "http://") ||
-		strings.HasPrefix(str, "https://") ||
-		strings.HasPrefix(str, "git@")
 }
 
 // checkBoilerplateInstalled verifies that the boilerplate CLI is available.

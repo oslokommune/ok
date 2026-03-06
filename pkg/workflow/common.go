@@ -1,7 +1,6 @@
 package workflow
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -14,7 +13,6 @@ import (
 
 const (
 	BoilerplateGitHubActionsPath = common.BoilerplatePackageGitHubActionsPath
-	TemplateRefDefault           = "iac-app"
 	TemplateTerraformIac         = "terraform-iac"
 	TemplateAppCicd              = "app-cicd"
 )
@@ -34,7 +32,7 @@ func buildTemplateURL(baseURL, templateName string) string {
 	templatePath := strings.Join([]string{BoilerplateGitHubActionsPath, templateName}, "/")
 
 	if okcommon.IsUrl(baseURL) {
-		return fmt.Sprintf("%s%s?ref=%s", baseURL, templatePath, TemplateRefDefault)
+		return baseURL + templatePath
 	}
 
 	return path.Join(baseURL, templatePath)

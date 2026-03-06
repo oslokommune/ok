@@ -98,7 +98,7 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", common.DefaultBaseUrl+"boilerplate/github-actions/terraform-on-changed-dirs?ref=main",
+					"--template-url", common.DefaultBaseUrl+common.BoilerplatePackageGitHubActionsPath+"/terraform-on-changed-dirs?ref=main",
 					"--output-folder", "out/.github/workflows",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",

@@ -15,7 +15,7 @@ func TestBuildAppInitCommand_DefaultType(t *testing.T) {
 	cmd := buildAppInitCommand(common.DefaultBaseUrl, opts)
 
 	expectedArgs := []string{
-		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/app-cicd?ref=iac-app",
+		"--template-url", common.DefaultBaseUrl + common.BoilerplatePackageGitHubActionsPath + "/app-cicd",
 		"--output-folder", ".",
 		"--non-interactive",
 		"--var", "AppName=my-app",
@@ -37,7 +37,7 @@ func TestBuildAppInitCommand_AppWithIac(t *testing.T) {
 	cmd := buildAppInitCommand(common.DefaultBaseUrl, opts)
 
 	expectedArgs := []string{
-		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/app-cicd?ref=iac-app",
+		"--template-url", common.DefaultBaseUrl + common.BoilerplatePackageGitHubActionsPath + "/app-cicd",
 		"--output-folder", ".",
 		"--non-interactive",
 		"--var", "AppName=my-app",
@@ -66,7 +66,7 @@ func TestBuildAppInitCommand_AllFlags(t *testing.T) {
 	cmd := buildAppInitCommand(common.DefaultBaseUrl, opts)
 
 	expectedArgs := []string{
-		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/app-cicd?ref=iac-app",
+		"--template-url", common.DefaultBaseUrl + common.BoilerplatePackageGitHubActionsPath + "/app-cicd",
 		"--output-folder", ".",
 		"--non-interactive",
 		"--var", "AppName=my-app",

@@ -13,7 +13,7 @@ func TestBuildIacInitCommand_NoFlags(t *testing.T) {
 	cmd := buildIacInitCommand(common.DefaultBaseUrl, opts)
 
 	expectedArgs := []string{
-		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/terraform-iac?ref=iac-app",
+		"--template-url", common.DefaultBaseUrl + common.BoilerplatePackageGitHubActionsPath + "/terraform-iac",
 		"--output-folder", ".",
 		"--non-interactive",
 	}
@@ -36,7 +36,7 @@ func TestBuildIacInitCommand_AllFlags(t *testing.T) {
 	cmd := buildIacInitCommand(common.DefaultBaseUrl, opts)
 
 	expectedArgs := []string{
-		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/terraform-iac?ref=iac-app",
+		"--template-url", common.DefaultBaseUrl + common.BoilerplatePackageGitHubActionsPath + "/terraform-iac",
 		"--output-folder", ".",
 		"--non-interactive",
 		"--var", "DevAccountId=111111111111",

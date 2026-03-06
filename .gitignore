@@ -32,3 +32,4 @@ main
 /packages.yml
 
 docs
+.env

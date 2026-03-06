@@ -8,6 +8,7 @@ import (
 	"github.com/oslokommune/ok/cmd/data"
 	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
+	wf "github.com/oslokommune/ok/cmd/workflow"
 	"github.com/oslokommune/ok/pkg/error_user_msg"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
@@ -91,6 +92,12 @@ func init() {
 
 	rootCmd.AddCommand(dataCommand)
 	dataCommand.AddCommand(data.InitCommand)
+
+	rootCmd.AddCommand(workflowCommand)
+	workflowCommand.AddCommand(wf.IacCommand)
+	workflowCommand.AddCommand(wf.AppCommand)
+	wf.IacCommand.AddCommand(wf.IacInitCommand)
+	wf.AppCommand.AddCommand(wf.AppInitCommand)
 
 	initializeConfiguration()
 

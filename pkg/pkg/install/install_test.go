@@ -1,6 +1,7 @@
 package install
 
 import (
+	okcommon "github.com/oslokommune/ok/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -97,7 +98,7 @@ func TestInstall(t *testing.T) {
 			expectBoilerplateCommands: []*exec.Cmd{
 				exec.Command(
 					"boilerplate",
-					"--template-url", common.DefaultBaseUrl+"boilerplate/github-actions/terraform-on-changed-dirs?ref=main",
+					"--template-url", common.DefaultBaseUrl+common.BoilerplatePackageGitHubActionsPath+"/terraform-on-changed-dirs?ref=main",
 					"--output-folder", "out/.github/workflows",
 					"--non-interactive",
 					"--var-file", "config/common-config.yml",
@@ -182,7 +183,7 @@ func TestIsUrl(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := isUrl(tt.input)
+			result := okcommon.IsUrl(tt.input)
 			require.Equal(t, tt.expected, result)
 		})
 	}

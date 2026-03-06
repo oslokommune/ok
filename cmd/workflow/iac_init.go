@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	iacFlagAccountID           string
+	iacFlagDevAccountID        string
+	iacFlagProdAccountID       string
 	iacFlagRegion              string
 	iacFlagDevEnvironmentName  string
 	iacFlagProdEnvironmentName string
@@ -24,14 +25,15 @@ This command runs boilerplate to download and render workflow templates.`,
 	Example: `  # Basic initialization
   ok workflow iac init
 
-  # With AWS account and region
-  ok workflow iac init --account-id 123456789012 --region eu-west-1
+  # With AWS accounts and region
+  ok workflow iac init --dev-account-id 111111111111 --prod-account-id 222222222222 --region eu-west-1
 
   # With a boilerplate variable file
   ok workflow iac init --var-file common-config.yml`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return workflow.RunIacInit(workflow.IacInitOptions{
-			AccountID:           iacFlagAccountID,
+			DevAccountID:        iacFlagDevAccountID,
+			ProdAccountID:       iacFlagProdAccountID,
 			Region:              iacFlagRegion,
 			DevEnvironmentName:  iacFlagDevEnvironmentName,
 			ProdEnvironmentName: iacFlagProdEnvironmentName,
@@ -41,7 +43,8 @@ This command runs boilerplate to download and render workflow templates.`,
 }
 
 func init() {
-	IacInitCommand.Flags().StringVar(&iacFlagAccountID, "account-id", "", "AWS account ID")
+	IacInitCommand.Flags().StringVar(&iacFlagDevAccountID, "dev-account-id", "", "AWS account ID for the dev environment")
+	IacInitCommand.Flags().StringVar(&iacFlagProdAccountID, "prod-account-id", "", "AWS account ID for the prod environment")
 	IacInitCommand.Flags().StringVar(&iacFlagRegion, "region", "", "AWS region")
 	IacInitCommand.Flags().StringVar(&iacFlagDevEnvironmentName, "dev-env-name", "", "Name of the dev environment, used in AWS resource names")
 	IacInitCommand.Flags().StringVar(&iacFlagProdEnvironmentName, "prod-env-name", "", "Name of the prod environment, used in AWS resource names")

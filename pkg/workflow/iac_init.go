@@ -9,7 +9,8 @@ import (
 
 // IacInitOptions contains options for the iac init command.
 type IacInitOptions struct {
-	AccountID           string
+	DevAccountID        string
+	ProdAccountID       string
 	Region              string
 	DevEnvironmentName  string
 	ProdEnvironmentName string
@@ -46,8 +47,12 @@ func BuildIacInitCommand(opts IacInitOptions) *exec.Cmd {
 		"--non-interactive",
 	}
 
-	if opts.AccountID != "" {
-		args = append(args, "--var", "AccountId="+opts.AccountID)
+	if opts.DevAccountID != "" {
+		args = append(args, "--var", "DevAccountId="+opts.DevAccountID)
+	}
+
+	if opts.ProdAccountID != "" {
+		args = append(args, "--var", "ProdAccountId="+opts.ProdAccountID)
 	}
 
 	if opts.Region != "" {

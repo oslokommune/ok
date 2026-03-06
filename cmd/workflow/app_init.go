@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	appFlagAccountID           string
+	appFlagDevAccountID        string
+	appFlagProdAccountID       string
 	appFlagRegion              string
 	appFlagType                string
 	appFlagDevEnvironmentName  string
@@ -28,8 +29,8 @@ This command runs boilerplate to download and render workflow templates.`,
   # For a repo that also contains infrastructure
   ok workflow app init my-app --type=app-with-iac
 
-  # With AWS account and region
-  ok workflow app init my-app --account-id 123456789012 --region eu-west-1`,
+  # With AWS accounts and region
+  ok workflow app init my-app --dev-account-id 111111111111 --prod-account-id 222222222222 --region eu-west-1`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := workflow.ValidateAppType(appFlagType); err != nil {
@@ -39,7 +40,8 @@ This command runs boilerplate to download and render workflow templates.`,
 		return workflow.RunAppInit(workflow.AppInitOptions{
 			AppName:             args[0],
 			AppType:             workflow.AppType(appFlagType),
-			AccountID:           appFlagAccountID,
+			DevAccountID:        appFlagDevAccountID,
+			ProdAccountID:       appFlagProdAccountID,
 			Region:              appFlagRegion,
 			DevEnvironmentName:  appFlagDevEnvironmentName,
 			ProdEnvironmentName: appFlagProdEnvironmentName,
@@ -49,7 +51,8 @@ This command runs boilerplate to download and render workflow templates.`,
 }
 
 func init() {
-	AppInitCommand.Flags().StringVar(&appFlagAccountID, "account-id", "", "AWS account ID")
+	AppInitCommand.Flags().StringVar(&appFlagDevAccountID, "dev-account-id", "", "AWS account ID for the dev environment")
+	AppInitCommand.Flags().StringVar(&appFlagProdAccountID, "prod-account-id", "", "AWS account ID for the prod environment")
 	AppInitCommand.Flags().StringVar(&appFlagRegion, "region", "", "AWS region")
 	AppInitCommand.Flags().StringVar(&appFlagType, "type", "", "Repository type variant (valid: app-with-iac)")
 	AppInitCommand.Flags().StringVar(&appFlagDevEnvironmentName, "dev-env-name", "", "Name of the dev environment, used in AWS resource names")

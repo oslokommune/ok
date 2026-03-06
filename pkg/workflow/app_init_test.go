@@ -36,7 +36,8 @@ func TestBuildAppInitCommand_AppWithIac(t *testing.T) {
 	opts := AppInitOptions{
 		AppName:   "my-app",
 		AppType:   AppTypeAppWithIac,
-		AccountID: "123",
+		DevAccountID:  "111111111111",
+		ProdAccountID: "222222222222",
 	}
 	cmd := BuildAppInitCommand(opts)
 
@@ -46,7 +47,8 @@ func TestBuildAppInitCommand_AppWithIac(t *testing.T) {
 		"--non-interactive",
 		"--var", "AppName=my-app",
 		"--var", "AppWithIac=true",
-		"--var", "AccountId=123",
+		"--var", "DevAccountId=111111111111",
+		"--var", "ProdAccountId=222222222222",
 	}
 	actualArgs := cmd.Args[1:]
 
@@ -61,10 +63,11 @@ func TestBuildAppInitCommand_AllFlags(t *testing.T) {
 	opts := AppInitOptions{
 		AppName:             "my-app",
 		AppType:             AppTypeAppWithIac,
-		AccountID:           "456",
-		Region:              "eu-north-1",
-		DevEnvironmentName:  "staging",
-		ProdEnvironmentName: "production",
+		DevAccountID:        "333333333333",
+		ProdAccountID:       "444444444444",
+		Region:              "eu-west-1",
+		DevEnvironmentName:  "pirates-dev",
+		ProdEnvironmentName: "pirates-prod",
 		VarFiles:            []string{"vars.yml"},
 	}
 	cmd := BuildAppInitCommand(opts)
@@ -75,10 +78,11 @@ func TestBuildAppInitCommand_AllFlags(t *testing.T) {
 		"--non-interactive",
 		"--var", "AppName=my-app",
 		"--var", "AppWithIac=true",
-		"--var", "AccountId=456",
-		"--var", "Region=eu-north-1",
-		"--var", "DevEnvironmentName=staging",
-		"--var", "ProdEnvironmentName=production",
+		"--var", "DevAccountId=333333333333",
+		"--var", "ProdAccountId=444444444444",
+		"--var", "Region=eu-west-1",
+		"--var", "DevEnvironmentName=pirates-dev",
+		"--var", "ProdEnvironmentName=pirates-prod",
 		"--var-file", "vars.yml",
 	}
 	actualArgs := cmd.Args[1:]

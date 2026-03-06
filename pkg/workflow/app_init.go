@@ -23,7 +23,8 @@ var ValidAppTypes = []AppType{AppTypeAppWithIac}
 type AppInitOptions struct {
 	AppName             string
 	AppType             AppType
-	AccountID           string
+	DevAccountID        string
+	ProdAccountID       string
 	Region              string
 	DevEnvironmentName  string
 	ProdEnvironmentName string
@@ -80,8 +81,12 @@ func BuildAppInitCommand(opts AppInitOptions) *exec.Cmd {
 		args = append(args, "--var", "AppWithIac=true")
 	}
 
-	if opts.AccountID != "" {
-		args = append(args, "--var", "AccountId="+opts.AccountID)
+	if opts.DevAccountID != "" {
+		args = append(args, "--var", "DevAccountId="+opts.DevAccountID)
+	}
+
+	if opts.ProdAccountID != "" {
+		args = append(args, "--var", "ProdAccountId="+opts.ProdAccountID)
 	}
 
 	if opts.Region != "" {

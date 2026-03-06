@@ -31,10 +31,11 @@ func TestBuildIacInitCommand_AllFlags(t *testing.T) {
 	os.Unsetenv(common.BaseUrlEnvName)
 
 	opts := IacInitOptions{
-		AccountID:           "123",
+		DevAccountID:        "111111111111",
+		ProdAccountID:       "222222222222",
 		Region:              "eu-west-1",
-		DevEnvironmentName:  "staging",
-		ProdEnvironmentName: "production",
+		DevEnvironmentName:  "pirates-dev",
+		ProdEnvironmentName: "pirates-prod",
 		VarFiles:            []string{"common-config.yml"},
 	}
 	cmd := BuildIacInitCommand(opts)
@@ -43,10 +44,11 @@ func TestBuildIacInitCommand_AllFlags(t *testing.T) {
 		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/terraform-iac?ref=iac-app",
 		"--output-folder", ".",
 		"--non-interactive",
-		"--var", "AccountId=123",
+		"--var", "DevAccountId=111111111111",
+		"--var", "ProdAccountId=222222222222",
 		"--var", "Region=eu-west-1",
-		"--var", "DevEnvironmentName=staging",
-		"--var", "ProdEnvironmentName=production",
+		"--var", "DevEnvironmentName=pirates-dev",
+		"--var", "ProdEnvironmentName=pirates-prod",
 		"--var-file", "common-config.yml",
 	}
 	actualArgs := cmd.Args[1:]

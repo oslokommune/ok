@@ -8,7 +8,8 @@ import (
 var (
 	iacFlagDevAccountID        string
 	iacFlagProdAccountID       string
-	iacFlagRegion              string
+	iacFlagDevRegion           string
+	iacFlagProdRegion          string
 	iacFlagDevEnvironmentName  string
 	iacFlagProdEnvironmentName string
 )
@@ -24,15 +25,16 @@ This command runs boilerplate to download and render workflow templates.`,
 	Example: `  # Basic initialization
   ok workflow iac init
 
-  # With AWS accounts and region
-  ok workflow iac init --dev-account-id 111111111111 --prod-account-id 222222222222 --region eu-west-1
+  # With AWS accounts and regions
+  ok workflow iac init --dev-account-id 111111111111 --prod-account-id 222222222222 --dev-region eu-west-1 --prod-region eu-west-1
 
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return workflow.RunIacInit(workflow.IacInitOptions{
 			DevAccountID:        iacFlagDevAccountID,
 			ProdAccountID:       iacFlagProdAccountID,
-			Region:              iacFlagRegion,
+			DevRegion:           iacFlagDevRegion,
+			ProdRegion:          iacFlagProdRegion,
 			DevEnvironmentName:  iacFlagDevEnvironmentName,
 			ProdEnvironmentName: iacFlagProdEnvironmentName,
 		})
@@ -42,7 +44,8 @@ This command runs boilerplate to download and render workflow templates.`,
 func init() {
 	IacInitCommand.Flags().StringVar(&iacFlagDevAccountID, "dev-account-id", "", "AWS account ID for the dev environment")
 	IacInitCommand.Flags().StringVar(&iacFlagProdAccountID, "prod-account-id", "", "AWS account ID for the prod environment")
-	IacInitCommand.Flags().StringVar(&iacFlagRegion, "region", "", "AWS region")
+	IacInitCommand.Flags().StringVar(&iacFlagDevRegion, "dev-region", "", "AWS region for the dev environment")
+	IacInitCommand.Flags().StringVar(&iacFlagProdRegion, "prod-region", "", "AWS region for the prod environment")
 	IacInitCommand.Flags().StringVar(&iacFlagDevEnvironmentName, "dev-env-name", "", "Name of the dev environment, used in AWS resource names")
 	IacInitCommand.Flags().StringVar(&iacFlagProdEnvironmentName, "prod-env-name", "", "Name of the prod environment, used in AWS resource names")
 }

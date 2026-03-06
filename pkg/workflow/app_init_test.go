@@ -65,7 +65,8 @@ func TestBuildAppInitCommand_AllFlags(t *testing.T) {
 		AppType:             AppTypeAppWithIac,
 		DevAccountID:        "333333333333",
 		ProdAccountID:       "444444444444",
-		Region:              "eu-west-1",
+		DevRegion:           "eu-west-1",
+		ProdRegion:          "eu-west-1",
 		DevEnvironmentName:  "pirates-dev",
 		ProdEnvironmentName: "pirates-prod",
 	}
@@ -79,7 +80,8 @@ func TestBuildAppInitCommand_AllFlags(t *testing.T) {
 		"--var", "AppWithIac=true",
 		"--var", "DevAccountId=333333333333",
 		"--var", "ProdAccountId=444444444444",
-		"--var", "Region=eu-west-1",
+		"--var", "DevRegion=eu-west-1",
+		"--var", "ProdRegion=eu-west-1",
 		"--var", "DevEnvironmentName=pirates-dev",
 		"--var", "ProdEnvironmentName=pirates-prod",
 	}

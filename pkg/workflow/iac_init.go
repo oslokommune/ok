@@ -11,7 +11,8 @@ import (
 type IacInitOptions struct {
 	DevAccountID        string
 	ProdAccountID       string
-	Region              string
+	DevRegion           string
+	ProdRegion          string
 	DevEnvironmentName  string
 	ProdEnvironmentName string
 }
@@ -54,8 +55,12 @@ func BuildIacInitCommand(opts IacInitOptions) *exec.Cmd {
 		args = append(args, "--var", "ProdAccountId="+opts.ProdAccountID)
 	}
 
-	if opts.Region != "" {
-		args = append(args, "--var", "Region="+opts.Region)
+	if opts.DevRegion != "" {
+		args = append(args, "--var", "DevRegion="+opts.DevRegion)
+	}
+
+	if opts.ProdRegion != "" {
+		args = append(args, "--var", "ProdRegion="+opts.ProdRegion)
 	}
 
 	if opts.DevEnvironmentName != "" {

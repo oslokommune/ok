@@ -8,7 +8,8 @@ import (
 var (
 	appFlagDevAccountID        string
 	appFlagProdAccountID       string
-	appFlagRegion              string
+	appFlagDevRegion           string
+	appFlagProdRegion          string
 	appFlagType                string
 	appFlagDevEnvironmentName  string
 	appFlagProdEnvironmentName string
@@ -28,8 +29,8 @@ This command runs boilerplate to download and render workflow templates.`,
   # For a repo that also contains infrastructure
   ok workflow app init my-app --type=app-with-iac
 
-  # With AWS accounts and region
-  ok workflow app init my-app --dev-account-id 111111111111 --prod-account-id 222222222222 --region eu-west-1`,
+  # With AWS accounts and regions
+  ok workflow app init my-app --dev-account-id 111111111111 --prod-account-id 222222222222 --dev-region eu-west-1 --prod-region eu-west-1`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := workflow.ValidateAppType(appFlagType); err != nil {
@@ -41,7 +42,8 @@ This command runs boilerplate to download and render workflow templates.`,
 			AppType:             workflow.AppType(appFlagType),
 			DevAccountID:        appFlagDevAccountID,
 			ProdAccountID:       appFlagProdAccountID,
-			Region:              appFlagRegion,
+			DevRegion:           appFlagDevRegion,
+			ProdRegion:          appFlagProdRegion,
 			DevEnvironmentName:  appFlagDevEnvironmentName,
 			ProdEnvironmentName: appFlagProdEnvironmentName,
 		})
@@ -51,7 +53,8 @@ This command runs boilerplate to download and render workflow templates.`,
 func init() {
 	AppInitCommand.Flags().StringVar(&appFlagDevAccountID, "dev-account-id", "", "AWS account ID for the dev environment")
 	AppInitCommand.Flags().StringVar(&appFlagProdAccountID, "prod-account-id", "", "AWS account ID for the prod environment")
-	AppInitCommand.Flags().StringVar(&appFlagRegion, "region", "", "AWS region")
+	AppInitCommand.Flags().StringVar(&appFlagDevRegion, "dev-region", "", "AWS region for the dev environment")
+	AppInitCommand.Flags().StringVar(&appFlagProdRegion, "prod-region", "", "AWS region for the prod environment")
 	AppInitCommand.Flags().StringVar(&appFlagType, "type", "", "Repository type variant (valid: app-with-iac)")
 	AppInitCommand.Flags().StringVar(&appFlagDevEnvironmentName, "dev-env-name", "", "Name of the dev environment, used in AWS resource names")
 	AppInitCommand.Flags().StringVar(&appFlagProdEnvironmentName, "prod-env-name", "", "Name of the prod environment, used in AWS resource names")

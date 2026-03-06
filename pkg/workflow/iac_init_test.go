@@ -33,7 +33,8 @@ func TestBuildIacInitCommand_AllFlags(t *testing.T) {
 	opts := IacInitOptions{
 		DevAccountID:        "111111111111",
 		ProdAccountID:       "222222222222",
-		Region:              "eu-west-1",
+		DevRegion:           "eu-west-1",
+		ProdRegion:          "eu-west-1",
 		DevEnvironmentName:  "pirates-dev",
 		ProdEnvironmentName: "pirates-prod",
 	}
@@ -45,7 +46,8 @@ func TestBuildIacInitCommand_AllFlags(t *testing.T) {
 		"--non-interactive",
 		"--var", "DevAccountId=111111111111",
 		"--var", "ProdAccountId=222222222222",
-		"--var", "Region=eu-west-1",
+		"--var", "DevRegion=eu-west-1",
+		"--var", "ProdRegion=eu-west-1",
 		"--var", "DevEnvironmentName=pirates-dev",
 		"--var", "ProdEnvironmentName=pirates-prod",
 	}

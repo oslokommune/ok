@@ -68,8 +68,6 @@ func TestBuildAppInitCommand_AllFlags(t *testing.T) {
 		Region:              "eu-west-1",
 		DevEnvironmentName:  "pirates-dev",
 		ProdEnvironmentName: "pirates-prod",
-		DevVarFile:          "dev-vars.yml",
-		ProdVarFile:         "prod-vars.yml",
 	}
 	cmd := BuildAppInitCommand(opts)
 
@@ -84,8 +82,6 @@ func TestBuildAppInitCommand_AllFlags(t *testing.T) {
 		"--var", "Region=eu-west-1",
 		"--var", "DevEnvironmentName=pirates-dev",
 		"--var", "ProdEnvironmentName=pirates-prod",
-		"--var-file", "dev-vars.yml",
-		"--var-file", "prod-vars.yml",
 	}
 	actualArgs := cmd.Args[1:]
 

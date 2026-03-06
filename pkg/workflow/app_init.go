@@ -28,8 +28,6 @@ type AppInitOptions struct {
 	Region              string
 	DevEnvironmentName  string
 	ProdEnvironmentName string
-	DevVarFile          string
-	ProdVarFile         string
 }
 
 // ValidateAppType checks if the given type string is valid.
@@ -100,14 +98,6 @@ func BuildAppInitCommand(opts AppInitOptions) *exec.Cmd {
 
 	if opts.ProdEnvironmentName != "" {
 		args = append(args, "--var", "ProdEnvironmentName="+opts.ProdEnvironmentName)
-	}
-
-	if opts.DevVarFile != "" {
-		args = append(args, "--var-file", opts.DevVarFile)
-	}
-
-	if opts.ProdVarFile != "" {
-		args = append(args, "--var-file", opts.ProdVarFile)
 	}
 
 	cmd := exec.Command("boilerplate", args...)

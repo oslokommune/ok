@@ -14,8 +14,6 @@ type IacInitOptions struct {
 	Region              string
 	DevEnvironmentName  string
 	ProdEnvironmentName string
-	DevVarFile          string
-	ProdVarFile         string
 }
 
 // RunIacInit executes the boilerplate command for terraform-iac workflow init.
@@ -66,14 +64,6 @@ func BuildIacInitCommand(opts IacInitOptions) *exec.Cmd {
 
 	if opts.ProdEnvironmentName != "" {
 		args = append(args, "--var", "ProdEnvironmentName="+opts.ProdEnvironmentName)
-	}
-
-	if opts.DevVarFile != "" {
-		args = append(args, "--var-file", opts.DevVarFile)
-	}
-
-	if opts.ProdVarFile != "" {
-		args = append(args, "--var-file", opts.ProdVarFile)
 	}
 
 	cmd := exec.Command("boilerplate", args...)

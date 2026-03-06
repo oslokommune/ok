@@ -11,8 +11,6 @@ var (
 	iacFlagRegion              string
 	iacFlagDevEnvironmentName  string
 	iacFlagProdEnvironmentName string
-	iacFlagDevVarFile          string
-	iacFlagProdVarFile         string
 )
 
 // IacInitCommand initializes CI/CD workflow files for a terraform-iac repository.
@@ -29,8 +27,7 @@ This command runs boilerplate to download and render workflow templates.`,
   # With AWS accounts and region
   ok workflow iac init --dev-account-id 111111111111 --prod-account-id 222222222222 --region eu-west-1
 
-  # With boilerplate variable files per environment
-  ok workflow iac init --dev-var-file dev-config.yml --prod-var-file prod-config.yml`,
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return workflow.RunIacInit(workflow.IacInitOptions{
 			DevAccountID:        iacFlagDevAccountID,
@@ -38,8 +35,6 @@ This command runs boilerplate to download and render workflow templates.`,
 			Region:              iacFlagRegion,
 			DevEnvironmentName:  iacFlagDevEnvironmentName,
 			ProdEnvironmentName: iacFlagProdEnvironmentName,
-			DevVarFile:          iacFlagDevVarFile,
-			ProdVarFile:         iacFlagProdVarFile,
 		})
 	},
 }
@@ -50,6 +45,4 @@ func init() {
 	IacInitCommand.Flags().StringVar(&iacFlagRegion, "region", "", "AWS region")
 	IacInitCommand.Flags().StringVar(&iacFlagDevEnvironmentName, "dev-env-name", "", "Name of the dev environment, used in AWS resource names")
 	IacInitCommand.Flags().StringVar(&iacFlagProdEnvironmentName, "prod-env-name", "", "Name of the prod environment, used in AWS resource names")
-	IacInitCommand.Flags().StringVar(&iacFlagDevVarFile, "dev-var-file", "", "Path to a boilerplate variable file for the dev environment")
-	IacInitCommand.Flags().StringVar(&iacFlagProdVarFile, "prod-var-file", "", "Path to a boilerplate variable file for the prod environment")
 }

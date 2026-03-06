@@ -19,14 +19,18 @@ const (
 	TemplateAppCicd              = "app-cicd"
 )
 
-// buildTemplateURL constructs the full template URL for boilerplate.
-// It supports git URLs (git@, http://, https://) and local filesystem paths.
-func buildTemplateURL(templateName string) string {
+// resolveBaseURL returns the base URL from the environment, or the default.
+func resolveBaseURL() string {
 	baseURL := os.Getenv(common.BaseUrlEnvName)
 	if baseURL == "" {
-		baseURL = common.DefaultBaseUrl
+		return common.DefaultBaseUrl
 	}
+	return baseURL
+}
 
+// buildTemplateURL constructs the full template URL for boilerplate.
+// It supports git URLs (git@, http://, https://) and local filesystem paths.
+func buildTemplateURL(baseURL, templateName string) string {
 	templatePath := strings.Join([]string{BoilerplateGitHubActionsPath, templateName}, "/")
 
 	if okcommon.IsUrl(baseURL) {

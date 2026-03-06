@@ -39,7 +39,11 @@ func RunIacInit(opts IacInitOptions) error {
 
 // BuildIacInitCommand constructs the exec.Cmd for boilerplate terraform-iac init.
 func BuildIacInitCommand(opts IacInitOptions) *exec.Cmd {
-	templateURL := buildTemplateURL(TemplateTerraformIac)
+	return buildIacInitCommand(resolveBaseURL(), opts)
+}
+
+func buildIacInitCommand(baseURL string, opts IacInitOptions) *exec.Cmd {
+	templateURL := buildTemplateURL(baseURL, TemplateTerraformIac)
 
 	args := []string{
 		"--template-url", templateURL,

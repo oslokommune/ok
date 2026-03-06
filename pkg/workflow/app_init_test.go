@@ -1,21 +1,18 @@
 package workflow
 
 import (
-	"os"
 	"testing"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
 )
 
 func TestBuildAppInitCommand_DefaultType(t *testing.T) {
-	originalEnv := os.Getenv(common.BaseUrlEnvName)
-	defer restoreEnv(common.BaseUrlEnvName, originalEnv)
-	os.Unsetenv(common.BaseUrlEnvName)
+	t.Parallel()
 
 	opts := AppInitOptions{
 		AppName: "my-app",
 	}
-	cmd := BuildAppInitCommand(opts)
+	cmd := buildAppInitCommand(common.DefaultBaseUrl, opts)
 
 	expectedArgs := []string{
 		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/app-cicd?ref=iac-app",
@@ -29,17 +26,15 @@ func TestBuildAppInitCommand_DefaultType(t *testing.T) {
 }
 
 func TestBuildAppInitCommand_AppWithIac(t *testing.T) {
-	originalEnv := os.Getenv(common.BaseUrlEnvName)
-	defer restoreEnv(common.BaseUrlEnvName, originalEnv)
-	os.Unsetenv(common.BaseUrlEnvName)
+	t.Parallel()
 
 	opts := AppInitOptions{
-		AppName:   "my-app",
-		AppType:   AppTypeAppWithIac,
+		AppName:       "my-app",
+		AppType:       AppTypeAppWithIac,
 		DevAccountID:  "111111111111",
 		ProdAccountID: "222222222222",
 	}
-	cmd := BuildAppInitCommand(opts)
+	cmd := buildAppInitCommand(common.DefaultBaseUrl, opts)
 
 	expectedArgs := []string{
 		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/app-cicd?ref=iac-app",
@@ -56,9 +51,7 @@ func TestBuildAppInitCommand_AppWithIac(t *testing.T) {
 }
 
 func TestBuildAppInitCommand_AllFlags(t *testing.T) {
-	originalEnv := os.Getenv(common.BaseUrlEnvName)
-	defer restoreEnv(common.BaseUrlEnvName, originalEnv)
-	os.Unsetenv(common.BaseUrlEnvName)
+	t.Parallel()
 
 	opts := AppInitOptions{
 		AppName:             "my-app",
@@ -70,7 +63,7 @@ func TestBuildAppInitCommand_AllFlags(t *testing.T) {
 		DevEnvironmentName:  "pirates-dev",
 		ProdEnvironmentName: "pirates-prod",
 	}
-	cmd := BuildAppInitCommand(opts)
+	cmd := buildAppInitCommand(common.DefaultBaseUrl, opts)
 
 	expectedArgs := []string{
 		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/app-cicd?ref=iac-app",

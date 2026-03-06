@@ -1,19 +1,16 @@
 package workflow
 
 import (
-	"os"
 	"testing"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
 )
 
 func TestBuildIacInitCommand_NoFlags(t *testing.T) {
-	originalEnv := os.Getenv(common.BaseUrlEnvName)
-	defer restoreEnv(common.BaseUrlEnvName, originalEnv)
-	os.Unsetenv(common.BaseUrlEnvName)
+	t.Parallel()
 
 	opts := IacInitOptions{}
-	cmd := BuildIacInitCommand(opts)
+	cmd := buildIacInitCommand(common.DefaultBaseUrl, opts)
 
 	expectedArgs := []string{
 		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/terraform-iac?ref=iac-app",
@@ -26,9 +23,7 @@ func TestBuildIacInitCommand_NoFlags(t *testing.T) {
 }
 
 func TestBuildIacInitCommand_AllFlags(t *testing.T) {
-	originalEnv := os.Getenv(common.BaseUrlEnvName)
-	defer restoreEnv(common.BaseUrlEnvName, originalEnv)
-	os.Unsetenv(common.BaseUrlEnvName)
+	t.Parallel()
 
 	opts := IacInitOptions{
 		DevAccountID:        "111111111111",
@@ -38,7 +33,7 @@ func TestBuildIacInitCommand_AllFlags(t *testing.T) {
 		DevEnvironmentName:  "pirates-dev",
 		ProdEnvironmentName: "pirates-prod",
 	}
-	cmd := BuildIacInitCommand(opts)
+	cmd := buildIacInitCommand(common.DefaultBaseUrl, opts)
 
 	expectedArgs := []string{
 		"--template-url", common.DefaultBaseUrl + "boilerplate/github-actions/terraform-iac?ref=iac-app",

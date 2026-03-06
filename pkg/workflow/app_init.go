@@ -68,7 +68,11 @@ func RunAppInit(opts AppInitOptions) error {
 
 // BuildAppInitCommand constructs the exec.Cmd for boilerplate app-cicd init.
 func BuildAppInitCommand(opts AppInitOptions) *exec.Cmd {
-	templateURL := buildTemplateURL(TemplateAppCicd)
+	return buildAppInitCommand(resolveBaseURL(), opts)
+}
+
+func buildAppInitCommand(baseURL string, opts AppInitOptions) *exec.Cmd {
+	templateURL := buildTemplateURL(baseURL, TemplateAppCicd)
 
 	args := []string{
 		"--template-url", templateURL,

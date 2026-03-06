@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	okcommon "github.com/oslokommune/ok/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 )
 
@@ -76,7 +77,7 @@ func CreateBoilerplateCommands(packages []common.Package, opts CreateBoilerPlate
 		}
 
 		var templateURL string
-		if common.IsUrl(opts.BaseUrlOrPath) {
+		if okcommon.IsUrl(opts.BaseUrlOrPath) {
 			pathz := strings.Join(
 				[]string{opts.PackagePathPrefix, pkg.Template}, "/")
 

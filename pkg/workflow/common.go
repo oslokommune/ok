@@ -7,6 +7,7 @@ import (
 	"path"
 	"strings"
 
+	okcommon "github.com/oslokommune/ok/pkg/common"
 	"github.com/oslokommune/ok/pkg/error_user_msg"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 )
@@ -28,7 +29,7 @@ func buildTemplateURL(templateName string) string {
 
 	templatePath := strings.Join([]string{BoilerplateGitHubActionsPath, templateName}, "/")
 
-	if common.IsUrl(baseURL) {
+	if okcommon.IsUrl(baseURL) {
 		return fmt.Sprintf("%s%s?ref=%s", baseURL, templatePath, TemplateRefDefault)
 	}
 

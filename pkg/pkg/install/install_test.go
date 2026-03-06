@@ -1,6 +1,7 @@
 package install
 
 import (
+	okcommon "github.com/oslokommune/ok/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -182,7 +183,7 @@ func TestIsUrl(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := common.IsUrl(tt.input)
+			result := okcommon.IsUrl(tt.input)
 			require.Equal(t, tt.expected, result)
 		})
 	}

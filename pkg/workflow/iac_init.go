@@ -9,9 +9,11 @@ import (
 
 // IacInitOptions contains options for the iac init command.
 type IacInitOptions struct {
-	AccountID string
-	Region    string
-	VarFiles  []string
+	AccountID           string
+	Region              string
+	DevEnvironmentName  string
+	ProdEnvironmentName string
+	VarFiles            []string
 }
 
 // RunIacInit executes the boilerplate command for terraform-iac workflow init.
@@ -50,6 +52,14 @@ func BuildIacInitCommand(opts IacInitOptions) *exec.Cmd {
 
 	if opts.Region != "" {
 		args = append(args, "--var", "Region="+opts.Region)
+	}
+
+	if opts.DevEnvironmentName != "" {
+		args = append(args, "--var", "DevEnvironmentName="+opts.DevEnvironmentName)
+	}
+
+	if opts.ProdEnvironmentName != "" {
+		args = append(args, "--var", "ProdEnvironmentName="+opts.ProdEnvironmentName)
 	}
 
 	for _, varFile := range opts.VarFiles {

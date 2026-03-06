@@ -31,9 +31,11 @@ func TestBuildIacInitCommand_AllFlags(t *testing.T) {
 	os.Unsetenv(common.BaseUrlEnvName)
 
 	opts := IacInitOptions{
-		AccountID: "123",
-		Region:    "eu-west-1",
-		VarFiles:  []string{"common-config.yml"},
+		AccountID:           "123",
+		Region:              "eu-west-1",
+		DevEnvironmentName:  "staging",
+		ProdEnvironmentName: "production",
+		VarFiles:            []string{"common-config.yml"},
 	}
 	cmd := BuildIacInitCommand(opts)
 
@@ -43,6 +45,8 @@ func TestBuildIacInitCommand_AllFlags(t *testing.T) {
 		"--non-interactive",
 		"--var", "AccountId=123",
 		"--var", "Region=eu-west-1",
+		"--var", "DevEnvironmentName=staging",
+		"--var", "ProdEnvironmentName=production",
 		"--var-file", "common-config.yml",
 	}
 	actualArgs := cmd.Args[1:]

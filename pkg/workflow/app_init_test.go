@@ -59,11 +59,13 @@ func TestBuildAppInitCommand_AllFlags(t *testing.T) {
 	os.Unsetenv(common.BaseUrlEnvName)
 
 	opts := AppInitOptions{
-		AppName:   "my-app",
-		AppType:   AppTypeAppWithIac,
-		AccountID: "456",
-		Region:    "eu-north-1",
-		VarFiles:  []string{"vars.yml"},
+		AppName:             "my-app",
+		AppType:             AppTypeAppWithIac,
+		AccountID:           "456",
+		Region:              "eu-north-1",
+		DevEnvironmentName:  "staging",
+		ProdEnvironmentName: "production",
+		VarFiles:            []string{"vars.yml"},
 	}
 	cmd := BuildAppInitCommand(opts)
 
@@ -75,6 +77,8 @@ func TestBuildAppInitCommand_AllFlags(t *testing.T) {
 		"--var", "AppWithIac=true",
 		"--var", "AccountId=456",
 		"--var", "Region=eu-north-1",
+		"--var", "DevEnvironmentName=staging",
+		"--var", "ProdEnvironmentName=production",
 		"--var-file", "vars.yml",
 	}
 	actualArgs := cmd.Args[1:]

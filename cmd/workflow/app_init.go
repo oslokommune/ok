@@ -6,10 +6,12 @@ import (
 )
 
 var (
-	appFlagAccountID string
-	appFlagRegion    string
-	appFlagType      string
-	appFlagVarFiles  []string
+	appFlagAccountID           string
+	appFlagRegion              string
+	appFlagType                string
+	appFlagDevEnvironmentName  string
+	appFlagProdEnvironmentName string
+	appFlagVarFiles            []string
 )
 
 // AppInitCommand initializes CI/CD workflow files for an application repository.
@@ -35,11 +37,13 @@ This command runs boilerplate to download and render workflow templates.`,
 		}
 
 		return workflow.RunAppInit(workflow.AppInitOptions{
-			AppName:   args[0],
-			AppType:   workflow.AppType(appFlagType),
-			AccountID: appFlagAccountID,
-			Region:    appFlagRegion,
-			VarFiles:  appFlagVarFiles,
+			AppName:             args[0],
+			AppType:             workflow.AppType(appFlagType),
+			AccountID:           appFlagAccountID,
+			Region:              appFlagRegion,
+			DevEnvironmentName:  appFlagDevEnvironmentName,
+			ProdEnvironmentName: appFlagProdEnvironmentName,
+			VarFiles:            appFlagVarFiles,
 		})
 	},
 }
@@ -48,5 +52,7 @@ func init() {
 	AppInitCommand.Flags().StringVar(&appFlagAccountID, "account-id", "", "AWS account ID")
 	AppInitCommand.Flags().StringVar(&appFlagRegion, "region", "", "AWS region")
 	AppInitCommand.Flags().StringVar(&appFlagType, "type", "", "Repository type variant (valid: app-with-iac)")
+	AppInitCommand.Flags().StringVar(&appFlagDevEnvironmentName, "dev-env-name", "", "Name of the dev environment, used in AWS resource names")
+	AppInitCommand.Flags().StringVar(&appFlagProdEnvironmentName, "prod-env-name", "", "Name of the prod environment, used in AWS resource names")
 	AppInitCommand.Flags().StringArrayVar(&appFlagVarFiles, "var-file", nil, "Path to a boilerplate variable file (repeatable)")
 }

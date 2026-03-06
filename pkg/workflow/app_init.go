@@ -21,11 +21,13 @@ var ValidAppTypes = []AppType{AppTypeAppWithIac}
 
 // AppInitOptions contains options for the app init command.
 type AppInitOptions struct {
-	AppName   string
-	AppType   AppType
-	AccountID string
-	Region    string
-	VarFiles  []string
+	AppName             string
+	AppType             AppType
+	AccountID           string
+	Region              string
+	DevEnvironmentName  string
+	ProdEnvironmentName string
+	VarFiles            []string
 }
 
 // ValidateAppType checks if the given type string is valid.
@@ -84,6 +86,14 @@ func BuildAppInitCommand(opts AppInitOptions) *exec.Cmd {
 
 	if opts.Region != "" {
 		args = append(args, "--var", "Region="+opts.Region)
+	}
+
+	if opts.DevEnvironmentName != "" {
+		args = append(args, "--var", "DevEnvironmentName="+opts.DevEnvironmentName)
+	}
+
+	if opts.ProdEnvironmentName != "" {
+		args = append(args, "--var", "ProdEnvironmentName="+opts.ProdEnvironmentName)
 	}
 
 	for _, varFile := range opts.VarFiles {

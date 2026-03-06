@@ -6,7 +6,7 @@ This package builds boilerplate commands for the `ok workflow` CLI. The template
 
 **BEFORE making any changes to this package, you MUST:**
 
-1. Ask the user if they have a local clone of the `golden-path-boilerplate` repo. If so, use that. Otherwise, reference https://github.com/oslokommune/golden-path-boilerplate.
+1. Check `.env` in the repo root for `GOLDEN_PATH_BOILERPLATE_REPO_PATH`. If set, use that (path is relative to repo root). Otherwise, ask the user if they have a local clone. If not, reference https://github.com/oslokommune/golden-path-boilerplate.
 2. Read the related template files listed below to understand how the CLI code consumes them.
 3. Only then propose or make changes.
 

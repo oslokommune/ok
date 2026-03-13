@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.17.0](https://github.com/oslokommune/ok/compare/v5.16.0...v5.17.0) (2026-03-13)
+
+
+### Features
+
+* **pkg:** copy paste friendly boilerplate output ([#494](https://github.com/oslokommune/ok/issues/494)) ([4b288a4](https://github.com/oslokommune/ok/commit/4b288a432156b65c3c9177d08a5c2e4c6c0c8b8d))
+
 ## [5.16.0](https://github.com/oslokommune/ok/compare/v5.15.3...v5.16.0) (2025-12-29)
 
 

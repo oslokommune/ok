@@ -1,12 +1,13 @@
 package install
 
 import (
-	"github.com/oslokommune/ok/pkg/pkg/common"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"os/exec"
 	"strings"
 	"testing"
+
+	"github.com/oslokommune/ok/pkg/pkg/common"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestInstall(t *testing.T) {
@@ -145,6 +146,42 @@ func TestInstall(t *testing.T) {
 			assert.Equal(t, len(cmds), len(tc.expectBoilerplateCommands))
 		})
 	}
+}
+
+func TestCreatePrettyCmdString_NoTrailingSpaces(t *testing.T) {
+	cmd := exec.Command(
+		"boilerplate",
+		"--template-url", "git@github.com:oslokommune/SOMETHING_ELSE.git//boilerplate/terraform/app?ref=app-v6.1.1",
+		"--output-folder", "out/app-hello",
+		"--non-interactive",
+		"--var-file", "config/common-config.yml",
+		"--var-file", "config/app-hello.yml",
+	)
+
+	result := createPrettyCmdString(cmd)
+
+	lines := strings.Split(result, "\n")
+	for i, line := range lines {
+		assert.Equal(t, strings.TrimRight(line, " "), line, "line %d has trailing spaces", i+1)
+	}
+}
+
+func TestCreatePrettyCmdString_NoTrailingBackslash(t *testing.T) {
+	cmd := exec.Command(
+		"boilerplate",
+		"--template-url", "git@github.com:oslokommune/SOMETHING_ELSE.git//boilerplate/terraform/app?ref=app-v6.1.1",
+		"--output-folder", "out/app-hello",
+		"--non-interactive",
+		"--var-file", "config/common-config.yml",
+		"--var-file", "config/app-hello.yml",
+	)
+
+	result := createPrettyCmdString(cmd)
+
+	lines := strings.Split(result, "\n")
+	lastLine := lines[len(lines)-1]
+	assert.False(t, strings.HasSuffix(lastLine, "\\"),
+		"last line should not end with a trailing backslash")
 }
 
 func TestIsUrl(t *testing.T) {

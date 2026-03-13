@@ -2,12 +2,13 @@ package install
 
 import (
 	"fmt"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/oslokommune/ok/pkg/pkg/common"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/charmbracelet/lipgloss"
+	"github.com/oslokommune/ok/pkg/pkg/common"
 )
 
 // Run runs Boilerplate for the specified packages.
@@ -51,12 +52,21 @@ func printPrettyCmd(cmd *exec.Cmd) {
 
 func createPrettyCmdString(cmd *exec.Cmd) string {
 	var argsStr string
+	args := cmd.Args[1:]
 
-	for _, arg := range cmd.Args[1:] {
+	for i, arg := range args {
 		if strings.HasPrefix(arg, "--") {
-			argsStr += "\n  " + arg
+			if i < len(args)-1 {
+				argsStr += " \\\n  " + arg
+			} else {
+				argsStr += "\n  " + arg
+			}
 		} else {
-			argsStr += " " + arg
+			if strings.ContainsAny(arg, "?&#;=()!") {
+				argsStr += " " + "\"" + arg + "\""
+			} else {
+				argsStr += " " + arg
+			}
 		}
 	}
 

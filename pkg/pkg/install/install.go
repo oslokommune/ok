@@ -13,6 +13,8 @@ import (
 
 // Run runs Boilerplate for the specified packages.
 func Run(packagesToInstall []common.Package, manifest common.PackageManifest, workingDirectory string) error {
+	warnIfInvalidBoilerplateVersion()
+
 	cmds, err := CreateBoilerplateCommands(packagesToInstall, CreateBoilerPlateCommandsOpts{
 		PackagePathPrefix: manifest.PackagePrefix(),
 		BaseUrlOrPath:     os.Getenv(common.BaseUrlEnvName),
@@ -123,3 +125,4 @@ type CreateBoilerPlateCommandsOpts struct {
 	BaseUrlOrPath     string
 	WorkingDirectory  string
 }
+

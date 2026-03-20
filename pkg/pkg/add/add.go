@@ -147,6 +147,7 @@ func createErrorIfOutputFolderExists(manifest common.PackageManifest, outputFold
 	}
 
 	manifestPath := filepath.Join(outputFolder, common.PackagesManifestFilename)
+
 	_, err := os.Stat(manifestPath)
 	if err == nil {
 		return fmt.Errorf("package already exists: %s already contains a package manifest (%s)", outputFolder, common.PackagesManifestFilename)

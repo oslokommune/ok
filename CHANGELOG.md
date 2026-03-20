@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.17.1](https://github.com/oslokommune/ok/compare/v5.17.0...v5.17.1) (2026-03-20)
+
+
+### Bug Fixes
+
+* **pkg:** check for package manifest instead of folder existence ([#498](https://github.com/oslokommune/ok/issues/498)) ([c03b52d](https://github.com/oslokommune/ok/commit/c03b52df0bb2bb6a77ee53a2bb51408926cca2b2))
+
 ## [5.17.0](https://github.com/oslokommune/ok/compare/v5.16.0...v5.17.0) (2026-03-13)
 
 

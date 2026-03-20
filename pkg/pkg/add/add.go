@@ -146,13 +146,15 @@ func createErrorIfOutputFolderExists(manifest common.PackageManifest, outputFold
 		return nil
 	}
 
-	info, err := os.Stat(outputFolder)
-	if err == nil && info.IsDir() {
-		return fmt.Errorf("folder already exists: %s", outputFolder)
+	manifestPath := filepath.Join(outputFolder, common.PackagesManifestFilename)
+
+	_, err := os.Stat(manifestPath)
+	if err == nil {
+		return fmt.Errorf("package already exists: %s already contains a package manifest (%s)", outputFolder, common.PackagesManifestFilename)
 	}
 
-	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("unable to verify folder existence: %w", err)
+	if !os.IsNotExist(err) {
+		return fmt.Errorf("unable to verify package existence: %w", err)
 	}
 
 	return nil

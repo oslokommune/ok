@@ -89,7 +89,7 @@ func TestAddCommand(t *testing.T) {
 				"databases/package-config.yml",
 			},
 			expectError:        true,
-			expectErrorMessage: "folder already exists: databases",
+			expectErrorMessage: "package already exists: databases already contains a package manifest (packages.yml)",
 		},
 		{
 			name:            "Should add package with the old package manifest structure",
@@ -124,7 +124,7 @@ func TestAddCommand(t *testing.T) {
 				"app/package-config.yml",
 			},
 			expectError:        true,
-			expectErrorMessage: "folder already exists: app-hello",
+			expectErrorMessage: "package already exists: app-hello already contains a package manifest (packages.yml)",
 		},
 		{
 			name:            "Should add package with specified var file",

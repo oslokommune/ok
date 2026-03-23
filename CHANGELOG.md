@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.18.0](https://github.com/oslokommune/ok/compare/v5.17.1...v5.18.0) (2026-03-23)
+
+
+### Features
+
+* **pkg:** warn when boilerplate has invalid semver version ([#496](https://github.com/oslokommune/ok/issues/496)) ([de3b655](https://github.com/oslokommune/ok/commit/de3b655a479392fa46f58c086725faeb1c842240))
+
 ## [5.17.1](https://github.com/oslokommune/ok/compare/v5.17.0...v5.17.1) (2026-03-20)
 
 

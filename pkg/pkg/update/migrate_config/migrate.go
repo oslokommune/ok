@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/add_apex_domain"
+	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/add_path_based_routing"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/metadata"
 	"github.com/oslokommune/ok/pkg/pkg/update/migrate_config/use_schema_uri"
 	"io"
@@ -72,6 +73,11 @@ func update(varFile string, jsonSchema metadata.JsonSchema) error {
 	}
 
 	err = use_schema_uri.ReplaceDirWithUri(varFile, jsonSchema)
+	if err != nil {
+		return err
+	}
+
+	err = add_path_based_routing.AddPathBasedRouting(varFile, jsonSchema)
 	if err != nil {
 		return err
 	}

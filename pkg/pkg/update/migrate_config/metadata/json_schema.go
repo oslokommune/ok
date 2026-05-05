@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/Masterminds/semver"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/Masterminds/semver"
 )
 
 var (
@@ -32,7 +33,7 @@ func ParseFirstLine(varFile string) (JsonSchema, error) {
 		return JsonSchema{}, fmt.Errorf("reading first line from %s: %w", varFile, err)
 	}
 
-	varFileMetadata, err := parseMetadata(firstLine)
+	varFileMetadata, err := ParseMetadataLine(firstLine)
 	if err != nil {
 		return JsonSchema{}, fmt.Errorf("parsing metadata from line '%s': %w", firstLine, err)
 	}
@@ -58,7 +59,7 @@ func ReadFirstLine(filename string) (string, error) {
 	return scanner.Text(), nil
 }
 
-func parseMetadata(firstLine string) (JsonSchema, error) {
+func ParseMetadataLine(firstLine string) (JsonSchema, error) {
 	if !strings.HasPrefix(firstLine, "# yaml-language-server: $schema=") {
 		return JsonSchema{}, ErrMissingSchemaDeclaration
 	}

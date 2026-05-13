@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/oslokommune/ok/cmd/aws"
 	"github.com/oslokommune/ok/cmd/data"
+	jitcmd "github.com/oslokommune/ok/cmd/jit"
 	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
 	"github.com/oslokommune/ok/pkg/error_user_msg"
@@ -91,6 +92,13 @@ func init() {
 
 	rootCmd.AddCommand(dataCommand)
 	dataCommand.AddCommand(data.InitCommand)
+
+	rootCmd.AddCommand(jitCommand)
+	jitCommand.AddCommand(jitcmd.LoginCommand)
+	jitCommand.AddCommand(jitcmd.LogoutCommand)
+	jitCommand.AddCommand(jitcmd.RevokeCommand)
+	jitCommand.AddCommand(jitcmd.StatusCommand)
+	jitCommand.AddCommand(jitcmd.ConfigureCommand)
 
 	initializeConfiguration()
 

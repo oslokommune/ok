@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -23,6 +22,7 @@ const accessRequestPath = "/prod/access-request"
 func init() {
 	LoginCommand.Flags().Bool("debug", false, "Print debug info about the token")
 	LoginCommand.Flags().Bool("interactive", false, "Use interactive browser login instead of device code flow")
+	LoginCommand.Flags().Float64("hours", 0, "Hours of access needed (1-8). Defaults to server default when unset.")
 }
 
 func loadConfig() (*jit.Config, error) {
@@ -44,6 +44,15 @@ var LoginCommand = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		debug, _ := cmd.Flags().GetBool("debug")
 		interactive, _ := cmd.Flags().GetBool("interactive")
+		hoursFlag, _ := cmd.Flags().GetFloat64("hours")
+
+		var hours *float64
+		if hoursFlag != 0 {
+			if hoursFlag < 1 || hoursFlag > 8 {
+				return fmt.Errorf("--hours must be between 1 and 8")
+			}
+			hours = &hoursFlag
+		}
 
 		cfg, err := loadConfig()
 		if err != nil {
@@ -100,40 +109,6 @@ var LoginCommand = &cobra.Command{
 				return nil
 			}
 			return fmt.Errorf("selection failed: %w", err)
-		}
-
-		var hoursStr string
-		err = huh.NewForm(
-			huh.NewGroup(
-				huh.NewInput().
-					Title("Hours needed (1-8, leave empty for default)").
-					Value(&hoursStr).
-					Validate(func(s string) error {
-						if s == "" {
-							return nil
-						}
-						h, err := strconv.ParseFloat(s, 64)
-						if err != nil {
-							return fmt.Errorf("must be a number")
-						}
-						if h < 1 || h > 8 {
-							return fmt.Errorf("must be between 1 and 8")
-						}
-						return nil
-					}),
-			),
-		).Run()
-		if err != nil {
-			if errors.Is(err, huh.ErrUserAborted) {
-				return nil
-			}
-			return fmt.Errorf("input failed: %w", err)
-		}
-
-		var hours *float64
-		if hoursStr != "" {
-			h, _ := strconv.ParseFloat(hoursStr, 64)
-			hours = &h
 		}
 
 		apiURL := cfg.BaseURL + accessRequestPath

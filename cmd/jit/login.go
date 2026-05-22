@@ -22,7 +22,7 @@ const accessRequestPath = "/prod/access-request"
 func init() {
 	LoginCommand.Flags().Bool("debug", false, "Print debug info about the token")
 	LoginCommand.Flags().Bool("interactive", false, "Use interactive browser login instead of device code flow")
-	LoginCommand.Flags().Float64("hours", 0, "Hours of access needed (1-8). Defaults to server default when unset.")
+	LoginCommand.Flags().Float64("hours", 0, "Hours of access needed (1-4). Defaults to server default when unset.")
 }
 
 func loadConfig() (*jit.Config, error) {
@@ -48,8 +48,8 @@ var LoginCommand = &cobra.Command{
 
 		var hours *float64
 		if hoursFlag != 0 {
-			if hoursFlag < 1 || hoursFlag > 8 {
-				return fmt.Errorf("--hours must be between 1 and 8")
+			if hoursFlag < 1 || hoursFlag > 4 {
+				return fmt.Errorf("--hours must be between 1 and 4")
 			}
 			hours = &hoursFlag
 		}

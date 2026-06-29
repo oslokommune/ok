@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.19.0](https://github.com/oslokommune/ok/compare/v5.18.0...v5.19.0) (2026-06-29)
+
+
+### Features
+
+* **forward:** label writer/reader in cluster endpoint picker ([#504](https://github.com/oslokommune/ok/issues/504)) ([111d26a](https://github.com/oslokommune/ok/commit/111d26a50cbd0342ea0cae2ce2e824e25bc9035e))
+
 ## [5.18.0](https://github.com/oslokommune/ok/compare/v5.17.1...v5.18.0) (2026-03-23)
 
 

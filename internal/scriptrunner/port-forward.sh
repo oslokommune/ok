@@ -238,17 +238,35 @@ fi
 if [ -z "$LOCAL_PORT" ] || [ -z "$REMOTE_PORT" ] || [ -z "$RDS_ENDPOINT" ]; then
 
     printMessage "Loading RDS endpoints ..."
-    endpoints=$(aws rds describe-db-instances | jq -r '.DBInstances[].Endpoint.Address')
+    instancesJson=$(aws rds describe-db-instances)
+    # Cluster info gives us the writer/reader role per instance. It's optional:
+    # if the call fails (e.g. missing IAM permission) we fall back to bare endpoints.
+    clustersJson=$(aws rds describe-db-clusters 2>/dev/null || echo '{"DBClusters":[]}')
+
+    # Label each cluster instance "(writer)"/"(reader)" via IsClusterWriter; leave
+    # standalone (non-cluster) instances as bare endpoints.
+    endpoints=$(echo "$instancesJson" | jq -r --argjson clusters "$clustersJson" '
+        ($clusters.DBClusters // []
+            | map(.DBClusterMembers[]? | {key: .DBInstanceIdentifier, value: (if .IsClusterWriter then "writer" else "reader" end)})
+            | from_entries) as $roles
+        | .DBInstances[]
+        | .Endpoint.Address as $addr
+        | ($roles[.DBInstanceIdentifier]) as $role
+        | if $role then "\($addr) (\($role))" else $addr end
+    ')
     if [ -z "$endpoints" ]; then
         printMessage "No RDS endpoints found" red
         exit 1
     fi
-    RDS_ENDPOINT=$(echo "$endpoints" | fzf)
+    selection=$(echo "$endpoints" | fzf)
 
-    if [ -z "$RDS_ENDPOINT" ]; then
+    if [ -z "$selection" ]; then
         printMessage "No RDS endpoint selected" red
         exit 1
     fi
+
+    # Strip the "(writer)"/"(reader)" label; endpoint hostnames contain no spaces.
+    RDS_ENDPOINT=$(echo "$selection" | cut -d' ' -f1)
 
     while true; do
         read -rp "$(echo -e "Enter local port or press enter to use:" "$colorGreen$localPortDefault$colorReset")" LOCAL_PORT

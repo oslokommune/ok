@@ -251,7 +251,10 @@ if [ -z "$LOCAL_PORT" ] || [ -z "$REMOTE_PORT" ] || [ -z "$RDS_ENDPOINT" ]; then
     }
 
     # Label each cluster instance "(writer)"/"(reader)" via IsClusterWriter; leave
-    # standalone (non-cluster) instances as bare endpoints.
+    # standalone (non-cluster) instances as bare endpoints. Each line looks like:
+    #   mydb-instance-1.xxxx.eu-west-1.rds.amazonaws.com (writer)
+    #   mydb-instance-2.xxxx.eu-west-1.rds.amazonaws.com (reader)
+    #   standalone-db.xxxx.eu-west-1.rds.amazonaws.com
     endpoints=$(echo "$instancesJson" | jq -r --argjson clusters "$clustersJson" '
         ($clusters.DBClusters // []
             | map(.DBClusterMembers[]? | {key: .DBInstanceIdentifier, value: (if .IsClusterWriter then "writer" else "reader" end)})

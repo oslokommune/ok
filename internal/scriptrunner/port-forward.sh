@@ -238,10 +238,17 @@ fi
 if [ -z "$LOCAL_PORT" ] || [ -z "$REMOTE_PORT" ] || [ -z "$RDS_ENDPOINT" ]; then
 
     printMessage "Loading RDS endpoints ..."
-    instancesJson=$(aws rds describe-db-instances)
+    instancesJson=$(aws rds describe-db-instances) || {
+        printMessage "Failed to load RDS instances. Check your AWS credentials and permissions." red
+        exit 1
+    }
     # Cluster info gives us the writer/reader role per instance. It's optional:
-    # if the call fails (e.g. missing IAM permission) we fall back to bare endpoints.
-    clustersJson=$(aws rds describe-db-clusters 2>/dev/null || echo '{"DBClusters":[]}')
+    # if the call fails (e.g. missing IAM permission) we fall back to bare endpoints
+    # and warn so missing labels aren't mistaken for standalone instances.
+    clustersJson=$(aws rds describe-db-clusters 2>/dev/null) || {
+        printMessage "Could not load cluster roles; writer/reader labels unavailable." yellow
+        clustersJson='{"DBClusters":[]}'
+    }
 
     # Label each cluster instance "(writer)"/"(reader)" via IsClusterWriter; leave
     # standalone (non-cluster) instances as bare endpoints.

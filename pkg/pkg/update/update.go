@@ -142,29 +142,20 @@ func (u Updater) setJsonSchemaDeclarationInVarFiles(selectedPackages []common.Pa
 			continue
 		}
 
-		varFile, ok := getLastVarFile(pkg, workingDirectory)
-		if !ok {
+		varFile, existingSchema, found := findSchemaVarFile(pkg, workingDirectory)
+		if !found {
+			_, _ = fmt.Fprintf(os.Stderr,
+				"⚠️ Warning: no var file of package '%s' declares a JSON schema for template '%s'."+
+					" Skipping schema update for this package."+
+					" Add a '# yaml-language-server: $schema=...' declaration to the package's own var file to enable schema updates.\n",
+				pkg.OutputFolder, pkg.Template)
 			continue
 		}
 
 		fmt.Printf("- %s\n", pkg.OutputFolder)
 
-		// Get current JSON schema for the package
-		jsonSchemaMetdata, err := metadata.ParseFirstLine(varFile)
-		if err != nil && errors.Is(err, metadata.ErrMissingSchemaDeclaration) {
-			err = schema.SetSchemaDeclarationInVarFile(varFile, pkg.Ref)
-			if err != nil {
-				return fmt.Errorf("creating or updating configuration file: %w", err)
-			}
-
-			return nil
-		} else if err != nil {
-			return fmt.Errorf("parsing first line of file '%s': %w", varFile, err)
-		}
-
-		existingRef := fmt.Sprintf("%s-v%s", jsonSchemaMetdata.Template, jsonSchemaMetdata.Version)
-		if existingRef == pkg.Ref {
-			// No need to update the varFile with a new JSON schema, as the existing one is as declared in the pacckage
+		if existingSchema.Ref() == pkg.Ref {
+			// No need to update the varFile with a new JSON schema, as the existing one is as declared in the package
 			// manifest.
 			continue
 		}
@@ -178,14 +169,44 @@ func (u Updater) setJsonSchemaDeclarationInVarFiles(selectedPackages []common.Pa
 	return nil
 }
 
-func getLastVarFile(pkg common.Package, workingDirectory string) (string, bool) {
-	if len(pkg.VarFiles) > 0 {
-		varFileRelative := pkg.VarFiles[len(pkg.VarFiles)-1]
-		varFile := path.Join(workingDirectory, varFileRelative)
-		return varFile, true
+// findSchemaVarFile returns the var file that should receive the package's JSON schema declaration.
+//
+// The file is selected by looking at the schema declaration each var file already carries, instead of relying on the
+// position of the file in pkg.VarFiles (the position is meaningful to Boilerplate, but says nothing about which file
+// is the package's own config). The rules are:
+//
+//   - A var file whose declaration references the package's template is a candidate. If several var files qualify,
+//     the last one wins.
+//   - A var file that declares a different template (for example a shared common-config.yml declared by another
+//     package) is never selected, as overwriting its declaration would break schema validation for the other users
+//     of the file.
+//   - A var file without a (parseable) schema declaration is never selected. `ok pkg add` scaffolds the declaration
+//     into the package's var file, so guessing by position here would risk writing a package-specific declaration
+//     into a shared file.
+//
+// If no var file qualifies, found is false.
+func findSchemaVarFile(pkg common.Package, workingDirectory string) (varFile string, existingSchema metadata.JsonSchema, found bool) {
+	for _, varFileRelative := range pkg.VarFiles {
+		candidate := path.Join(workingDirectory, varFileRelative)
+
+		jsonSchema, err := metadata.ParseFirstLine(candidate)
+		if err != nil {
+			// The file is missing, empty, or has no parseable schema declaration on its first line, so we cannot
+			// tell if it belongs to this package.
+			continue
+		}
+
+		if jsonSchema.Template != pkg.Template {
+			// The file declares a schema for a different template, e.g. a shared config file.
+			continue
+		}
+
+		varFile = candidate
+		existingSchema = jsonSchema
+		found = true
 	}
 
-	return "", false
+	return varFile, existingSchema, found
 }
 
 type Options struct {

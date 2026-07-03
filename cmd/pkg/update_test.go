@@ -26,6 +26,7 @@ func TestUpdateCommand(t *testing.T) {
 				"packages.yml",
 				"config/app-hello.yml",
 				"config/common-config.yml",
+				"config/load-balancing-alb-main.yml",
 			},
 		},
 		{

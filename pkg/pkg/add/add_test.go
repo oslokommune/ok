@@ -1,10 +1,13 @@
 package add
 
 import (
-	"github.com/oslokommune/ok/pkg/pkg/schema"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/oslokommune/ok/pkg/pkg/schema"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/stretchr/testify/require"
@@ -107,6 +110,97 @@ func TestCreateNewPackage(t *testing.T) {
 			result, err := createNewPackage(tt.manifest, tt.templateName, tt.gitRef, tt.outputFolder, tt.consolidatedPackageStructure)
 			require.NoError(t, err)
 			require.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestRunAnnouncesManifestCreation(t *testing.T) {
+	tests := []struct {
+		name             string
+		setup            func(t *testing.T, dir string)
+		expectedOutput   []string
+		unexpectedOutput []string
+	}{
+		{
+			name:  "should announce when a new package manifest is created",
+			setup: func(t *testing.T, dir string) {},
+			expectedOutput: []string{
+				"Creating new package manifest",
+				"A new package manifest was created at",
+				fmt.Sprintf("DefaultPackagePathPrefix: %s", common.BoilerplatePackageGitHubActionsPath),
+			},
+			unexpectedOutput: []string{
+				"Updating package manifest",
+			},
+		},
+		{
+			name: "should not announce manifest creation when updating an existing package manifest",
+			setup: func(t *testing.T, dir string) {
+				manifestPath := filepath.Join(dir, common.PackagesManifestFilename)
+				err := common.SavePackageManifest(manifestPath, common.PackageManifest{})
+				require.NoError(t, err)
+
+				err = os.MkdirAll(filepath.Join(dir, common.BoilerplatePackageTerraformConfigPrefix), 0755)
+				require.NoError(t, err)
+			},
+			expectedOutput: []string{
+				"Updating package manifest",
+			},
+			unexpectedOutput: []string{
+				"Creating new package manifest",
+				"A new package manifest was created at",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testDir := t.TempDir()
+
+			// Change to test directory
+			originalDir, err := os.Getwd()
+			require.NoError(t, err)
+			err = os.Chdir(testDir)
+			require.NoError(t, err)
+			defer func(dir string) {
+				err := os.Chdir(dir)
+				require.NoError(t, err)
+			}(originalDir) // Restore the original directory at the end
+
+			tt.setup(t, testDir)
+
+			// Capture stdout
+			originalStdout := os.Stdout
+			pipeReader, pipeWriter, err := os.Pipe()
+			require.NoError(t, err)
+			os.Stdout = pipeWriter
+
+			// Setting BaseUrl skips the GitHub release lookup, and disabling DownloadVarFile
+			// skips the var file download, so Run does not need network access.
+			adder := NewAdder(nil)
+			runErr := adder.Run(Options{
+				BaseUrl:         "../boilerplate/terraform",
+				CurrentDir:      testDir,
+				TemplateName:    "databases",
+				OutputFolder:    "databases",
+				DownloadVarFile: false,
+			})
+
+			os.Stdout = originalStdout
+			err = pipeWriter.Close()
+			require.NoError(t, err)
+			outputBytes, err := io.ReadAll(pipeReader)
+			require.NoError(t, err)
+			output := string(outputBytes)
+
+			require.NoError(t, runErr)
+
+			for _, expected := range tt.expectedOutput {
+				require.Contains(t, output, expected)
+			}
+			for _, unexpected := range tt.unexpectedOutput {
+				require.NotContains(t, output, unexpected)
+			}
 		})
 	}
 }

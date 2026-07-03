@@ -60,6 +60,11 @@ func (a Adder) Run(opts Options) error {
 		packagesManifestFilename = filepath.Join(opts.OutputFolder, common.PackagesManifestFilename)
 	}
 
+	manifestExists, err := common.ManifestExists(packagesManifestFilename)
+	if err != nil {
+		return fmt.Errorf("checking if package manifest exists: %w", err)
+	}
+
 	manifest, err := common.LoadPackageManifest(packagesManifestFilename)
 	if err != nil {
 		return err
@@ -94,7 +99,11 @@ func (a Adder) Run(opts Options) error {
 
 	manifest.Packages = append(manifest.Packages, newPackage)
 
-	fmt.Printf("Creating package manifest %s\n", packagesManifestFilename)
+	if manifestExists {
+		fmt.Printf("Updating package manifest %s\n", packagesManifestFilename)
+	} else {
+		fmt.Printf("Creating new package manifest %s\n", packagesManifestFilename)
+	}
 	err = common.SavePackageManifest(packagesManifestFilename, manifest)
 	if err != nil {
 		return fmt.Errorf("saving package manifest: %w", err)
@@ -131,6 +140,20 @@ func (a Adder) Run(opts Options) error {
 		partMsg,
 		common.StyleHighlight.Render(manifest.PackageOutputFolder(opts.OutputFolder)),
 	)
+
+	if !manifestExists {
+		fmt.Println()
+		fmt.Printf("%sA new package manifest was created at %s.\n",
+			common.StyleHighlight.Render("Note: "),
+			common.StyleHighlight.Render(packagesManifestFilename),
+		)
+		fmt.Printf("If you are adding GitHub Actions packages, set %s in it before installing.\n",
+			common.StyleHighlight.Render(
+				fmt.Sprintf("DefaultPackagePathPrefix: %s", common.BoilerplatePackageGitHubActionsPath),
+			),
+		)
+	}
+
 	fmt.Println()
 	fmt.Printf("%sOpen %s to configure your stack.\n",
 		common.StyleHighlight.Render("Next step: "),

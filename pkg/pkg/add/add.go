@@ -99,11 +99,7 @@ func (a Adder) Run(opts Options) error {
 
 	manifest.Packages = append(manifest.Packages, newPackage)
 
-	if manifestExists {
-		fmt.Printf("Updating package manifest %s\n", packagesManifestFilename)
-	} else {
-		fmt.Printf("Creating new package manifest %s\n", packagesManifestFilename)
-	}
+	fmt.Println(manifestSaveMessage(manifestExists, packagesManifestFilename))
 	err = common.SavePackageManifest(packagesManifestFilename, manifest)
 	if err != nil {
 		return fmt.Errorf("saving package manifest: %w", err)
@@ -141,17 +137,9 @@ func (a Adder) Run(opts Options) error {
 		common.StyleHighlight.Render(manifest.PackageOutputFolder(opts.OutputFolder)),
 	)
 
-	if !manifestExists {
+	if notice := newManifestNotice(manifestExists, packagesManifestFilename); notice != "" {
 		fmt.Println()
-		fmt.Printf("%sA new package manifest was created at %s.\n",
-			common.StyleHighlight.Render("Note: "),
-			common.StyleHighlight.Render(packagesManifestFilename),
-		)
-		fmt.Printf("If you are adding GitHub Actions packages, set %s in it before installing.\n",
-			common.StyleHighlight.Render(
-				fmt.Sprintf("DefaultPackagePathPrefix: %s", common.BoilerplatePackageGitHubActionsPath),
-			),
-		)
+		fmt.Println(notice)
 	}
 
 	fmt.Println()
@@ -161,6 +149,35 @@ func (a Adder) Run(opts Options) error {
 	)
 
 	return nil
+}
+
+// manifestSaveMessage returns the status line printed when saving a package manifest,
+// distinguishing between updating an existing manifest and creating a brand new one.
+func manifestSaveMessage(manifestExists bool, manifestPath string) string {
+	action := "Creating new"
+	if manifestExists {
+		action = "Updating"
+	}
+	return fmt.Sprintf("%s package manifest %s", action, manifestPath)
+}
+
+// newManifestNotice returns guidance shown after a fresh manifest is created, or an empty
+// string when the manifest already existed. A fresh manifest defaults to Terraform packages,
+// so the notice nudges users adding a GitHub Actions package to set the correct prefix.
+func newManifestNotice(manifestExists bool, manifestPath string) string {
+	if manifestExists {
+		return ""
+	}
+	return fmt.Sprintf(
+		"%sThe new manifest defaults to %s packages.\n"+
+			"If this is a GitHub Actions package, set %s in %s before installing.",
+		common.StyleHighlight.Render("Note: "),
+		common.StyleHighlight.Render(common.BoilerplatePackageTerraformPath),
+		common.StyleHighlight.Render(
+			fmt.Sprintf("DefaultPackagePathPrefix: %s", common.BoilerplatePackageGitHubActionsPath),
+		),
+		common.StyleHighlight.Render(manifestPath),
+	)
 }
 
 func createErrorIfOutputFolderExists(manifest common.PackageManifest, outputFolder string) error {

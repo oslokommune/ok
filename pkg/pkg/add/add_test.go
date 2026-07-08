@@ -1,10 +1,13 @@
 package add
 
 import (
-	"github.com/oslokommune/ok/pkg/pkg/schema"
+	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/oslokommune/ok/pkg/pkg/schema"
 
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/stretchr/testify/require"
@@ -109,6 +112,110 @@ func TestCreateNewPackage(t *testing.T) {
 			require.Equal(t, tt.expected, result)
 		})
 	}
+}
+
+// gitHubReleasesStub is a mockable implementation of the add.GitHubReleases dependency that
+// NewAdder accepts. Injecting it lets tests exercise Adder.Run without network access or
+// changing the working directory, so they can run in parallel.
+type gitHubReleasesStub struct {
+	latestReleases map[string]string
+}
+
+func (g *gitHubReleasesStub) GetLatestReleases() (map[string]string, error) {
+	return g.latestReleases, nil
+}
+
+func (g *gitHubReleasesStub) DownloadGithubFile(context.Context, string, string, string, string) ([]byte, error) {
+	return nil, fmt.Errorf("DownloadGithubFile should not be called in this test")
+}
+
+// TestRunCreatesManifestUsingInjectedDependency exercises the manifest-creation branch of
+// Adder.Run end-to-end using the injected GitHubReleases dependency (per review feedback) and
+// an absolute output folder, so the test needs neither network access nor a directory change
+// and can run in parallel.
+func TestRunCreatesManifestUsingInjectedDependency(t *testing.T) {
+	t.Parallel()
+
+	repoDir := t.TempDir()
+	outputFolder := filepath.Join(repoDir, "databases")
+
+	ghReleases := &gitHubReleasesStub{
+		latestReleases: map[string]string{"databases": "v4.0.0"},
+	}
+	adder := NewAdder(ghReleases)
+
+	// repoDir has no packages.yml and no _config dir, so the legacy (non-consolidated)
+	// structure is used and the manifest is written under the absolute output folder.
+	err := adder.Run(Options{
+		CurrentDir:      repoDir,
+		TemplateName:    "databases",
+		OutputFolder:    outputFolder,
+		DownloadVarFile: false,
+	})
+	require.NoError(t, err)
+
+	manifestPath := filepath.Join(outputFolder, common.PackagesManifestFilename)
+	require.FileExists(t, manifestPath)
+
+	manifest, err := common.LoadPackageManifest(manifestPath)
+	require.NoError(t, err)
+	require.Len(t, manifest.Packages, 1)
+	require.Equal(t, "databases", manifest.Packages[0].Template)
+	require.Equal(t, "databases-v4.0.0", manifest.Packages[0].Ref)
+}
+
+// TestManifestSaveMessage covers the created-vs-updated status line without printing, so it is
+// parallel-safe and does not depend on the working directory.
+func TestManifestSaveMessage(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name           string
+		manifestExists bool
+		manifestPath   string
+		want           string
+	}{
+		{
+			name:           "new manifest",
+			manifestExists: false,
+			manifestPath:   "databases/packages.yml",
+			want:           "Creating new package manifest databases/packages.yml",
+		},
+		{
+			name:           "existing manifest",
+			manifestExists: true,
+			manifestPath:   "packages.yml",
+			want:           "Updating package manifest packages.yml",
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			require.Equal(t, tt.want, manifestSaveMessage(tt.manifestExists, tt.manifestPath))
+		})
+	}
+}
+
+// TestNewManifestNotice covers the GitHub Actions guidance shown only when a fresh manifest is
+// created. It asserts on stable substrings so it is unaffected by terminal styling.
+func TestNewManifestNotice(t *testing.T) {
+	t.Parallel()
+
+	t.Run("shown when a new manifest is created", func(t *testing.T) {
+		t.Parallel()
+		notice := newManifestNotice(false, "databases/packages.yml")
+		require.Contains(t, notice, "GitHub Actions")
+		require.Contains(t, notice, common.BoilerplatePackageTerraformPath)
+		require.Contains(t, notice, fmt.Sprintf("DefaultPackagePathPrefix: %s", common.BoilerplatePackageGitHubActionsPath))
+		require.Contains(t, notice, "databases/packages.yml")
+	})
+
+	t.Run("empty when the manifest already exists", func(t *testing.T) {
+		t.Parallel()
+		require.Empty(t, newManifestNotice(true, "packages.yml"))
+	})
 }
 
 func TestAllowDuplicateOutputFolder(t *testing.T) {

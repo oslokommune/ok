@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.20.0](https://github.com/oslokommune/ok/compare/v5.19.0...v5.20.0) (2026-07-08)
+
+
+### Features
+
+* **pkg:** announce when ok pkg add creates a new package manifest ([#506](https://github.com/oslokommune/ok/issues/506)) ([0a4fa65](https://github.com/oslokommune/ok/commit/0a4fa65de223f1edad6dbaa2098fc85d7d7cc1a3))
+
 ## [5.19.0](https://github.com/oslokommune/ok/compare/v5.18.0...v5.19.0) (2026-06-29)
 
 

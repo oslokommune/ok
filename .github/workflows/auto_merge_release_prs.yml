@@ -1,7 +1,7 @@
 name: Approve and merge release PRs
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -10,7 +10,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    if: github.actor == 'okctl-bot'
+    if: >
+      github.actor == 'okctl-bot' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'release-please--')
 
     name: Approve and merge release PRs
 

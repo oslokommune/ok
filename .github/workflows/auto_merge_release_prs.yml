@@ -25,6 +25,7 @@ jobs:
       - name: Approve the PR with okctl-bot
         env:
           GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           BODY_TEXT=$(cat <<- EOM
             _Beep boop_ :robot:
@@ -34,7 +35,7 @@ jobs:
             [I was summoned by workflow run `${{ github.run_id }}` (click to see run)](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
           EOM
           )
-          gh pr review --approve "${{github.event.pull_request.html_url}}" --body "$BODY_TEXT"
+          gh pr review --approve "$PR_URL" --body "$BODY_TEXT"
 
 
       # This has to be done because release-please does not support signing commits
@@ -42,4 +43,5 @@ jobs:
       - name: Squash and merge the PR
         env:
           GH_TOKEN: ${{ secrets.OKCTL_FINE_GRAINED_TOKEN }}
-        run: gh pr merge --squash --admin "${{github.event.pull_request.html_url}}"
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --squash --admin "$PR_URL"

@@ -6,6 +6,8 @@ updates:
     directory: "/" # This should be / rather than .github/workflows
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 7
     groups:
       github-actions-all:
         patterns:
@@ -17,6 +19,8 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    cooldown:
+      default-days: 7
     groups:
       gomod-all:
         patterns:
@@ -28,6 +32,8 @@ updates:
     directory: "docs-optimizer"
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     groups:
       npm-all:
         patterns:

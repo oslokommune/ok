@@ -82,6 +82,34 @@ const processMarkdownNode = (node) => {
   }
 };
 
+// Shell names are product names when used as words in a sentence. Cobra
+// generates them lowercase, which reads as a misspelling in prose. The literal
+// argument the user types (`ok completion powershell`) stays lowercase, and is
+// left alone because codeFontCommandNamesPlugin has already put it in code font.
+const shellNames = {
+  bash: "Bash",
+  zsh: "Zsh",
+  fish: "Fish",
+  powershell: "PowerShell",
+};
+
+// Match a shell name as a standalone word only. The lookarounds skip file paths
+// and compound identifiers such as `.zshrc`, `fish/completions` and
+// `bash-completion`, while still allowing trailing punctuation.
+const shellNamePattern = new RegExp(
+  String.raw`(?<![\w./-])(${Object.keys(shellNames).join("|")})(?![\w/-])`,
+  "g"
+);
+
+const capitalizeShellNamesPlugin = () => (tree) => {
+  visit(tree, "text", (node) => {
+    node.value = node.value.replace(
+      shellNamePattern,
+      (shellName) => shellNames[shellName]
+    );
+  });
+};
+
 // Literals that cobra emits as bare or single-quoted words mid-sentence. Outside
 // code font they read as misspellings, so each match becomes an inlineCode node.
 const inlineLiteralPattern = new RegExp(
@@ -175,8 +203,11 @@ const markdownProcessor = unified()
   .use(removeHeadingAndSubsectionsPlugin, {
     targetHeading: "Options inherited from parent commands",
   })
+  // Order matters: the code font passes run first so the literals they wrap are
+  // no longer text nodes when shell names get capitalized.
   .use(codeFontCommandNamesPlugin)
   .use(codeFontLiteralsPlugin)
+  .use(capitalizeShellNamesPlugin)
   .use(remarkStringify);
 
 const processMarkdownFile = async (markdownFilePath) => {

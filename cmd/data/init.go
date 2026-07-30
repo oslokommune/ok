@@ -6,10 +6,10 @@ import (
 )
 
 var (
-	flagBranch     string
-	flagConfigFile string
-	flagOutputDir  string
-	flagTag        string
+	flagBranch      string
+	flagConfigFile  string
+	flagOutputDir   string
+	flagTag         string
 	flagTemplateDir string
 )
 
@@ -22,7 +22,7 @@ var InitCommand = &cobra.Command{
 The TEMPLATE_PATH is optional. If not provided, uses the Oslo kommune custom template.
 You can override the default template URL with the DATA_TEMPLATE_URL environment variable.
 
-This command is a wrapper around 'databricks bundle init' that uses Oslo kommune's
+This command is a wrapper around ` + "`databricks bundle init`" + ` that uses Oslo kommune's
 standard Databricks project template by default, while still allowing you to use
 any other template (built-in or custom) by specifying it explicitly.`,
 	Example: `  # Use Oslo kommune template (default)

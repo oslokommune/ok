@@ -82,6 +82,83 @@ const processMarkdownNode = (node) => {
   }
 };
 
+// Literals that cobra emits as bare or single-quoted words mid-sentence. Outside
+// code font they read as misspellings, so each match becomes an inlineCode node.
+const inlineLiteralPattern = new RegExp(
+  [
+    // Package names that cobra's help text wraps in single quotes.
+    String.raw`'(?<quoted>bash-completion)'`,
+    // The CLI's own name used as a word in a sentence. The lookarounds keep it
+    // from matching inside a longer word, a filename or a possessive.
+    String.raw`(?<![\w'./-])(?<command>ok)(?![\w'./-])`,
+  ].join("|"),
+  "g"
+);
+
+const splitTextNodeOnLiterals = (node, parentNode, nodeIndex) => {
+  const literalPattern = new RegExp(inlineLiteralPattern);
+  if (!literalPattern.test(node.value)) return;
+
+  literalPattern.lastIndex = 0;
+  const replacementNodes = [];
+  let lastMatchEnd = 0;
+
+  for (const match of node.value.matchAll(literalPattern)) {
+    if (match.index > lastMatchEnd) {
+      replacementNodes.push({
+        type: "text",
+        value: node.value.slice(lastMatchEnd, match.index),
+      });
+    }
+    const { quoted, command } = match.groups;
+    replacementNodes.push({ type: "inlineCode", value: quoted ?? command });
+    lastMatchEnd = match.index + match[0].length;
+  }
+
+  if (lastMatchEnd < node.value.length) {
+    replacementNodes.push({
+      type: "text",
+      value: node.value.slice(lastMatchEnd),
+    });
+  }
+
+  parentNode.children.splice(nodeIndex, 1, ...replacementNodes);
+  return nodeIndex + replacementNodes.length;
+};
+
+const codeFontLiteralsPlugin = () => (tree) => {
+  visit(tree, "text", (node, nodeIndex, parentNode) => {
+    if (!parentNode) return;
+    const nextIndex = splitTextNodeOnLiterals(node, parentNode, nodeIndex);
+    if (nextIndex !== undefined) return nextIndex;
+  });
+};
+
+// A bare command name in a sentence reads as a misspelling, because that is what
+// `fmt` and `aws` are outside code font. Cobra emits the command path bare in
+// both the page title and the "See also" link labels.
+const isCommandPath = (value) => /^ok(\s|$)/.test(value);
+
+const wrapChildInCodeFont = (node) => {
+  const [firstChild] = node.children;
+  if (firstChild?.type !== "text" || !isCommandPath(firstChild.value)) return;
+  node.children = [{ type: "inlineCode", value: firstChild.value }];
+};
+
+const codeFontCommandNamesPlugin = () => (tree) => {
+  visit(tree, "heading", (node) => {
+    // Only the page title holds a command path; the rest are section headings.
+    if (node.depth !== 1) return;
+    wrapChildInCodeFont(node);
+  });
+
+  visit(tree, "link", (node) => {
+    // "See also" links point at sibling pages; leave external links alone.
+    if (!node.url.endsWith(".md")) return;
+    wrapChildInCodeFont(node);
+  });
+};
+
 const markdownProcessor = unified()
   .use(remarkParse)
   .use(() => (tree) => {
@@ -98,6 +175,8 @@ const markdownProcessor = unified()
   .use(removeHeadingAndSubsectionsPlugin, {
     targetHeading: "Options inherited from parent commands",
   })
+  .use(codeFontCommandNamesPlugin)
+  .use(codeFontLiteralsPlugin)
   .use(remarkStringify);
 
 const processMarkdownFile = async (markdownFilePath) => {

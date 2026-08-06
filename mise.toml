@@ -1,0 +1,29 @@
+[tools]
+# Keep in sync with the `go` directive in go.mod.
+go = "1.25.3"
+"aqua:magefile/mage" = "1.17.2"
+
+# Runtime dependencies of the `ok` binary, also installed by the Homebrew formula.
+"aqua:gruntwork-io/boilerplate" = "0.16.0"
+"aqua:junegunn/fzf" = "0.74.2"
+"aqua:mikefarah/yq" = "4.53.3"
+
+# `mage docs` runs docs-optimizer/index.js and renders the README with cog.
+node = "24.19.0"
+"pipx:cogapp" = "3.6.0"
+
+[tasks.build]
+description = "Build the project"
+run = "mage build"
+
+[tasks.test]
+description = "Run the unit tests"
+run = "mage test"
+
+[tasks.docs]
+description = "Generate and optimize the docs"
+run = "mage docs"
+
+[tasks.readme]
+description = "Re-render the `ok --help` output in README.md"
+run = "cog -r README.md"

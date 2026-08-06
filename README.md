@@ -179,6 +179,17 @@ That is all — no `brew install go`, no `go install mage`. With mise activated,
 If you would rather not activate mise in your shell, prefix commands with `mise exec --`, e.g.
 `mise exec -- go test ./...`.
 
+### Lockfile
+
+[`mise.lock`](mise.lock) records the download URL and SHA-256 checksum of every tool for Linux and macOS on
+both `arm64` and `x64`. mise verifies the checksum on install, so everyone gets bit-for-bit identical
+binaries. The lockfile is committed and updates itself when you change a version in `mise.toml` and run
+`mise install`. To refresh the entries for the platforms you are not on, run:
+
+```sh
+mise run lock
+```
+
 ### Tasks
 
 The `mage` targets are also exposed as mise tasks:
@@ -188,6 +199,7 @@ mise run build   # build the ok binary
 mise run test    # run the unit tests
 mise run docs    # regenerate and optimize docs/
 mise run readme  # re-render the `ok --help` output in README.md
+mise run lock    # refresh mise.lock for every supported platform
 ```
 
 Run `mise tasks` to list them.

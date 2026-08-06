@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.21.0](https://github.com/oslokommune/ok/compare/v5.20.2...v5.21.0) (2026-08-06)
+
+
+### Features
+
+* change data init, use padda-golden-path bundle-templates ([#528](https://github.com/oslokommune/ok/issues/528)) ([e5a19e3](https://github.com/oslokommune/ok/commit/e5a19e3a6591929431df49fc2947aac2d9d343db))
+
 ## [5.20.2](https://github.com/oslokommune/ok/compare/v5.20.1...v5.20.2) (2026-08-06)
 
 

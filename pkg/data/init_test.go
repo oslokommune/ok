@@ -58,6 +58,31 @@ func TestDetermineTemplate_Default(t *testing.T) {
 	}
 }
 
+func TestDetermineTemplateDir_DefaultTemplate(t *testing.T) {
+	// The default template lives in a subdirectory of the repository,
+	// so template-dir should default when the default template is used
+	result := determineTemplateDir(DefaultTemplateURL, "")
+	if result != DefaultTemplateDir {
+		t.Errorf("Expected %s, got %s", DefaultTemplateDir, result)
+	}
+}
+
+func TestDetermineTemplateDir_UserProvidedDir(t *testing.T) {
+	// An explicit --template-dir should always win
+	result := determineTemplateDir(DefaultTemplateURL, "custom-dir")
+	if result != "custom-dir" {
+		t.Errorf("Expected custom-dir, got %s", result)
+	}
+}
+
+func TestDetermineTemplateDir_NonDefaultTemplate(t *testing.T) {
+	// Other templates should not get a template-dir forced on them
+	result := determineTemplateDir("user/custom-template", "")
+	if result != "" {
+		t.Errorf("Expected empty string, got %s", result)
+	}
+}
+
 func TestBuildDatabricksCommand_MinimalArgs(t *testing.T) {
 	opts := InitOptions{
 		TemplatePath: "test-template",

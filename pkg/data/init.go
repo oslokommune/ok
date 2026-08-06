@@ -29,6 +29,7 @@ func RunInit(opts InitOptions) error {
 
 	// Update options with determined template
 	opts.TemplatePath = template
+	opts.TemplateDir = determineTemplateDir(template, opts.TemplateDir)
 
 	// Build and execute the databricks command
 	cmd := buildDatabricksCommand(opts)
@@ -76,6 +77,22 @@ func determineTemplate(userTemplate string) string {
 
 	// 3. Default Oslo kommune template
 	return DefaultTemplateURL
+}
+
+// determineTemplateDir selects which template directory to use.
+// The default template lives in a subdirectory of its repository, so when the
+// default template is used and the user has not passed --template-dir, the
+// directory defaults to DefaultTemplateDir. Other templates are left untouched.
+func determineTemplateDir(template, userTemplateDir string) string {
+	if userTemplateDir != "" {
+		return userTemplateDir
+	}
+
+	if template == DefaultTemplateURL {
+		return DefaultTemplateDir
+	}
+
+	return ""
 }
 
 // buildDatabricksCommand constructs the exec.Cmd for databricks bundle init

@@ -148,3 +148,29 @@ Zsh:
 ```sh
 source <(ok completions zsh)
 ```
+
+## Development
+
+The development toolchain is declared in [`mise.toml`](mise.toml), so [mise](https://mise.jdx.dev) can install
+everything you need: Go, `mage`, Node (for the docs optimizer), `cog` (for rendering this README), and the
+`boilerplate`, `fzf` and `yq` binaries that `ok` shells out to at runtime.
+
+```sh
+brew install mise
+mise trust
+mise install
+```
+
+Add [the mise activation hook](https://mise.jdx.dev/getting-started.html) to your shell to get the tools on
+`PATH` automatically, or prefix commands with `mise exec --`.
+
+The `mage` targets are also exposed as mise tasks:
+
+```sh
+mise run build   # build the ok binary
+mise run test    # run the unit tests
+mise run docs    # regenerate and optimize docs/
+mise run readme  # re-render the `ok --help` output in README.md
+```
+
+Run `mise tasks` to list them.

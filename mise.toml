@@ -6,6 +6,9 @@ minimum_release_age = "7d"
 # Install Python tools with uv instead of pipx.
 pipx.uvx = true
 
+# Record the exact versions and checksums of the installed tools in mise.lock.
+lockfile = true
+
 [tools]
 # Keep in sync with the `go` directive in go.mod.
 go = "1.25.3"

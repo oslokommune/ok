@@ -39,3 +39,7 @@ run = "mage docs"
 [tasks.readme]
 description = "Re-render the `ok --help` output in README.md"
 run = "cog -r README.md"
+
+[tasks.lock]
+description = "Refresh mise.lock for every supported platform"
+run = "mise lock --platform macos-arm64,macos-x64,linux-x64,linux-arm64"

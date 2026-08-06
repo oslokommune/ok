@@ -37,10 +37,10 @@ brew untap oslokommune/ok
 
 <!-- Cog renders the output of `ok --help` below. Manual changes will be overwritten.
 
-To install `cog`, you can use `pipx` by running the following command:
+`cog` is part of the mise toolchain (see the Development section), or install it with `uv`:
 
 ```sh
-pipx install cogapp
+uv tool install cogapp
 ```
 
 Once `cog` is installed, you can use the following command to generate the updated README.md file:
@@ -152,8 +152,8 @@ source <(ok completions zsh)
 ## Development
 
 The development toolchain is declared in [`mise.toml`](mise.toml), so [mise](https://mise.jdx.dev) can install
-everything you need: Go, `mage`, Node (for the docs optimizer), `cog` (for rendering this README), and the
-`boilerplate`, `fzf` and `yq` binaries that `ok` shells out to at runtime.
+everything you need: Go, `mage`, Node (for the docs optimizer), `uv` and `cog` (for rendering this README),
+and the `boilerplate`, `fzf` and `yq` binaries that `ok` shells out to at runtime.
 
 ```sh
 brew install mise

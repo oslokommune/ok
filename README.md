@@ -151,18 +151,35 @@ source <(ok completions zsh)
 
 ## Development
 
-The development toolchain is declared in [`mise.toml`](mise.toml), so [mise](https://mise.jdx.dev) can install
-everything you need: Go, `mage`, Node (for the docs optimizer), `uv` and `cog` (for rendering this README),
-and the `boilerplate`, `fzf` and `yq` binaries that `ok` shells out to at runtime.
+The development toolchain is declared in [`mise.toml`](mise.toml), so [mise](https://mise.jdx.dev) installs
+everything you need at the pinned versions: Go, `mage`, Node (for the docs optimizer), `uv` and `cog` (for
+rendering this README), and the `boilerplate`, `fzf` and `yq` binaries that `ok` shells out to at runtime.
+
+### Setting up a new machine
+
+Install mise and activate it in your shell (once per machine):
 
 ```sh
 brew install mise
-mise trust
-mise install
+echo 'eval "$(mise activate zsh)"' >> ~/.zshrc  # use bash and ~/.bashrc for bash
+exec $SHELL
 ```
 
-Add [the mise activation hook](https://mise.jdx.dev/getting-started.html) to your shell to get the tools on
-`PATH` automatically, or prefix commands with `mise exec --`.
+Then clone the repository and install the tools:
+
+```sh
+git clone https://github.com/oslokommune/ok.git
+cd ok
+mise trust     # mise only reads config files you have trusted
+mise install   # downloads every tool in mise.toml
+```
+
+That is all — no `brew install go`, no `go install mage`. With mise activated, the pinned tools are on your
+`PATH` whenever you are inside the repository, and the versions you had before are back when you leave it.
+If you would rather not activate mise in your shell, prefix commands with `mise exec --`, e.g.
+`mise exec -- go test ./...`.
+
+### Tasks
 
 The `mage` targets are also exposed as mise tasks:
 

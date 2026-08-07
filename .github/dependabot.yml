@@ -1,5 +1,15 @@
 version: 2
 
+# `cooldown.default-days` holds back versions published less than 7 days ago, so
+# researchers get a chance to catch a compromised release before it reaches us.
+# It matches `min-release-age` in docs-optimizer/.npmrc and `minimum_release_age`
+# in mise.toml — keep the three in sync.
+#
+# Bypass: Dependabot already exempts security updates, so CVE fixes arrive
+# immediately. To let a specific package through for another reason, add it to
+# `cooldown.exclude` in that ecosystem's block, then remove the entry once the
+# update has landed.
+
 updates:
 
   - package-ecosystem: "github-actions"

@@ -1,6 +1,11 @@
 [settings]
 # Ignore releases published within the last 7 days, matching the Dependabot
-# cooldown and `min-release-age` in docs-optimizer/.npmrc.
+# cooldown and `min-release-age` in docs-optimizer/.npmrc. Requires mise
+# 2026.6.2 or later; older mise silently ignores this setting.
+#
+# Bypass: add the tool to `minimum_release_age_excludes`, then remove it again
+# once the update has landed. Pinning an exact version below installs that
+# version regardless of the cooldown.
 minimum_release_age = "7d"
 
 # Install Python tools with uv instead of pipx.

@@ -16,7 +16,10 @@ updates:
       prefix: ci(deps)
 
   - package-ecosystem: gomod
-    directory: "/"
+    # `magefiles` is a separate Go module, so it needs its own entry here.
+    directories:
+      - "/"
+      - "/magefiles"
     schedule:
       interval: daily
     cooldown:

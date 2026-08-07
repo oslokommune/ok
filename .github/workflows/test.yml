@@ -29,7 +29,7 @@ jobs:
 
       # We don't need the ok binary from the setup-ok action, but we need the dependencies.
       - name: Install ok dependencies
-        uses: oslokommune/composite-actions/setup-ok@ec8af16c03d62d35987ff358fda9509908ad79eb # setup-ok: v1.3.0
+        uses: oslokommune/composite-actions/setup-ok@6054e3b0e9d06f15d19d9b6885a0c0e1a58ae9c7 # setup-ok: v1.6.3
 
 
       - name: Run tests

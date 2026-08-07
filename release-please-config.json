@@ -3,6 +3,8 @@
   "commit-search-depth": 100,
   "release-type": "go",
   "separate-pull-requests": false,
+  "draft": true,
+  "force-tag-creation": true,
   "packages": {
     ".": {
       "component": "",

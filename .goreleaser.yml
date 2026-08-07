@@ -5,6 +5,12 @@ version: 2
 changelog:
   disable: true
 
+# Since GoReleaser attaches artifacts to a release after release-please has
+# created it, we create it as a draft and instead let a later step publish it.
+# This allows us to have immutable releases.
+release:
+  draft: true
+
 before:
   hooks:
     - ./scripts/completions.sh

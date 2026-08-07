@@ -37,16 +37,11 @@ brew untap oslokommune/ok
 
 <!-- Cog renders the output of `ok --help` below. Manual changes will be overwritten.
 
-`cog` is part of the mise toolchain (see the Development section), or install it with `uv`:
+`cog` is part of the mise toolchain, pinned in `mise.toml` and installed by `mise install` (see the
+Development section). Re-render this file with:
 
 ```sh
-uv tool install cogapp
-```
-
-Once `cog` is installed, you can use the following command to generate the updated README.md file:
-
-```sh
-cog -r README.md
+mise run readme
 ``` -->
 
 <!-- [[[cog

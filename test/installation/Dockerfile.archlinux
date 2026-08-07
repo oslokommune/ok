@@ -1,3 +1,6 @@
+# No dependency cooldown here: neither Docker Hub tags nor `pacman` support one.
+# This image is a throwaway test fixture that installs our own release artifact,
+# so it never resolves third-party application dependencies.
 FROM archlinux:latest
 
 RUN pacman -Sy --noconfirm github-cli

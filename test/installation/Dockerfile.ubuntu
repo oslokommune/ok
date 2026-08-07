@@ -1,3 +1,6 @@
+# No dependency cooldown here: neither Docker Hub tags nor `apt` support one.
+# This image is a throwaway test fixture that installs our own release artifact,
+# so it never resolves third-party application dependencies.
 FROM ubuntu:latest
 
 RUN apt-get update && apt-get install -y wget gpg

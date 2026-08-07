@@ -1,3 +1,6 @@
+# No dependency cooldown here: neither Docker Hub tags nor `dnf` support one.
+# This image is a throwaway test fixture that installs our own release artifact,
+# so it never resolves third-party application dependencies.
 FROM fedora:latest
 
 RUN dnf install -y dnf5-plugins git && \

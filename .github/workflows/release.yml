@@ -11,7 +11,8 @@ on:
       - 'go.mod'
       - 'go.sum'
       - '**/*.sh'
-      - '**/*.rb'
+      # NOTE: Formula/ is written by GoReleaser during a release. It is left out
+      # so that commit does not start another run.
       # NOTE: We need to trigger a release when a PR from release-please has been merged
       - ".release-please-manifest.json"
   workflow_dispatch:
@@ -78,7 +79,17 @@ jobs:
           version: v2.17.1
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.OKCTL_FINE_GRAINED_TOKEN }}
+
+
+      # NOTE: This has to be the last step that touches the release. Immutable
+      # releases freeze the assets at publish time, so everything must already
+      # be attached.
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ secrets.OKCTL_FINE_GRAINED_TOKEN }}
+          TAG: ${{ needs.release-please.outputs.tag_name }}
+        run: gh release edit "$TAG" --draft=false
 
 
   ################################################################################

@@ -187,6 +187,18 @@ const codeFontCommandNamesPlugin = () => (tree) => {
   });
 };
 
+// A list with one item is not a list; it is a paragraph wearing a bullet. Cobra
+// emits one for every leaf command's "See also" section, since that only links
+// back to the parent. The item's content moves up to take the list's place.
+const unwrapSingleItemListsPlugin = () => (tree) => {
+  visit(tree, "list", (node, nodeIndex, parentNode) => {
+    if (!parentNode || node.children.length !== 1) return;
+    const [onlyItem] = node.children;
+    parentNode.children.splice(nodeIndex, 1, ...onlyItem.children);
+    return [visit.SKIP, nodeIndex + onlyItem.children.length];
+  });
+};
+
 const markdownProcessor = unified()
   .use(remarkParse)
   .use(() => (tree) => {
@@ -208,6 +220,7 @@ const markdownProcessor = unified()
   .use(codeFontCommandNamesPlugin)
   .use(codeFontLiteralsPlugin)
   .use(capitalizeShellNamesPlugin)
+  .use(unwrapSingleItemListsPlugin)
   .use(remarkStringify);
 
 const processMarkdownFile = async (markdownFilePath) => {

@@ -4,15 +4,21 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 )
 
 // CheckVarFiles returns an error if a var file of the packages does not exist. Var file paths are relative to
-// workingDirectory. If workingDirectory is in a git repository, the error suggests a file with the same name in a
-// parent directory, up to the repository root.
+// workingDirectory, which is also the directory of manifestFile. If workingDirectory is in a git repository, the error
+// suggests a file with the same name in a parent directory, up to the repository root.
 func CheckVarFiles(manifestFile string, packages []Package, workingDirectory string) error {
-	repoRoot := gitRepoRoot(workingDirectory)
+	prefix, levelsToRoot, inGitRepo := gitLocation(workingDirectory)
+
+	displayManifestFile := manifestFile
+	if inGitRepo {
+		displayManifestFile = path.Join(prefix, filepath.Base(manifestFile))
+	}
 
 	var messages []string
 	checked := make(map[string]bool)
@@ -38,11 +44,13 @@ func CheckVarFiles(manifestFile string, packages []Package, workingDirectory str
 				continue
 			}
 
-			message := fmt.Sprintf("%s: var file %q does not exist", displayPath(manifestFile, repoRoot), varFile)
+			message := fmt.Sprintf("%s: var file %q does not exist", displayManifestFile, varFile)
 
-			suggestion, ok := findVarFileSuggestion(varFile, workingDirectory, repoRoot)
-			if ok {
-				message += fmt.Sprintf(". Did you mean %q?", suggestion)
+			if inGitRepo {
+				suggestion, ok := findVarFileSuggestion(varFile, workingDirectory, levelsToRoot)
+				if ok {
+					message += fmt.Sprintf(". Did you mean %q?", suggestion)
+				}
 			}
 
 			messages = append(messages, message)
@@ -56,13 +64,13 @@ func CheckVarFiles(manifestFile string, packages []Package, workingDirectory str
 	return nil
 }
 
-// findVarFileSuggestion looks for varFile, without its leading "../" parts, in workingDirectory and each parent
-// directory up to repoRoot. It returns the nearest match, relative to workingDirectory.
+// findVarFileSuggestion looks for varFile, without its leading "../" parts, in workingDirectory and in each of the
+// levels parent directories above it. It returns the nearest match, relative to workingDirectory.
 //
-// Example: if varFile is "../common-config.yml", it checks "common-config.yml", "../common-config.yml",
-// "../../common-config.yml" and so on, and skips "../common-config.yml" as it does not exist.
-func findVarFileSuggestion(varFile string, workingDirectory string, repoRoot string) (string, bool) {
-	if repoRoot == "" || filepath.IsAbs(varFile) {
+// Example: if varFile is "../common-config.yml", it checks "common-config.yml", "../../common-config.yml" and so on.
+// It skips "../common-config.yml", as that file does not exist.
+func findVarFileSuggestion(varFile string, workingDirectory string, levels int) (string, bool) {
+	if filepath.IsAbs(varFile) {
 		return "", false
 	}
 
@@ -71,41 +79,23 @@ func findVarFileSuggestion(varFile string, workingDirectory string, repoRoot str
 		return "", false
 	}
 
-	start, err := resolvePath(workingDirectory)
-	if err != nil {
-		return "", false
-	}
-
-	missing := filepath.Join(start, varFile)
-	dir := start
-
-	for isInDir(dir, repoRoot) {
-		candidate := filepath.Join(dir, name)
-
-		if candidate != missing {
-			exists, err := fileExists(candidate)
-			if err == nil && exists {
-				suggestion, err := filepath.Rel(start, candidate)
-				if err != nil {
-					return "", false
-				}
-
-				return suggestion, true
-			}
+	for i := 0; i <= levels; i++ {
+		candidate := filepath.Join(strings.Repeat("../", i), name)
+		if candidate == filepath.Clean(varFile) {
+			continue
 		}
 
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
+		exists, err := fileExists(filepath.Join(workingDirectory, candidate))
+		if err == nil && exists {
+			return candidate, true
 		}
-		dir = parent
 	}
 
 	return "", false
 }
 
-func stripLeadingParentDirs(path string) string {
-	parts := strings.Split(filepath.ToSlash(filepath.Clean(path)), "/")
+func stripLeadingParentDirs(varFile string) string {
+	parts := strings.Split(filepath.ToSlash(filepath.Clean(varFile)), "/")
 
 	for len(parts) > 0 && (parts[0] == ".." || parts[0] == ".") {
 		parts = parts[1:]
@@ -114,61 +104,22 @@ func stripLeadingParentDirs(path string) string {
 	return filepath.Join(parts...)
 }
 
-// isInDir returns true if path is dir or a subdirectory of dir.
-func isInDir(path string, dir string) bool {
-	rel, err := filepath.Rel(dir, path)
-	if err != nil {
-		return false
-	}
-
-	return rel == "." || (rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)))
-}
-
-// displayPath returns path relative to repoRoot, or path as is if this is not possible.
-func displayPath(path string, repoRoot string) string {
-	if repoRoot == "" {
-		return path
-	}
-
-	resolved, err := resolvePath(path)
-	if err != nil {
-		return path
-	}
-
-	rel, err := filepath.Rel(repoRoot, resolved)
-	if err != nil || !isInDir(resolved, repoRoot) {
-		return path
-	}
-
-	return rel
-}
-
-// gitRepoRoot returns the root of the git repository that contains dir, or an empty string if dir is not in a git
-// repository.
-func gitRepoRoot(dir string) string {
-	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+// gitLocation returns the path of dir relative to the root of its git repository, for example "stacks/prod/", and the
+// number of directory levels from dir up to the root. ok is false if dir is not in a git repository.
+func gitLocation(dir string) (prefix string, levelsToRoot int, ok bool) {
+	cmd := exec.Command("git", "rev-parse", "--show-prefix", "--show-cdup")
 	cmd.Dir = dir
 
 	out, err := cmd.Output()
 	if err != nil {
-		return ""
+		return "", 0, false
 	}
 
-	root, err := resolvePath(strings.TrimSpace(string(out)))
-	if err != nil {
-		return ""
+	// The output has one line for each flag. The second line is "../" for each level, for example "../../".
+	lines := strings.Split(strings.TrimSuffix(string(out), "\n"), "\n")
+	if len(lines) != 2 {
+		return "", 0, false
 	}
 
-	return root
-}
-
-// resolvePath returns the absolute path of path, with symbolic links resolved. Symbolic links make paths from git and
-// from the working directory different, for example /var and /private/var on macOS.
-func resolvePath(path string) (string, error) {
-	abs, err := filepath.Abs(path)
-	if err != nil {
-		return "", err
-	}
-
-	return filepath.EvalSymlinks(abs)
+	return lines[0], strings.Count(lines[1], "../"), true
 }

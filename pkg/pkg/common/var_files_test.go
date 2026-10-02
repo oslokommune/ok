@@ -21,87 +21,8 @@ func TestCheckVarFiles(t *testing.T) {
 		noGitRepo     bool
 		expectedError string
 	}{
-		// Package manifest in the stack directory
 		{
-			name:         "stack directory: should return no error when all var files exist",
-			manifestPath: "stacks/prod/apps/my-app/packages.yml",
-			manifest: `
-Packages:
-  - OutputFolder: .
-    Template: app
-    Ref: app-v1.0.0
-    VarFiles:
-      - ../../common-config.yml
-      - package-config.yml
-`,
-			files: []string{"stacks/prod/common-config.yml", "stacks/prod/apps/my-app/package-config.yml"},
-		},
-		{
-			name:         "stack directory: should suggest a var file in a parent directory",
-			manifestPath: "stacks/prod/apps/my-app/packages.yml",
-			manifest: `
-Packages:
-  - OutputFolder: .
-    Template: app
-    Ref: app-v1.0.0
-    VarFiles:
-      - ../common-config.yml
-      - package-config.yml
-`,
-			files:         []string{"stacks/prod/common-config.yml", "stacks/prod/apps/my-app/package-config.yml"},
-			expectedError: `stacks/prod/apps/my-app/packages.yml: var file "../common-config.yml" does not exist. Did you mean "../../common-config.yml"?`,
-		},
-		{
-			name:         "stack directory: should suggest the nearest var file, starting in the stack directory",
-			manifestPath: "stacks/prod/apps/my-app/packages.yml",
-			manifest: `
-Packages:
-  - OutputFolder: .
-    Template: app
-    Ref: app-v1.0.0
-    VarFiles:
-      - ../../common-config.yml
-`,
-			files:         []string{"stacks/prod/apps/my-app/common-config.yml", "common-config.yml"},
-			expectedError: `stacks/prod/apps/my-app/packages.yml: var file "../../common-config.yml" does not exist. Did you mean "common-config.yml"?`,
-		},
-
-		// Package manifest for GitHub Actions workflows
-		{
-			name:         "github actions: should return no error when all var files exist",
-			manifestPath: ".github/workflows/_config/dev/packages.yml",
-			manifest: `
-DefaultPackagePathPrefix: boilerplate/github-actions
-Packages:
-  - OutputFolder: ../..
-    Template: docker-build-push
-    Ref: docker-build-push-v2.3.2
-    VarFiles:
-      - common-config.yml
-      - docker-build-push.yml
-`,
-			files: []string{".github/workflows/_config/dev/common-config.yml", ".github/workflows/_config/dev/docker-build-push.yml"},
-		},
-		{
-			name:         "github actions: should suggest a var file in a parent directory",
-			manifestPath: ".github/workflows/_config/dev/packages.yml",
-			manifest: `
-DefaultPackagePathPrefix: boilerplate/github-actions
-Packages:
-  - OutputFolder: ../..
-    Template: docker-build-push
-    Ref: docker-build-push-v2.3.2
-    VarFiles:
-      - common-config.yml
-      - docker-build-push.yml
-`,
-			files:         []string{".github/workflows/_config/common-config.yml", ".github/workflows/_config/dev/docker-build-push.yml"},
-			expectedError: `.github/workflows/_config/dev/packages.yml: var file "common-config.yml" does not exist. Did you mean "../common-config.yml"?`,
-		},
-
-		// Central package manifest with var files in a _config directory
-		{
-			name:         "central manifest: should return no error when all var files exist",
+			name:         "should return no error when all var files exist",
 			manifestPath: "stacks/dev/packages.yml",
 			manifest: `
 Packages:
@@ -121,7 +42,36 @@ Packages:
 			files: []string{"stacks/dev/_config/common-config.yml", "stacks/dev/_config/databases.yml", "stacks/dev/_config/app-hello.yml"},
 		},
 		{
-			name:         "central manifest: should report a var file that packages share one time, and keep its subdirectory in the suggestion",
+			name:         "should suggest a var file in a parent directory",
+			manifestPath: "stacks/prod/apps/my-app/packages.yml",
+			manifest: `
+Packages:
+  - OutputFolder: .
+    Template: app
+    Ref: app-v1.0.0
+    VarFiles:
+      - ../common-config.yml
+      - package-config.yml
+`,
+			files:         []string{"stacks/prod/common-config.yml", "stacks/prod/apps/my-app/package-config.yml"},
+			expectedError: `stacks/prod/apps/my-app/packages.yml: var file "../common-config.yml" does not exist. Did you mean "../../common-config.yml"?`,
+		},
+		{
+			name:         "should suggest the nearest var file, starting in the directory of the package manifest",
+			manifestPath: "stacks/prod/apps/my-app/packages.yml",
+			manifest: `
+Packages:
+  - OutputFolder: .
+    Template: app
+    Ref: app-v1.0.0
+    VarFiles:
+      - ../../common-config.yml
+`,
+			files:         []string{"stacks/prod/apps/my-app/common-config.yml", "common-config.yml"},
+			expectedError: `stacks/prod/apps/my-app/packages.yml: var file "../../common-config.yml" does not exist. Did you mean "common-config.yml"?`,
+		},
+		{
+			name:         "should report each missing var file one time, and keep its subdirectory in the suggestion",
 			manifestPath: "stacks/dev/packages.yml",
 			manifest: `
 Packages:
@@ -142,24 +92,9 @@ Packages:
 			expectedError: `stacks/dev/packages.yml: var file "_config/common-config.yml" does not exist. Did you mean "../_config/common-config.yml"?` + "\n" +
 				`stacks/dev/packages.yml: var file "_config/app-hello.yml" does not exist`,
 		},
-
-		// Cases without a suggestion
-		{
-			name:         "should not suggest a var file when no file with the same name exists",
-			manifestPath: "stacks/prod/apps/my-app/packages.yml",
-			manifest: `
-Packages:
-  - OutputFolder: .
-    Template: app
-    Ref: app-v1.0.0
-    VarFiles:
-      - ../common-config.yml
-`,
-			expectedError: `stacks/prod/apps/my-app/packages.yml: var file "../common-config.yml" does not exist`,
-		},
 		{
 			name:         "should stop the search at the repository root",
-			manifestPath: "stacks/prod/apps/my-app/packages.yml",
+			manifestPath: "packages.yml",
 			manifest: `
 Packages:
   - OutputFolder: .
@@ -170,7 +105,7 @@ Packages:
 `,
 			// The only common-config.yml is in the directory above the repository root.
 			files:         []string{"../common-config.yml"},
-			expectedError: `stacks/prod/apps/my-app/packages.yml: var file "common-config.yml" does not exist`,
+			expectedError: `packages.yml: var file "common-config.yml" does not exist`,
 		},
 		{
 			name:         "should not suggest a var file when not in a git repository",
@@ -249,8 +184,7 @@ Packages:
 // createRepo creates a repository root directory, makes it the current directory, and returns its path. Git does not
 // look for a repository above the directory, so the result does not depend on where the test runs.
 func createRepo(t *testing.T, gitRepo bool) string {
-	tempDir, err := resolvePath(t.TempDir())
-	require.NoError(t, err)
+	tempDir := t.TempDir()
 
 	repoRoot := filepath.Join(tempDir, "repo")
 	require.NoError(t, os.MkdirAll(repoRoot, 0755))

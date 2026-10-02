@@ -168,7 +168,8 @@ func prettyPrintError(err error) {
 }
 
 func printWithSpaces(text string, depth int) {
-	out := strings.Repeat(" ", depth*2) + text
+	indent := strings.Repeat(" ", depth*2)
+	out := indent + strings.ReplaceAll(text, "\n", "\n"+indent)
 	fmt.Fprintln(os.Stderr, out)
 
 }

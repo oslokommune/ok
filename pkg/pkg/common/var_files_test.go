@@ -118,9 +118,10 @@ Packages:
     VarFiles:
       - ../common-config.yml
 `,
-			files:         []string{"stacks/prod/common-config.yml"},
-			noGitRepo:     true,
-			expectedError: `stacks/prod/apps/my-app/packages.yml: var file "../common-config.yml" does not exist`,
+			files:     []string{"stacks/prod/common-config.yml"},
+			noGitRepo: true,
+			// Without a git repository, the path of the package manifest shows as given.
+			expectedError: `packages.yml: var file "../common-config.yml" does not exist`,
 		},
 	}
 
@@ -133,7 +134,11 @@ Packages:
 				createFile(t, filepath.Join(repoRoot, file), "")
 			}
 
-			manifest, err := LoadPackageManifest(tt.manifestPath)
+			// Run from the directory of the package manifest, as "ok pkg install" and "ok pkg update" do.
+			t.Chdir(filepath.Join(repoRoot, filepath.Dir(tt.manifestPath)))
+			manifestFile := filepath.Base(tt.manifestPath)
+
+			manifest, err := LoadPackageManifest(manifestFile)
 			require.NoError(t, err)
 			require.NotEmpty(t, manifest.Packages)
 			for _, pkg := range manifest.Packages {
@@ -141,7 +146,7 @@ Packages:
 			}
 
 			// When
-			err = CheckVarFiles(tt.manifestPath, manifest.Packages, filepath.Dir(tt.manifestPath))
+			err = CheckVarFiles(manifestFile, manifest.Packages, ".")
 
 			// Then
 			if tt.expectedError == "" {
@@ -171,6 +176,35 @@ Packages:
       - %s
 `, existing, missing))
 
+	t.Chdir(filepath.Join(repoRoot, filepath.Dir(manifestPath)))
+
+	manifest, err := LoadPackageManifest("packages.yml")
+	require.NoError(t, err)
+
+	// When
+	err = CheckVarFiles("packages.yml", manifest.Packages, ".")
+
+	// Then
+	require.EqualError(t, err, fmt.Sprintf(`%s: var file %q does not exist`, manifestPath, missing))
+}
+
+// TestCheckVarFilesFromRepositoryRoot runs the check from the repository root, as "ok pkg install --recursive" and
+// "ok pkg update --recursive" do.
+func TestCheckVarFilesFromRepositoryRoot(t *testing.T) {
+	// Given
+	repoRoot := createRepo(t, true)
+	manifestPath := "stacks/prod/apps/my-app/packages.yml"
+
+	createFile(t, filepath.Join(repoRoot, "stacks/prod/common-config.yml"), "")
+	createFile(t, filepath.Join(repoRoot, manifestPath), `
+Packages:
+  - OutputFolder: .
+    Template: app
+    Ref: app-v1.0.0
+    VarFiles:
+      - ../common-config.yml
+`)
+
 	manifest, err := LoadPackageManifest(manifestPath)
 	require.NoError(t, err)
 
@@ -178,7 +212,7 @@ Packages:
 	err = CheckVarFiles(manifestPath, manifest.Packages, filepath.Dir(manifestPath))
 
 	// Then
-	require.EqualError(t, err, fmt.Sprintf(`%s: var file %q does not exist`, manifestPath, missing))
+	require.EqualError(t, err, `stacks/prod/apps/my-app/packages.yml: var file "../common-config.yml" does not exist. Did you mean "../../common-config.yml"?`)
 }
 
 // createRepo creates a repository root directory, makes it the current directory, and returns its path. Git does not

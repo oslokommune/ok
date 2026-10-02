@@ -48,15 +48,15 @@ func Execute() {
 			Bold(true).
 			Foreground(lipgloss.Color("1")) // Red text
 
-		fmt.Println()
-		fmt.Println(redStyle.Render("Error:"))
+		fmt.Fprintln(os.Stderr)
+		fmt.Fprintln(os.Stderr, redStyle.Render("Error:"))
 		prettyPrintError(err)
 
 		var userError *error_user_msg.ErrorUserMessage
 		if errors.As(err, &userError) {
-			fmt.Println()
-			fmt.Println(common.StyleTitle.Render("Details:"))
-			fmt.Println(userError.Details())
+			fmt.Fprintln(os.Stderr)
+			fmt.Fprintln(os.Stderr, common.StyleTitle.Render("Details:"))
+			fmt.Fprintln(os.Stderr, userError.Details())
 		}
 
 		os.Exit(1)
@@ -168,7 +168,8 @@ func prettyPrintError(err error) {
 }
 
 func printWithSpaces(text string, depth int) {
-	out := strings.Repeat(" ", depth*2) + text
-	fmt.Println(out)
+	indent := strings.Repeat(" ", depth*2)
+	out := indent + strings.ReplaceAll(text, "\n", "\n"+indent)
+	fmt.Fprintln(os.Stderr, out)
 
 }

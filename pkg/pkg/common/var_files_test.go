@@ -158,7 +158,7 @@ Packages:
 			expectedError: `stacks/prod/apps/my-app/packages.yml: var file "../common-config.yml" does not exist`,
 		},
 		{
-			name:         "should not suggest a var file outside the repository",
+			name:         "should stop the search at the repository root",
 			manifestPath: "stacks/prod/apps/my-app/packages.yml",
 			manifest: `
 Packages:
@@ -168,6 +168,7 @@ Packages:
     VarFiles:
       - common-config.yml
 `,
+			// The only common-config.yml is in the directory above the repository root.
 			files:         []string{"../common-config.yml"},
 			expectedError: `stacks/prod/apps/my-app/packages.yml: var file "common-config.yml" does not exist`,
 		},

@@ -12,10 +12,8 @@ import (
 // workingDirectory. If workingDirectory is in a git repository, the error suggests a file with the same name in a
 // parent directory, up to the repository root.
 func CheckVarFiles(manifestFile string, packages []Package, workingDirectory string) error {
-	return checkVarFiles(manifestFile, packages, workingDirectory, gitRepoRoot(workingDirectory))
-}
+	repoRoot := gitRepoRoot(workingDirectory)
 
-func checkVarFiles(manifestFile string, packages []Package, workingDirectory string, repoRoot string) error {
 	var messages []string
 	checked := make(map[string]bool)
 

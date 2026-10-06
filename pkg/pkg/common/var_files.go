@@ -9,10 +9,10 @@ import (
 	"strings"
 )
 
-// CheckVarFiles returns an error if a var file of the packages does not exist. Var file paths are relative to
+// CheckVarFilesExist returns an error if a var file of the packages does not exist. Var file paths are relative to
 // workingDirectory, which is also the directory of manifestFile. If workingDirectory is in a git repository, the error
 // suggests a file with the same name in a parent directory, up to the repository root.
-func CheckVarFiles(manifestFile string, packages []Package, workingDirectory string) error {
+func CheckVarFilesExist(manifestFile string, packages []Package, workingDirectory string) error {
 	prefix, levelsToRoot, inGitRepo := gitLocation(workingDirectory)
 
 	displayManifestFile := manifestFile

@@ -129,7 +129,7 @@ func updateFromManifest(workingDirectory string, manifestFile string, outputFold
 	}
 
 	if opts.UpdateSchema || opts.MigrateConfig {
-		err = common.CheckVarFiles(manifestFile, packages, workingDirectory)
+		err = common.CheckVarFilesExist(manifestFile, packages, workingDirectory)
 		if err != nil {
 			err = fmt.Errorf("checking var files: %w", err)
 			return fmt.Errorf("updating packages: %w", err)

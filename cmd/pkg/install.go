@@ -100,6 +100,12 @@ func installFromManifest(manifestFile string, outputFolders []string, workingDir
 		packages = manifest.Packages
 	}
 
+	err = common.CheckVarFilesExist(manifestFile, packages, workingDirectory)
+	if err != nil {
+		err = fmt.Errorf("checking var files: %w", err)
+		return fmt.Errorf("installing packages: %w", err)
+	}
+
 	err = install.Run(packages, manifest, workingDirectory)
 	if err != nil {
 		return fmt.Errorf("installing packages: %w", err)

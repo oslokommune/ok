@@ -65,7 +65,10 @@ func CheckVarFiles(manifestFile string, packages []Package, workingDirectory str
 }
 
 // findVarFileSuggestion looks for varFile, without its leading "../" parts, in workingDirectory and in each of the
-// levels parent directories above it. It returns the nearest match, relative to workingDirectory.
+// levels parent directories above it.
+//
+// It returns the path of the nearest match, relative to workingDirectory, and true. If there is no match, or if varFile
+// is an absolute path, it returns an empty string and false.
 //
 // Example: if varFile is "../common-config.yml", it checks "common-config.yml", "../../common-config.yml" and so on.
 // It skips "../common-config.yml", as that file does not exist.

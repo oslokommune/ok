@@ -89,7 +89,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.OKCTL_FINE_GRAINED_TOKEN }}
           TAG: ${{ needs.release-please.outputs.tag_name }}
-        run: gh release edit "$TAG" --draft=false
+        run: |
+          # Fail before publishing, as an immutable release without assets
+          # cannot be fixed afterwards.
+          count=$(gh release view "$TAG" --json assets --jq '.assets | length')
+          if [ "$count" -eq 0 ]; then
+            echo "::error::Release $TAG has no assets. Not publishing it."
+            exit 1
+          fi
+          gh release edit "$TAG" --draft=false
 
 
   ################################################################################

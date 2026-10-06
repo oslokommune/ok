@@ -1,5 +1,17 @@
 # Changelog
 
+## [5.22.0](https://github.com/oslokommune/ok/compare/v5.21.0...v5.22.0) (2026-10-06)
+
+
+### Features
+
+* check that var files exist before install and update ([#543](https://github.com/oslokommune/ok/issues/543)) ([a7816dc](https://github.com/oslokommune/ok/commit/a7816dc52d61c15ed66b813eaa0377e7bb857e2f))
+
+
+### Bug Fixes
+
+* **deps:** watch the magefiles Go module with Dependabot ([cf369a8](https://github.com/oslokommune/ok/commit/cf369a8020c12c8a35f827d682d7a23f6e24f6c6))
+
 ## [5.21.0](https://github.com/oslokommune/ok/compare/v5.20.2...v5.21.0) (2026-08-06)
 
 

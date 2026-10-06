@@ -10,6 +10,9 @@ changelog:
 # This allows us to have immutable releases.
 release:
   draft: true
+  # Upload to the draft that release-please created. Without this, GoReleaser
+  # cannot find that draft by tag and creates a second one.
+  use_existing_draft: true
 
 before:
   hooks:

@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.22.1](https://github.com/oslokommune/ok/compare/v5.22.0...v5.22.1) (2026-10-06)
+
+
+### Bug Fixes
+
+* **ci:** upload release assets to the release-please draft ([#545](https://github.com/oslokommune/ok/issues/545)) ([3d694d5](https://github.com/oslokommune/ok/commit/3d694d5077b0f586a021171b81761992a8cae176))
+
 ## [5.22.0](https://github.com/oslokommune/ok/compare/v5.21.0...v5.22.0) (2026-10-06)
 
 

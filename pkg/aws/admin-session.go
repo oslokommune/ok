@@ -110,7 +110,16 @@ func selectAWSProfile() (string, error) {
 	}
 	var profiles []huh.Option[string]
 	for _, profile := range strings.Split(string(out), "\n") {
+		// Skip blank lines, such as the one after the trailing newline. A blank option gets
+		// preselected, and huh scrolls it to the top, hiding all real profiles.
+		profile = strings.TrimSpace(profile)
+		if profile == "" {
+			continue
+		}
 		profiles = append(profiles, huh.NewOption(profile, profile))
+	}
+	if len(profiles) == 0 {
+		return "", errors.New("no AWS profiles found, run `ok aws generate` to create them")
 	}
 
 	var selectedProfile string

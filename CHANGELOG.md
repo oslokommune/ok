@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.22.2](https://github.com/oslokommune/ok/compare/v5.22.1...v5.22.2) (2026-10-15)
+
+
+### Bug Fixes
+
+* **aws:** show AWS profiles in admin-session selector ([#548](https://github.com/oslokommune/ok/issues/548)) ([4c0be83](https://github.com/oslokommune/ok/commit/4c0be8361bdde39e116484760317446bfcbdd986))
+
 ## [5.22.1](https://github.com/oslokommune/ok/compare/v5.22.0...v5.22.1) (2026-10-06)
 
 

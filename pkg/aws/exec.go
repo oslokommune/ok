@@ -139,7 +139,7 @@ func Exec() (string, error) {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
 		} else {
-			return "", fmt.Errorf("running cluster select form: %w", err)
+			return "", fmt.Errorf("selecting cluster: %w", err)
 		}
 	}
 
@@ -165,7 +165,7 @@ func Exec() (string, error) {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
 		} else {
-			return "", fmt.Errorf("running service select form: %w", err)
+			return "", fmt.Errorf("selecting service: %w", err)
 		}
 	}
 
@@ -190,7 +190,7 @@ func Exec() (string, error) {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
 		} else {
-			return "", fmt.Errorf("running task select form: %w", err)
+			return "", fmt.Errorf("selecting task: %w", err)
 		}
 	}
 
@@ -215,7 +215,7 @@ func Exec() (string, error) {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
 		} else {
-			return "", fmt.Errorf("running container select form: %w", err)
+			return "", fmt.Errorf("selecting container: %w", err)
 		}
 	}
 

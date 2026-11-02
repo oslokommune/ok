@@ -35,7 +35,7 @@ func SelectPackages(manifest common.PackageManifest, action string) ([]common.Pa
 		if errors.Is(err, huh.ErrUserAborted) {
 			return []common.Package{}, nil
 		} else {
-			return []common.Package{}, fmt.Errorf("running multi select form: %w", err)
+			return []common.Package{}, err
 		}
 	}
 

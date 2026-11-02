@@ -12,6 +12,7 @@ import (
 
 	"github.com/oslokommune/ok/pkg/prompt"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -113,6 +114,7 @@ func TestNonInteractiveFlagReachesPrompts(t *testing.T) {
 				checkErr = prompt.Check("Select cluster", "")
 			}}
 			rootCmd.AddCommand(probe)
+			resetRootCmdAfter(t)
 			t.Cleanup(func() {
 				rootCmd.RemoveCommand(probe)
 				prompt.SetMode(prompt.Mode{Interactive: true})
@@ -143,9 +145,9 @@ func TestHelpShowsExitCodesAfterTheFlags(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Given
 			var out bytes.Buffer
+			resetRootCmdAfter(t)
 			rootCmd.SetOut(&out)
 			rootCmd.SetArgs(tt.args)
-			t.Cleanup(func() { rootCmd.SetOut(nil) })
 
 			// When
 			require.NoError(t, rootCmd.Execute())
@@ -175,6 +177,29 @@ func TestLoadConfigurationKeepsStdoutClean(t *testing.T) {
 	// Then the message goes to stderr, not stdout
 	assert.Empty(t, stdout)
 	assert.Contains(t, stderr, "Using config file: "+configFile)
+}
+
+// resetRootCmdAfter undoes, when the test ends, what running rootCmd leaves behind: the arguments,
+// the output, and the parsed flags (cobra keeps their values and Changed between runs).
+func resetRootCmdAfter(t *testing.T) {
+	t.Helper()
+	t.Cleanup(func() {
+		rootCmd.SetArgs([]string{}) // not nil: then cobra reads os.Args, which hold go test's flags
+		rootCmd.SetOut(nil)
+		resetFlags(rootCmd)
+	})
+}
+
+func resetFlags(c *cobra.Command) {
+	reset := func(f *pflag.Flag) {
+		_ = f.Value.Set(f.DefValue)
+		f.Changed = false
+	}
+	c.Flags().VisitAll(reset)
+	c.PersistentFlags().VisitAll(reset)
+	for _, sub := range c.Commands() {
+		resetFlags(sub)
+	}
 }
 
 func captureOutput(t *testing.T, f func()) (stdout string, stderr string) {

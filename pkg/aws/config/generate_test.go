@@ -1,7 +1,10 @@
 package config
 
 import (
+	"errors"
 	"testing"
+
+	"github.com/oslokommune/ok/pkg/prompt"
 )
 
 func TestSanitizeName(t *testing.T) {
@@ -229,5 +232,17 @@ func TestGenerateProfileName(t *testing.T) {
 				t.Errorf("generateProfileName() = %q, want %q", got, tt.expected)
 			}
 		})
+	}
+}
+
+func TestGenerateWithoutPrompting(t *testing.T) {
+	prompt.SetMode(prompt.Mode{Reason: "CI=true is set"})
+	t.Cleanup(func() { prompt.SetMode(prompt.Mode{Interactive: true}) })
+
+	err := Generate(Options{})
+
+	var inputNeeded *prompt.InputNeededError
+	if !errors.As(err, &inputNeeded) {
+		t.Fatalf("expected InputNeededError before the browser login, got %v", err)
 	}
 }

@@ -220,7 +220,7 @@ func SelectTemplatesInteractively(templates []Template) ([]Template, error) {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("running template selection: %w", err)
+		return nil, fmt.Errorf("selecting templates: %w", err)
 	}
 
 	var selected []Template

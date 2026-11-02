@@ -45,10 +45,15 @@ func (e *InputNeededError) ExitCode() int {
 	return ExitCodeInputNeeded
 }
 
+// Allowed reports whether ok may prompt.
+func Allowed() bool {
+	return mode.Interactive
+}
+
 // Check returns *InputNeededError when ok may not prompt. Use it before a command does anything
 // it cannot undo, when a prompt will follow.
 func Check(title string, hint string) error {
-	if !mode.Interactive {
+	if !Allowed() {
 		return &InputNeededError{Prompt: title, Reason: mode.Reason, Hint: hint}
 	}
 	return nil

@@ -28,8 +28,7 @@ var (
 			"- Infrastructure setup\n" +
 			"- Terraform & CI/CD templates\n" +
 			"- AWS tasks\n\n" +
-			"[Get started](https://km.oslo.systems/setup/infrastructure/initialize-environment/)!\n\n" +
-			"Exit codes: 0 success, 1 error, 2 input needed but ok may not prompt.",
+			"[Get started](https://km.oslo.systems/setup/infrastructure/initialize-environment/)!",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
@@ -90,6 +89,18 @@ func exitCode(err error) int {
 	return exitCodeError
 }
 
+// usageTemplateWithExitCodes adds an Exit Codes section after the flags in a cobra usage template.
+func usageTemplateWithExitCodes(template string) string {
+	exitCodes := fmt.Sprintf("\n\nExit Codes:\n"+
+		"  0  success\n"+
+		"  %d  error\n"+
+		"  %d  input needed, but ok may not prompt (see --%s)",
+		exitCodeError, prompt.ExitCodeInputNeeded, FlagNonInteractiveName)
+
+	const afterFlags = "{{if .HasHelpSubCommands}}"
+	return strings.Replace(template, afterFlags, exitCodes+afterFlags, 1)
+}
+
 // promptMode decides whether ok may prompt. The first one set wins: --non-interactive (nil when
 // not given), OK_NON_INTERACTIVE, CI=true. When none is set, ok prompts if it has a terminal.
 func promptMode(nonInteractive *bool, getenv func(string) string, hasTerminal bool) prompt.Mode {
@@ -126,6 +137,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", defaultConfigPath))
 	rootCmd.PersistentFlags().Bool(FlagNonInteractiveName, false, FlagNonInteractiveUsage)
+	rootCmd.SetUsageTemplate(usageTemplateWithExitCodes(rootCmd.UsageTemplate()))
 
 	// Create dependencies
 	ghReleases := githubreleases.NewGitHubReleases()

@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/oslokommune/ok/pkg/prompt"
@@ -123,6 +125,38 @@ func TestNonInteractiveFlagReachesPrompts(t *testing.T) {
 			// Then
 			var inputNeeded *prompt.InputNeededError
 			assert.Equal(t, tt.wantInputNeeded, errors.As(checkErr, &inputNeeded))
+		})
+	}
+}
+
+func TestHelpShowsExitCodesAfterTheFlags(t *testing.T) {
+	tests := []struct {
+		name      string
+		args      []string
+		lastFlags string
+	}{
+		{name: "ok", args: []string{"--help"}, lastFlags: "Flags:"},
+		{name: "a subcommand", args: []string{"pkg", "install", "--help"}, lastFlags: "Global Flags:"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Given
+			var out bytes.Buffer
+			rootCmd.SetOut(&out)
+			rootCmd.SetArgs(tt.args)
+			t.Cleanup(func() { rootCmd.SetOut(nil) })
+
+			// When
+			require.NoError(t, rootCmd.Execute())
+
+			// Then
+			help := out.String()
+			flags := strings.Index(help, tt.lastFlags)
+			exitCodes := strings.Index(help, "Exit Codes:\n  0  success\n  1  error\n  2  input needed")
+			require.NotEqual(t, -1, exitCodes, "no Exit Codes section in:\n%s", help)
+			assert.Less(t, flags, exitCodes, "Exit Codes should come after %s", tt.lastFlags)
+			assert.NotContains(t, help[:flags], "Exit codes", "the description should not list the exit codes")
 		})
 	}
 }

@@ -1,85 +1,54 @@
 package prompt
 
 import (
-	"os"
 	"testing"
 
 	"github.com/charmbracelet/huh"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestNonInteractive(t *testing.T) {
-	t.Run("the flag turns prompts off", func(t *testing.T) {
-		t.Setenv("CI", "")
-		setFlag(t, true)
+func TestRun(t *testing.T) {
+	t.Run("returns InputNeededError without showing the form when ok may not prompt", func(t *testing.T) {
+		// Given
+		setMode(t, Mode{Reason: "CI=true is set"})
 
-		assert.True(t, NonInteractive())
-	})
+		// When
+		err := Run(huh.NewForm(huh.NewGroup(huh.NewInput())), "Select cluster", "Pass --cluster")
 
-	t.Run("CI=true turns prompts off", func(t *testing.T) {
-		t.Setenv("CI", "true")
-		setFlag(t, false)
-
-		assert.True(t, NonInteractive())
-	})
-
-	t.Run("stdin that is not a terminal turns prompts off", func(t *testing.T) {
-		t.Setenv("CI", "")
-		setFlag(t, false)
-		setStdinToPipe(t)
-
-		assert.True(t, NonInteractive())
+		// Then
+		var inputNeeded *InputNeededError
+		require.ErrorAs(t, err, &inputNeeded)
+		assert.Equal(t, &InputNeededError{Prompt: "Select cluster", Reason: "CI=true is set", Hint: "Pass --cluster"}, inputNeeded)
 	})
 }
 
-func TestRun(t *testing.T) {
-	t.Run("returns InputNeededError without showing the form", func(t *testing.T) {
-		t.Setenv("CI", "true")
+func TestCheck(t *testing.T) {
+	t.Run("passes when ok may prompt", func(t *testing.T) {
+		setMode(t, Mode{Interactive: true})
 
-		err := Run(huh.NewForm(huh.NewGroup(huh.NewInput())), "Select cluster", "pass --cluster")
+		assert.NoError(t, Check("Select cluster", ""))
+	})
+
+	t.Run("returns InputNeededError when ok may not prompt", func(t *testing.T) {
+		setMode(t, Mode{Reason: "there is no terminal"})
 
 		var inputNeeded *InputNeededError
-		require.ErrorAs(t, err, &inputNeeded)
-		assert.Equal(t, "Select cluster", inputNeeded.Prompt)
-		assert.Equal(t, "pass --cluster", inputNeeded.Hint)
+		assert.ErrorAs(t, Check("Select cluster", ""), &inputNeeded)
 	})
 }
 
 func TestInputNeededError(t *testing.T) {
-	t.Run("names the prompt, the flag and the hint", func(t *testing.T) {
-		err := &InputNeededError{Prompt: "Select cluster", Hint: "pass --cluster"}
+	err := &InputNeededError{Prompt: "Select cluster", Reason: "CI=true is set", Hint: "Pass --cluster"}
 
-		assert.Equal(t,
-			`ok needs input ("Select cluster") but runs non-interactively (--non-interactive, OK_NON_INTERACTIVE, CI=true or no terminal): pass --cluster`,
-			err.Error())
-	})
-
-	t.Run("leaves the hint out when there is none", func(t *testing.T) {
-		err := &InputNeededError{Prompt: "Select cluster"}
-
-		assert.Equal(t,
-			`ok needs input ("Select cluster") but runs non-interactively (--non-interactive, OK_NON_INTERACTIVE, CI=true or no terminal)`,
-			err.Error())
-	})
+	assert.Equal(t, `ok needs an answer to "Select cluster" but cannot ask: CI=true is set`, err.Error())
+	assert.Equal(t, "Pass --cluster", err.Details())
+	assert.Equal(t, 2, err.ExitCode())
 }
 
-func setFlag(t *testing.T, value bool) {
+func setMode(t *testing.T, m Mode) {
 	t.Helper()
-	viper.Set(ConfigKey, value)
-	t.Cleanup(func() { viper.Set(ConfigKey, false) })
-}
-
-func setStdinToPipe(t *testing.T) {
-	t.Helper()
-	r, w, err := os.Pipe()
-	require.NoError(t, err)
-	oldStdin := os.Stdin
-	os.Stdin = r
-	t.Cleanup(func() {
-		os.Stdin = oldStdin
-		_ = r.Close()
-		_ = w.Close()
-	})
+	old := mode
+	SetMode(m)
+	t.Cleanup(func() { SetMode(old) })
 }

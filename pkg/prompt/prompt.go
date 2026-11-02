@@ -1,4 +1,4 @@
-// Package prompt decides whether ok may ask the user anything, and shows huh forms only when it may.
+// Package prompt shows huh forms only when ok may ask, and otherwise says what ok needed.
 package prompt
 
 import (
@@ -7,48 +7,72 @@ import (
 
 	"github.com/charmbracelet/huh"
 	"github.com/mattn/go-isatty"
-	"github.com/spf13/viper"
 )
 
-const (
-	// FlagName is the persistent flag that turns prompts off. OK_NON_INTERACTIVE=true does the same.
-	FlagName = "non-interactive"
+// ExitCodeInputNeeded is ok's exit code when it needs input but may not prompt.
+const ExitCodeInputNeeded = 2
 
-	// ConfigKey is the viper key bound to FlagName and OK_NON_INTERACTIVE.
-	ConfigKey = "non_interactive"
+// Mode says whether ok may prompt, and if not, why.
+type Mode struct {
+	Interactive bool
+	Reason      string // why ok may not prompt, e.g. "CI=true is set"
+}
 
-	// ExitCodeInputNeeded is the exit code when ok needs input it is not allowed to ask for.
-	ExitCodeInputNeeded = 2
-)
+var mode = Mode{Interactive: true}
 
-// InputNeededError is returned instead of showing a prompt when ok runs non-interactively.
+// SetMode sets whether ok may prompt. The root command calls it before any command runs.
+func SetMode(m Mode) {
+	mode = m
+}
+
+// InputNeededError is returned instead of showing a prompt when ok may not prompt.
 type InputNeededError struct {
-	Prompt string // what ok would have asked, e.g. "Select cluster"
+	Prompt string // the prompt's title, e.g. "Select cluster"
+	Reason string // why ok may not prompt
 	Hint   string // how to give the answer without a prompt; empty when there is no way yet
 }
 
 func (e *InputNeededError) Error() string {
-	msg := fmt.Sprintf("ok needs input (%q) but runs non-interactively (--%s, OK_NON_INTERACTIVE, CI=true or no terminal)", e.Prompt, FlagName)
-	if e.Hint != "" {
-		msg += ": " + e.Hint
-	}
-	return msg
+	return fmt.Sprintf("ok needs an answer to %q but cannot ask: %s", e.Prompt, e.Reason)
 }
 
-// NonInteractive reports whether prompts are off: --non-interactive, OK_NON_INTERACTIVE=true,
-// CI=true, or stdin is not a terminal.
-func NonInteractive() bool {
-	if viper.GetBool(ConfigKey) || os.Getenv("CI") == "true" {
-		return true
-	}
-	fd := os.Stdin.Fd()
-	return !isatty.IsTerminal(fd) && !isatty.IsCygwinTerminal(fd)
+// Details is printed under the error.
+func (e *InputNeededError) Details() string {
+	return e.Hint
 }
 
-// Run shows the form, or returns *InputNeededError without showing it when prompts are off.
-func Run(form *huh.Form, prompt string, hint string) error {
-	if NonInteractive() {
-		return &InputNeededError{Prompt: prompt, Hint: hint}
+func (e *InputNeededError) ExitCode() int {
+	return ExitCodeInputNeeded
+}
+
+// Check returns *InputNeededError when ok may not prompt. Use it before a command does anything
+// it cannot undo, when a prompt will follow.
+func Check(title string, hint string) error {
+	if !mode.Interactive {
+		return &InputNeededError{Prompt: title, Reason: mode.Reason, Hint: hint}
+	}
+	return nil
+}
+
+// Run shows the form, or returns *InputNeededError without showing it when ok may not prompt.
+func Run(form *huh.Form, title string, hint string) error {
+	if err := Check(title, hint); err != nil {
+		return err
 	}
 	return form.Run()
+}
+
+// HasTerminal reports whether there is a terminal to prompt on: stdin, or /dev/tty, which huh
+// opens when stdin is redirected.
+func HasTerminal() bool {
+	fd := os.Stdin.Fd()
+	if isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd) {
+		return true
+	}
+	tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0)
+	if err != nil {
+		return false
+	}
+	_ = tty.Close()
+	return true
 }

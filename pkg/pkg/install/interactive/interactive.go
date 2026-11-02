@@ -21,14 +21,16 @@ func SelectPackages(manifest common.PackageManifest, action string) ([]common.Pa
 
 	var selectedPackageKeys []string
 
+	title := "Select package(s) to " + action
 	s := huh.NewMultiSelect[string]().
 		Options(options...).
-		Title("Select package(s) to " + action).
+		Title(title).
 		Limit(4).
 		Value(&selectedPackageKeys)
 
-	err := prompt.Run(huh.NewForm(huh.NewGroup(s)), "Select package(s) to "+action,
-		"name the output folder(s) as arguments instead of --interactive")
+	hint := fmt.Sprintf("Name the output folder(s) as arguments, e.g. ok pkg %s networking, "+
+		"or leave out --interactive to %s every package.", action, action)
+	err := prompt.Run(huh.NewForm(huh.NewGroup(s)), title, hint)
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return []common.Package{}, nil

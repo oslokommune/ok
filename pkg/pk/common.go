@@ -208,13 +208,14 @@ func SelectTemplatesInteractively(templates []Template) ([]Template, error) {
 
 	var selectedKeys []string
 
+	title := "Select template(s) to install"
 	s := huh.NewMultiSelect[string]().
 		Options(options...).
-		Title("Select template(s) to install").
+		Title(title).
 		Value(&selectedKeys)
 
-	err := prompt.Run(huh.NewForm(huh.NewGroup(s)), "Select template(s) to install",
-		"run ok pk install from the template's output folder")
+	err := prompt.Run(huh.NewForm(huh.NewGroup(s)), title,
+		"Run it from a template's output folder, or pass --all to install every template.")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return nil, nil

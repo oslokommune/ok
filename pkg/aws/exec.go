@@ -128,12 +128,13 @@ func Exec() (string, error) {
 		clusterOptions = append(clusterOptions, huh.NewOption(c, c))
 	}
 
+	clusterTitle := "Select cluster"
 	clusterSelect := huh.NewSelect[string]().
 		Options(clusterOptions...).
-		Title("Select cluster").
+		Title(clusterTitle).
 		Value(&cluster)
 
-	err = prompt.Run(huh.NewForm(huh.NewGroup(clusterSelect)), "Select cluster", "")
+	err = prompt.Run(huh.NewForm(huh.NewGroup(clusterSelect)), clusterTitle, "")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
@@ -152,12 +153,13 @@ func Exec() (string, error) {
 		serviceOptions = append(serviceOptions, huh.NewOption(s, s))
 	}
 
+	serviceTitle := "Select service"
 	serviceSelect := huh.NewSelect[string]().
 		Options(serviceOptions...).
-		Title("Select service").
+		Title(serviceTitle).
 		Value(&service)
 
-	err = prompt.Run(huh.NewForm(huh.NewGroup(serviceSelect)), "Select service", "")
+	err = prompt.Run(huh.NewForm(huh.NewGroup(serviceSelect)), serviceTitle, "")
 
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
@@ -177,12 +179,13 @@ func Exec() (string, error) {
 		taskOptions = append(taskOptions, huh.NewOption(t, t))
 	}
 
+	taskTitle := "Select running task"
 	taskSelect := huh.NewSelect[string]().
 		Options(taskOptions...).
-		Title("Select running task").
+		Title(taskTitle).
 		Value(&task)
 
-	err = prompt.Run(huh.NewForm(huh.NewGroup(taskSelect)), "Select running task", "")
+	err = prompt.Run(huh.NewForm(huh.NewGroup(taskSelect)), taskTitle, "")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
@@ -201,12 +204,13 @@ func Exec() (string, error) {
 		containerOptions = append(containerOptions, huh.NewOption(*c.Name, *c.Name))
 	}
 
+	containerTitle := "Select container"
 	containerSelect := huh.NewSelect[string]().
 		Options(containerOptions...).
-		Title("Select container").
+		Title(containerTitle).
 		Value(&container)
 
-	err = prompt.Run(huh.NewForm(huh.NewGroup(containerSelect)), "Select container", "")
+	err = prompt.Run(huh.NewForm(huh.NewGroup(containerSelect)), containerTitle, "")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil

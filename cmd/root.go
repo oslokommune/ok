@@ -8,7 +8,6 @@ import (
 	"github.com/oslokommune/ok/cmd/data"
 	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
-	"github.com/oslokommune/ok/pkg/error_user_msg"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
 	"github.com/oslokommune/ok/pkg/prompt"
@@ -16,6 +15,7 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -29,9 +29,17 @@ var (
 			"- Terraform & CI/CD templates\n" +
 			"- AWS tasks\n\n" +
 			"[Get started](https://km.oslo.systems/setup/infrastructure/initialize-environment/)!\n\n" +
-			"Exit codes: 0 success, 1 error, 2 input needed (ok would have to ask, but runs non-interactively).",
+			"Exit codes: 0 success, 1 error, 2 input needed but ok may not prompt.",
 		SilenceErrors: true,
 		SilenceUsage:  true,
+		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
+			var nonInteractive *bool
+			if cmd.Flags().Changed(FlagNonInteractiveName) {
+				on, _ := cmd.Flags().GetBool(FlagNonInteractiveName)
+				nonInteractive = &on
+			}
+			prompt.SetMode(promptMode(nonInteractive, os.Getenv, prompt.HasTerminal()))
+		},
 	}
 
 	// cfgFile stores the path to the configuration file specified by the user.
@@ -39,6 +47,14 @@ var (
 
 	// defaultConfigPath stores the default configuration file path.
 	defaultConfigPath string
+)
+
+const (
+	FlagNonInteractiveName  = "non-interactive"
+	FlagNonInteractiveUsage = "Never prompt; exit 2 if input is needed. On by default with OK_NON_INTERACTIVE=true, " +
+		"CI=true, or without a terminal. --non-interactive=false turns prompts back on"
+
+	exitCodeError = 1
 )
 
 // Execute is the main entry point for our program.
@@ -54,24 +70,52 @@ func Execute() {
 		fmt.Fprintln(os.Stderr, redStyle.Render("Error:"))
 		prettyPrintError(err)
 
-		var userError *error_user_msg.ErrorUserMessage
-		if errors.As(err, &userError) {
+		var withDetails interface{ Details() string }
+		if errors.As(err, &withDetails) && withDetails.Details() != "" {
 			fmt.Fprintln(os.Stderr)
 			fmt.Fprintln(os.Stderr, common.StyleTitle.Render("Details:"))
-			fmt.Fprintln(os.Stderr, userError.Details())
+			fmt.Fprintln(os.Stderr, withDetails.Details())
 		}
 
 		os.Exit(exitCode(err))
 	}
 }
 
-// exitCode is 2 when ok needed input it was not allowed to ask for, and 1 for any other error.
+// exitCode is the exit code the error asks for, or exitCodeError.
 func exitCode(err error) int {
-	var inputNeeded *prompt.InputNeededError
-	if errors.As(err, &inputNeeded) {
-		return prompt.ExitCodeInputNeeded
+	var withExitCode interface{ ExitCode() int }
+	if errors.As(err, &withExitCode) {
+		return withExitCode.ExitCode()
 	}
-	return 1
+	return exitCodeError
+}
+
+// promptMode decides whether ok may prompt. The first one set wins: --non-interactive (nil when
+// not given), OK_NON_INTERACTIVE, CI=true. When none is set, ok prompts if it has a terminal.
+func promptMode(nonInteractive *bool, getenv func(string) string, hasTerminal bool) prompt.Mode {
+	if nonInteractive != nil {
+		if *nonInteractive {
+			return prompt.Mode{Reason: "--" + FlagNonInteractiveName + " is set"}
+		}
+		return prompt.Mode{Interactive: true}
+	}
+	if v := getenv("OK_NON_INTERACTIVE"); v != "" {
+		if on, err := strconv.ParseBool(v); err == nil {
+			if on {
+				return prompt.Mode{Reason: "OK_NON_INTERACTIVE=" + v + " is set"}
+			}
+			return prompt.Mode{Interactive: true}
+		}
+	}
+	if v := getenv("CI"); v != "" {
+		if on, err := strconv.ParseBool(v); err == nil && on {
+			return prompt.Mode{Reason: "CI=" + v + " is set"}
+		}
+	}
+	if !hasTerminal {
+		return prompt.Mode{Reason: "there is no terminal"}
+	}
+	return prompt.Mode{Interactive: true}
 }
 
 // init initializes the root command, setting up the configuration file path and flags.
@@ -81,9 +125,7 @@ func init() {
 	defaultConfigPath = path.Join(home, ".config", "ok", "config.yml")
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", defaultConfigPath))
-	rootCmd.PersistentFlags().Bool(prompt.FlagName, false,
-		"Never prompt: exit 2 when input is needed. Also on with OK_NON_INTERACTIVE=true, CI=true or no terminal")
-	cobra.CheckErr(viper.BindPFlag(prompt.ConfigKey, rootCmd.PersistentFlags().Lookup(prompt.FlagName)))
+	rootCmd.PersistentFlags().Bool(FlagNonInteractiveName, false, FlagNonInteractiveUsage)
 
 	// Create dependencies
 	ghReleases := githubreleases.NewGitHubReleases()

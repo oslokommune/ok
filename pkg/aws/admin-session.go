@@ -14,9 +14,15 @@ import (
 	"strings"
 )
 
+const profileSelectTitle = "Select AWS profile"
+
 const AccessPackageUrl = "https://myaccess.microsoft.com/@oslokommune.onmicrosoft.com#/access-packages"
 
 func StartAdminSession(startShell bool) error {
+	if err := prompt.Check(profileSelectTitle, ""); err != nil {
+		return err
+	}
+
 	red := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
 	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 	yellow := lipgloss.NewStyle().Foreground(lipgloss.Color("3"))
@@ -125,7 +131,7 @@ func selectAWSProfile() (string, error) {
 
 	var selectedProfile string
 	selector := huh.NewSelect[string]().
-		Title("Select AWS profile:").
+		Title(profileSelectTitle + ":").
 		Options(profiles...).
 		Validate(func(t string) error {
 			if len(t) <= 0 {
@@ -135,7 +141,7 @@ func selectAWSProfile() (string, error) {
 		}).
 		Value(&selectedProfile)
 
-	if err := prompt.Run(huh.NewForm(huh.NewGroup(selector)).WithShowHelp(false), "Select AWS profile", ""); err != nil {
+	if err := prompt.Run(huh.NewForm(huh.NewGroup(selector)).WithShowHelp(false), profileSelectTitle, ""); err != nil {
 		return "", err
 	}
 	return selectedProfile, nil

@@ -53,17 +53,12 @@ func executeScript(scriptFile string, args []string) error {
 	return nil
 }
 
-func RunScript(scriptName string, args []string) {
+func RunScript(scriptName string, args []string) error {
 	scriptFile, err := createTempScriptFile(scriptName)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	defer os.Remove(scriptFile)
 
-	err = executeScript(scriptFile, args)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	return executeScript(scriptFile, args)
 }

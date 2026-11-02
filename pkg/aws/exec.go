@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/magefile/mage/sh"
+	"github.com/oslokommune/ok/pkg/prompt"
 	"strings"
 )
 
@@ -132,7 +133,7 @@ func Exec() (string, error) {
 		Title("Select cluster").
 		Value(&cluster)
 
-	err = huh.NewForm(huh.NewGroup(clusterSelect)).Run()
+	err = prompt.Run(huh.NewForm(huh.NewGroup(clusterSelect)), "Select cluster", "")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
@@ -156,7 +157,7 @@ func Exec() (string, error) {
 		Title("Select service").
 		Value(&service)
 
-	err = huh.NewForm(huh.NewGroup(serviceSelect)).Run()
+	err = prompt.Run(huh.NewForm(huh.NewGroup(serviceSelect)), "Select service", "")
 
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
@@ -181,7 +182,7 @@ func Exec() (string, error) {
 		Title("Select running task").
 		Value(&task)
 
-	err = huh.NewForm(huh.NewGroup(taskSelect)).Run()
+	err = prompt.Run(huh.NewForm(huh.NewGroup(taskSelect)), "Select running task", "")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
@@ -205,7 +206,7 @@ func Exec() (string, error) {
 		Title("Select container").
 		Value(&container)
 
-	err = huh.NewForm(huh.NewGroup(containerSelect)).Run()
+	err = prompt.Run(huh.NewForm(huh.NewGroup(containerSelect)), "Select container", "")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil

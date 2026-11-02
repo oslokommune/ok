@@ -11,6 +11,7 @@ import (
 	"github.com/oslokommune/ok/pkg/error_user_msg"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
+	"github.com/oslokommune/ok/pkg/prompt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -27,7 +28,8 @@ var (
 			"- Infrastructure setup\n" +
 			"- Terraform & CI/CD templates\n" +
 			"- AWS tasks\n\n" +
-			"[Get started](https://km.oslo.systems/setup/infrastructure/initialize-environment/)!",
+			"[Get started](https://km.oslo.systems/setup/infrastructure/initialize-environment/)!\n\n" +
+			"Exit codes: 0 success, 1 error, 2 input needed (ok would have to ask, but runs non-interactively).",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}
@@ -59,8 +61,17 @@ func Execute() {
 			fmt.Fprintln(os.Stderr, userError.Details())
 		}
 
-		os.Exit(1)
+		os.Exit(exitCode(err))
 	}
+}
+
+// exitCode is 2 when ok needed input it was not allowed to ask for, and 1 for any other error.
+func exitCode(err error) int {
+	var inputNeeded *prompt.InputNeededError
+	if errors.As(err, &inputNeeded) {
+		return prompt.ExitCodeInputNeeded
+	}
+	return 1
 }
 
 // init initializes the root command, setting up the configuration file path and flags.
@@ -70,6 +81,9 @@ func init() {
 	defaultConfigPath = path.Join(home, ".config", "ok", "config.yml")
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", defaultConfigPath))
+	rootCmd.PersistentFlags().Bool(prompt.FlagName, false,
+		"Never prompt: exit 2 when input is needed. Also on with OK_NON_INTERACTIVE=true, CI=true or no terminal")
+	cobra.CheckErr(viper.BindPFlag(prompt.ConfigKey, rootCmd.PersistentFlags().Lookup(prompt.FlagName)))
 
 	// Create dependencies
 	ghReleases := githubreleases.NewGitHubReleases()
@@ -112,7 +126,7 @@ func initializeConfiguration() {
 // loadConfiguration attempts to read the configuration file using viper and prints the path of the used configuration file if successful.
 func loadConfiguration() {
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
 }
 

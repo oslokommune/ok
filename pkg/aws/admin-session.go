@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/oslokommune/ok/pkg/prompt"
 	"io"
 	"os"
 	"os/exec"
@@ -134,7 +135,7 @@ func selectAWSProfile() (string, error) {
 		}).
 		Value(&selectedProfile)
 
-	if err := selector.Run(); err != nil {
+	if err := prompt.Run(huh.NewForm(huh.NewGroup(selector)).WithShowHelp(false), "Select AWS profile", ""); err != nil {
 		return "", err
 	}
 	return selectedProfile, nil

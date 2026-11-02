@@ -26,8 +26,8 @@ func getForwardCommandScriptFlags(cmd *cobra.Command) []string {
 var forwardCommand = &cobra.Command{
 	Use:   "forward",
 	Short: "Starts a port forwarding session to a database.",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		scriptArgs := getForwardCommandScriptFlags(cmd)
-		scriptrunner.RunScript("port-forward.sh", scriptArgs)
+		return scriptrunner.RunScript("port-forward.sh", scriptArgs)
 	},
 }

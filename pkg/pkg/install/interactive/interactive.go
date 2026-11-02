@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/huh"
 	"github.com/oslokommune/ok/pkg/pkg/common"
+	"github.com/oslokommune/ok/pkg/prompt"
 )
 
 func SelectPackages(manifest common.PackageManifest, action string) ([]common.Package, error) {
@@ -26,7 +27,8 @@ func SelectPackages(manifest common.PackageManifest, action string) ([]common.Pa
 		Limit(4).
 		Value(&selectedPackageKeys)
 
-	err := huh.NewForm(huh.NewGroup(s)).Run()
+	err := prompt.Run(huh.NewForm(huh.NewGroup(s)), "Select package(s) to "+action,
+		"name the output folder(s) as arguments instead of --interactive")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return []common.Package{}, nil

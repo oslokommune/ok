@@ -29,6 +29,11 @@ node = "24.19.0"
 "aqua:astral-sh/uv" = "0.12.0"
 "pipx:cogapp" = "3.6.0"
 
+# `mise run prose` lints the generated docs with Vale; `mise watch prose` reruns
+# it on save with watchexec.
+"aqua:vale-cli/vale" = "3.22.0"
+"aqua:watchexec/watchexec" = "2.8.0"
+
 [tasks.build]
 description = "Build the project"
 run = "mage build"
@@ -44,6 +49,19 @@ run = "mage docs"
 [tasks.readme]
 description = "Re-render the `ok --help` output in README.md"
 run = "cog -r README.md"
+
+[tasks.prose]
+description = "Lint the generated docs with Vale"
+depends = ["docs"]
+# The command help text that ends up in docs/ lives in cmd/.
+sources = ["cmd/**/*.go", "docs-optimizer/index.js"]
+run = """
+if [ -z "$VALE_CONFIG" ]; then
+  echo 'Set VALE_CONFIG to the .vale.ini of the house style to lint against.' >&2
+  exit 1
+fi
+vale --config="$VALE_CONFIG" docs
+"""
 
 [tasks.lock]
 description = "Refresh mise.lock for every supported platform"

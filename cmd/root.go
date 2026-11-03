@@ -92,6 +92,8 @@ func init() {
 	rootCmd.AddCommand(dataCommand)
 	dataCommand.AddCommand(data.InitCommand)
 
+	rewordCompletionCommand()
+
 	initializeConfiguration()
 
 	if viper.GetBool("enable_experimental") {

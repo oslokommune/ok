@@ -21,7 +21,7 @@ func NewAddCommand(ghReleases add.GitHubReleases) *cobra.Command {
 		Short: "Add the Boilerplate template to the package manifest with an optional output folder",
 		Long: `Add the Boilerplate template to the package manifest with an optional output folder.
 The template version is fetched from the latest GitHub release in the template repository.
-The output folder is useful when you need multiple instances of the same template with different configurations, for example having multiple instances of the application template.`,
+Use the output folder to add the same template more than once, each with its own configuration. For example, add the app template one time for each application.`,
 		Example: `ok pkg add databases my-postgres-database
 ok pkg add app ecommerce-website
 ok pkg add app ecommerce-api

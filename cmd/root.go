@@ -27,7 +27,7 @@ var (
 			"- Infrastructure setup\n" +
 			"- Terraform & CI/CD templates\n" +
 			"- AWS tasks\n\n" +
-			"[Get started](https://km.oslo.systems/setup/infrastructure/initialize-environment/)!",
+			"[Get started](https://km.oslo.systems/initial-setup-of-your-aws-environment/set-up-environment/)!",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}

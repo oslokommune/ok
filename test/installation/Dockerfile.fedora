@@ -7,11 +7,13 @@ RUN dnf install -y dnf5-plugins git && \
     dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo && \
     dnf install -y gh --repo gh-cli
 
+# Fedora 45+ refuses unsigned packages by default. We do not sign the RPM, so
+# skip the signature check. rpm still verifies the digests.
 RUN --mount=type=secret,id=github_token \
     export GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
     TEMP_DIR=$(mktemp -d) && \
     gh release download --repo "oslokommune/ok" --pattern "*amd64.rpm" --dir "$TEMP_DIR" && \
-    rpm -ivh "$TEMP_DIR"/*amd64.rpm && \
+    rpm -ivh --nosignature "$TEMP_DIR"/*amd64.rpm && \
     rm -rf "$TEMP_DIR"
 
 CMD ["ok"]

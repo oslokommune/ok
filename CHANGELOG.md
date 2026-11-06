@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.23.0](https://github.com/oslokommune/ok/compare/v5.22.2...v5.23.0) (2026-11-06)
+
+
+### Features
+
+* **doctor:** add ok doctor to check that the machine is ready ([#558](https://github.com/oslokommune/ok/issues/558)) ([84e9ba9](https://github.com/oslokommune/ok/commit/84e9ba9e671f769eec9640a3e316a98659710d1f))
+
 ## [5.22.2](https://github.com/oslokommune/ok/compare/v5.22.1...v5.22.2) (2026-10-15)
 
 

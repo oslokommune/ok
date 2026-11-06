@@ -41,7 +41,7 @@ var versionCmd = &cobra.Command{
 				fmt.Println("\nTo update, run the following commands:")
 				fmt.Println("\nbrew update")
 				fmt.Println("brew upgrade ok")
-				fmt.Println("\nFor other update methods, see https://km.oslo.systems/setup/before-you-start/tools/ok/#updating")
+				fmt.Println("\nFor other update methods, see https://km.oslo.systems/set-up-your-machine/ok/#updating")
 			} else if currentVersion.Equal(latestVersion) {
 				fmt.Println("\nYou are using the latest version.")
 			}

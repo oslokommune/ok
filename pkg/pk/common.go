@@ -15,6 +15,7 @@ import (
 
 	"dario.cat/mergo"
 	"github.com/charmbracelet/huh"
+	"github.com/oslokommune/ok/pkg/prompt"
 	"gopkg.in/yaml.v3"
 )
 
@@ -207,17 +208,19 @@ func SelectTemplatesInteractively(templates []Template) ([]Template, error) {
 
 	var selectedKeys []string
 
+	title := "Select template(s) to install"
 	s := huh.NewMultiSelect[string]().
 		Options(options...).
-		Title("Select template(s) to install").
+		Title(title).
 		Value(&selectedKeys)
 
-	err := huh.NewForm(huh.NewGroup(s)).Run()
+	err := prompt.Run(huh.NewForm(huh.NewGroup(s)), title,
+		"Run it from a template's output folder, or pass --all to install every template.")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("running template selection: %w", err)
+		return nil, fmt.Errorf("selecting templates: %w", err)
 	}
 
 	var selected []Template

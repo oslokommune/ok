@@ -73,7 +73,7 @@ var forwardCommand = &cobra.Command{
 	Long: `Starts a port forwarding session to a database, through a port forwarding task in ECS.
 
 ok forward asks for the task definition, the database and the ports. To run it without
-prompts, set all four:
+prompts, set all four and pass --non-interactive:
 
   TASK_DEF_FAMILY  the port forwarding task's definition family (it starts with ssm-portfwd)
   RDS_ENDPOINT     the database's endpoint address

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -35,6 +36,11 @@ func TestIterate(t *testing.T) {
 func TestExitCode(t *testing.T) {
 	inputNeeded := &prompt.InputNeededError{Prompt: "Select cluster", Reason: "CI=true is set"}
 
+	// A program ok runs that exits 2 must not make ok exit 2: 2 means ok needs input.
+	var programFailed *exec.ExitError
+	require.ErrorAs(t, exec.Command("sh", "-c", "exit 2").Run(), &programFailed)
+	require.Equal(t, 2, programFailed.ExitCode())
+
 	tests := []struct {
 		name string
 		err  error
@@ -44,6 +50,7 @@ func TestExitCode(t *testing.T) {
 		{name: "input needed, wrapped", err: fmt.Errorf("selecting packages: %w", inputNeeded), want: 2},
 		{name: "input needed, joined", err: errors.Join(errors.New("other"), inputNeeded), want: 2},
 		{name: "any other error", err: errors.New("boom"), want: 1},
+		{name: "a program that exits 2, wrapped", err: fmt.Errorf("running boilerplate command: %w", programFailed), want: 1},
 	}
 
 	for _, tt := range tests {

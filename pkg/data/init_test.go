@@ -1,8 +1,11 @@
 package data
 
 import (
+	"errors"
 	"os"
 	"testing"
+
+	"github.com/oslokommune/ok/pkg/prompt"
 )
 
 func TestDetermineTemplate_UserProvided(t *testing.T) {
@@ -158,5 +161,20 @@ func TestBuildDatabricksCommand_NoTemplate(t *testing.T) {
 		if actualArgs[i] != arg {
 			t.Errorf("Arg %d: expected '%s', got '%s'", i, arg, actualArgs[i])
 		}
+	}
+}
+
+func TestRunInitWithoutPrompting(t *testing.T) {
+	prompt.SetMode(prompt.Mode{Reason: "CI=true is set"})
+	t.Cleanup(func() { prompt.SetMode(prompt.Mode{Interactive: true}) })
+
+	err := RunInit(InitOptions{})
+
+	var inputNeeded *prompt.InputNeededError
+	if !errors.As(err, &inputNeeded) {
+		t.Fatalf("expected InputNeededError without --config-file, got %v", err)
+	}
+	if inputNeeded.Hint == "" {
+		t.Error("expected a hint that names --config-file")
 	}
 }

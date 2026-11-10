@@ -82,9 +82,9 @@ func Execute() {
 
 // exitCode is the exit code the error asks for, or exitCodeError.
 func exitCode(err error) int {
-	var withExitCode interface{ ExitCode() int }
-	if errors.As(err, &withExitCode) {
-		return withExitCode.ExitCode()
+	var inputNeeded *prompt.InputNeededError
+	if errors.As(err, &inputNeeded) {
+		return inputNeeded.ExitCode()
 	}
 	return exitCodeError
 }

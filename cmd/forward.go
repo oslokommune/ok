@@ -81,8 +81,8 @@ prompts, set all four and pass --non-interactive:
   REMOTE_PORT      the database's port, e.g. 5432
 
 --keep saves the database endpoint and the ports in ` + forwardSavedSelections + `, and ok forward
-uses them next time. It does not save the task definition: set TASK_DEF_FAMILY for that.
---clear deletes the file.`,
+uses them next time. A variable you set wins over its saved value. It does not save the task
+definition: set TASK_DEF_FAMILY for that. --clear deletes the file.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		scriptArgs := getForwardCommandScriptFlags(cmd)
 

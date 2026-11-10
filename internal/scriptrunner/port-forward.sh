@@ -71,8 +71,16 @@ tagPrefix="OkTool:"
 taskDefinitionFamilyPrefix="ssm-portfwd"
 
 if [ -f "$configFile" ]; then
-    # shellcheck source=/dev/null
-    source "$configFile"
+    # A saved selection fills in only a variable the environment does not set.
+    while IFS='=' read -r name value; do
+        case "$name" in
+            TASK_DEF_FAMILY|TASK_DEF_ARN|RDS_ENDPOINT|LOCAL_PORT|REMOTE_PORT)
+                if [ -z "${!name}" ]; then
+                    printf -v "$name" '%s' "$value"
+                fi
+                ;;
+        esac
+    done < "$configFile"
 else
     if [ "$WRITE_CONFIG" = true ]; then
         touch "$configFile"

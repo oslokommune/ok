@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.23.1](https://github.com/oslokommune/ok/compare/v5.23.0...v5.23.1) (2026-11-18)
+
+
+### Dependency Updates
+
+* bump the gomod-all group across 2 directories with 7 updates ([#537](https://github.com/oslokommune/ok/issues/537)) ([ed9c117](https://github.com/oslokommune/ok/commit/ed9c1176417adfbcc3121578ff44153500f0a250))
+
 ## [5.23.0](https://github.com/oslokommune/ok/compare/v5.22.2...v5.23.0) (2026-11-06)
 
 

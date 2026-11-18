@@ -128,6 +128,54 @@ url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_darwin_amd64
 url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/440146744"
 provenance = "cosign"
 
+[[tools."aqua:vale-cli/vale"]]
+version = "3.22.0"
+backend = "aqua:vale-cli/vale"
+
+[tools."aqua:vale-cli/vale"."platforms.linux-arm64"]
+checksum = "sha256:18f57dfe023e804159b2bb307f00274d801d426c518a8a0cc25d4f98bf035e73"
+url = "https://github.com/vale-cli/vale/releases/download/v3.22.0/vale_3.22.0_Linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/570522680"
+
+[tools."aqua:vale-cli/vale"."platforms.linux-x64"]
+checksum = "sha256:52f5cd0314a1b7384cac6aa102a68193977312f6ba9c9f3ae001b5deec8e3a10"
+url = "https://github.com/vale-cli/vale/releases/download/v3.22.0/vale_3.22.0_Linux_64-bit.tar.gz"
+url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/570522733"
+
+[tools."aqua:vale-cli/vale"."platforms.macos-arm64"]
+checksum = "sha256:7dea014d6586101f6f695105f2e8825b7297236df0af9e68e193bcb4e4d25f7e"
+url = "https://github.com/vale-cli/vale/releases/download/v3.22.0/vale_3.22.0_macOS_arm64.tar.gz"
+url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/570522684"
+
+[tools."aqua:vale-cli/vale"."platforms.macos-x64"]
+checksum = "sha256:e54a94b86d45f8bdd751f31ad3d06d6ae04da1154e720a006ed0f2e03a675fff"
+url = "https://github.com/vale-cli/vale/releases/download/v3.22.0/vale_3.22.0_macOS_64-bit.tar.gz"
+url_api = "https://api.github.com/repos/vale-cli/vale/releases/assets/570522678"
+
+[[tools."aqua:watchexec/watchexec"]]
+version = "2.8.0"
+backend = "aqua:watchexec/watchexec"
+
+[tools."aqua:watchexec/watchexec"."platforms.linux-arm64"]
+checksum = "sha256:aaa5eb7e62e9ce99cad7f14260265aaa9df8884e195c0661ab011825a6d61634"
+url = "https://github.com/watchexec/watchexec/releases/download/v2.8.0/watchexec-2.8.0-aarch64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/watchexec/watchexec/releases/assets/616138796"
+
+[tools."aqua:watchexec/watchexec"."platforms.linux-x64"]
+checksum = "sha256:21839e9840ef592b4d571885ccbd692f54ae5bd4231f3caf29fcf31fa7723afe"
+url = "https://github.com/watchexec/watchexec/releases/download/v2.8.0/watchexec-2.8.0-x86_64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/watchexec/watchexec/releases/assets/616138794"
+
+[tools."aqua:watchexec/watchexec"."platforms.macos-arm64"]
+checksum = "sha256:8da8bdbfb8568138616a082c05a87224e08d5cb2994feb956426291cf0c6fe10"
+url = "https://github.com/watchexec/watchexec/releases/download/v2.8.0/watchexec-2.8.0-aarch64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/watchexec/watchexec/releases/assets/616138836"
+
+[tools."aqua:watchexec/watchexec"."platforms.macos-x64"]
+checksum = "sha256:b7f694ad19c1cf168388f3295a5e825425f7dac5cd27cffd2d89a51ed4ab0f22"
+url = "https://github.com/watchexec/watchexec/releases/download/v2.8.0/watchexec-2.8.0-x86_64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/watchexec/watchexec/releases/assets/616138831"
+
 [[tools.go]]
 version = "1.25.3"
 backend = "core:go"

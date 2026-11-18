@@ -198,3 +198,18 @@ mise run lock    # refresh mise.lock for every supported platform
 ```
 
 Run `mise tasks` to list them.
+
+### Linting the generated docs
+
+The command reference in `docs/` is published to a docs site with its own [Vale](https://vale.sh) house
+style. To check the help text against it before it gets there, point `VALE_CONFIG` at that style's
+`.vale.ini` and run the `prose` task:
+
+```sh
+export VALE_CONFIG=path/to/docs-site/.vale.ini
+mise run prose     # regenerate docs/ and lint it once
+mise watch prose   # lint again every time you save a file in cmd/
+```
+
+Vale resolves the rules and vocabulary relative to the config file, so nothing needs to be copied into
+this repository. The findings point at lines in `docs/`; fix them in the command's help text in `cmd/`.

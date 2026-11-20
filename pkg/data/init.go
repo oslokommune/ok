@@ -5,6 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/oslokommune/ok/pkg/error_user_msg"
+	"github.com/oslokommune/ok/pkg/prompt"
 )
 
 // InitOptions contains all the options for initializing a databricks bundle
@@ -19,6 +20,13 @@ type InitOptions struct {
 
 // RunInit executes the databricks bundle init command with the configured template
 func RunInit(opts InitOptions) error {
+	// Without a config file, databricks asks for the template's input values
+	if opts.ConfigFile == "" {
+		if err := prompt.Check("Enter the template's input values", "Pass --config-file with the template's input values."); err != nil {
+			return err
+		}
+	}
+
 	// Check if databricks CLI is installed
 	if err := checkDatabricksInstalled(); err != nil {
 		return err

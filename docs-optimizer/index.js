@@ -187,6 +187,50 @@ const codeFontCommandNamesPlugin = () => (tree) => {
   });
 };
 
+// Help text is written for the terminal, where a URL is plain text. In Markdown
+// a bare URL fails markdownlint's MD034, so each one becomes a link node whose
+// label is the URL itself, which remark-stringify writes as `<https://…>`.
+// Trailing punctuation belongs to the sentence, not the URL.
+const bareUrlPattern = /https?:\/\/[^\s<>]*[^\s<>.,;:!?'")\]]/g;
+
+const autolinkBareUrlsPlugin = () => (tree) => {
+  visit(tree, "text", (node, nodeIndex, parentNode) => {
+    // Text inside a link is already linked.
+    if (!parentNode || parentNode.type === "link") return;
+
+    const replacementNodes = [];
+    let lastMatchEnd = 0;
+
+    for (const match of node.value.matchAll(bareUrlPattern)) {
+      const [url] = match;
+      if (match.index > lastMatchEnd) {
+        replacementNodes.push({
+          type: "text",
+          value: node.value.slice(lastMatchEnd, match.index),
+        });
+      }
+      replacementNodes.push({
+        type: "link",
+        url,
+        children: [{ type: "text", value: url }],
+      });
+      lastMatchEnd = match.index + url.length;
+    }
+
+    if (replacementNodes.length === 0) return;
+
+    if (lastMatchEnd < node.value.length) {
+      replacementNodes.push({
+        type: "text",
+        value: node.value.slice(lastMatchEnd),
+      });
+    }
+
+    parentNode.children.splice(nodeIndex, 1, ...replacementNodes);
+    return [visit.SKIP, nodeIndex + replacementNodes.length];
+  });
+};
+
 // A list with one item is not a list; it is a paragraph wearing a bullet. Cobra
 // emits one for every leaf command's "See also" section, since that only links
 // back to the parent. The item's content moves up to take the list's place.
@@ -215,6 +259,7 @@ const markdownProcessor = unified()
   .use(removeHeadingAndSubsectionsPlugin, {
     targetHeading: "Options inherited from parent commands",
   })
+  .use(autolinkBareUrlsPlugin)
   // Order matters: the code font passes run first so the literals they wrap are
   // no longer text nodes when shell names get capitalized.
   .use(codeFontCommandNamesPlugin)

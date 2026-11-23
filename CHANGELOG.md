@@ -1,5 +1,16 @@
 # Changelog
 
+## [6.0.0](https://github.com/oslokommune/ok/compare/v5.23.1...v6.0.0) (2026-11-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* add --non-interactive and exit code 2 when input is needed ([#552](https://github.com/oslokommune/ok/issues/552))
+
+### Features
+
+* add --non-interactive and exit code 2 when input is needed ([#552](https://github.com/oslokommune/ok/issues/552)) ([b34aa86](https://github.com/oslokommune/ok/commit/b34aa867fe259ef46ad8479b86b7341c1b9db0b6)), closes [#551](https://github.com/oslokommune/ok/issues/551)
+
 ## [5.23.1](https://github.com/oslokommune/ok/compare/v5.23.0...v5.23.1) (2026-11-18)
 
 

@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sso"
 	"github.com/aws/aws-sdk-go-v2/service/ssooidc"
+	"github.com/oslokommune/ok/pkg/prompt"
 )
 
 const (
@@ -186,6 +187,11 @@ func generateProfileName(data profileNameData, templateStr string) (string, erro
 // Generate creates AWS SSO profile configurations based on the provided options.
 // It handles the SSO authentication flow and generates AWS config file content.
 func Generate(opts Options) error {
+	// Every run logs in to AWS SSO in the browser and waits for it.
+	if err := prompt.Check("Log in to AWS SSO in the browser", ""); err != nil {
+		return err
+	}
+
 	generator, err := NewConfigGenerator(opts)
 	if err != nil {
 		return fmt.Errorf("creating config generator: %w", err)

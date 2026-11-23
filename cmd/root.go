@@ -8,13 +8,14 @@ import (
 	"github.com/oslokommune/ok/cmd/data"
 	"github.com/oslokommune/ok/cmd/pk"
 	"github.com/oslokommune/ok/cmd/pkg"
-	"github.com/oslokommune/ok/pkg/error_user_msg"
 	"github.com/oslokommune/ok/pkg/pkg/common"
 	"github.com/oslokommune/ok/pkg/pkg/githubreleases"
+	"github.com/oslokommune/ok/pkg/prompt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -30,6 +31,14 @@ var (
 			"[Get started](https://km.oslo.systems/initial-setup-of-your-aws-environment/set-up-environment/)!",
 		SilenceErrors: true,
 		SilenceUsage:  true,
+		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
+			var nonInteractive *bool
+			if cmd.Flags().Changed(FlagNonInteractiveName) {
+				on, _ := cmd.Flags().GetBool(FlagNonInteractiveName)
+				nonInteractive = &on
+			}
+			prompt.SetMode(promptMode(nonInteractive, os.Getenv, prompt.HasTerminal()))
+		},
 	}
 
 	// cfgFile stores the path to the configuration file specified by the user.
@@ -37,6 +46,14 @@ var (
 
 	// defaultConfigPath stores the default configuration file path.
 	defaultConfigPath string
+)
+
+const (
+	FlagNonInteractiveName  = "non-interactive"
+	FlagNonInteractiveUsage = "Never prompt; exit 2 if input is needed. On by default with OK_NON_INTERACTIVE=true, " +
+		"CI=true, or without a terminal. --non-interactive=false turns prompts back on"
+
+	exitCodeError = 1
 )
 
 // Execute is the main entry point for our program.
@@ -52,15 +69,64 @@ func Execute() {
 		fmt.Fprintln(os.Stderr, redStyle.Render("Error:"))
 		prettyPrintError(err)
 
-		var userError *error_user_msg.ErrorUserMessage
-		if errors.As(err, &userError) {
+		var withDetails interface{ Details() string }
+		if errors.As(err, &withDetails) && withDetails.Details() != "" {
 			fmt.Fprintln(os.Stderr)
 			fmt.Fprintln(os.Stderr, common.StyleTitle.Render("Details:"))
-			fmt.Fprintln(os.Stderr, userError.Details())
+			fmt.Fprintln(os.Stderr, withDetails.Details())
 		}
 
-		os.Exit(1)
+		os.Exit(exitCode(err))
 	}
+}
+
+// exitCode is the exit code the error asks for, or exitCodeError.
+func exitCode(err error) int {
+	var inputNeeded *prompt.InputNeededError
+	if errors.As(err, &inputNeeded) {
+		return inputNeeded.ExitCode()
+	}
+	return exitCodeError
+}
+
+// usageTemplateWithExitCodes adds an Exit Codes section after the flags in a cobra usage template.
+func usageTemplateWithExitCodes(template string) string {
+	exitCodes := fmt.Sprintf("\n\nExit Codes:\n"+
+		"  0  success\n"+
+		"  %d  error\n"+
+		"  %d  input needed, but ok may not prompt (see --%s)",
+		exitCodeError, prompt.ExitCodeInputNeeded, FlagNonInteractiveName)
+
+	const afterFlags = "{{if .HasHelpSubCommands}}"
+	return strings.Replace(template, afterFlags, exitCodes+afterFlags, 1)
+}
+
+// promptMode decides whether ok may prompt. The first one set wins: --non-interactive (nil when
+// not given), OK_NON_INTERACTIVE, CI=true. When none is set, ok prompts if it has a terminal.
+func promptMode(nonInteractive *bool, getenv func(string) string, hasTerminal bool) prompt.Mode {
+	if nonInteractive != nil {
+		if *nonInteractive {
+			return prompt.Mode{Reason: "--" + FlagNonInteractiveName + " is set"}
+		}
+		return prompt.Mode{Interactive: true}
+	}
+	if v := getenv("OK_NON_INTERACTIVE"); v != "" {
+		if on, err := strconv.ParseBool(v); err == nil {
+			if on {
+				return prompt.Mode{Reason: "OK_NON_INTERACTIVE=" + v + " is set"}
+			}
+			return prompt.Mode{Interactive: true}
+		}
+	}
+	if v := getenv("CI"); v != "" {
+		if on, err := strconv.ParseBool(v); err == nil && on {
+			return prompt.Mode{Reason: "CI=" + v + " is set"}
+		}
+	}
+	if !hasTerminal {
+		return prompt.Mode{Reason: "there is no terminal"}
+	}
+	return prompt.Mode{Interactive: true}
 }
 
 // init initializes the root command, setting up the configuration file path and flags.
@@ -70,6 +136,8 @@ func init() {
 	defaultConfigPath = path.Join(home, ".config", "ok", "config.yml")
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", fmt.Sprintf("config file (default is %s)", defaultConfigPath))
+	rootCmd.PersistentFlags().Bool(FlagNonInteractiveName, false, FlagNonInteractiveUsage)
+	rootCmd.SetUsageTemplate(usageTemplateWithExitCodes(rootCmd.UsageTemplate()))
 
 	// Create dependencies
 	ghReleases := githubreleases.NewGitHubReleases()
@@ -114,7 +182,7 @@ func initializeConfiguration() {
 // loadConfiguration attempts to read the configuration file using viper and prints the path of the used configuration file if successful.
 func loadConfiguration() {
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
 }
 

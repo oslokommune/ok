@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/huh"
 	"github.com/oslokommune/ok/pkg/pkg/common"
+	"github.com/oslokommune/ok/pkg/prompt"
 )
 
 func SelectPackages(manifest common.PackageManifest, action string) ([]common.Package, error) {
@@ -20,18 +21,21 @@ func SelectPackages(manifest common.PackageManifest, action string) ([]common.Pa
 
 	var selectedPackageKeys []string
 
+	title := "Select package(s) to " + action
 	s := huh.NewMultiSelect[string]().
 		Options(options...).
-		Title("Select package(s) to " + action).
+		Title(title).
 		Limit(4).
 		Value(&selectedPackageKeys)
 
-	err := huh.NewForm(huh.NewGroup(s)).Run()
+	hint := fmt.Sprintf("Name the output folder(s) as arguments, e.g. ok pkg %s networking, "+
+		"or leave out --interactive to %s every package.", action, action)
+	err := prompt.Run(huh.NewForm(huh.NewGroup(s)), title, hint)
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return []common.Package{}, nil
 		} else {
-			return []common.Package{}, fmt.Errorf("running multi select form: %w", err)
+			return []common.Package{}, err
 		}
 	}
 

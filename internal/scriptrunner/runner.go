@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-
-	"github.com/magefile/mage/sh"
 )
 
 //go:embed port-forward.sh
@@ -35,8 +33,9 @@ func createTempScriptFile(scriptName string) (string, error) {
 	return tmpFile.Name(), nil
 }
 
-// Executes a script with the given arguments, and returns the output.
-func executeScript(scriptFile string, args []string) error {
+// Executes a script with the given arguments. Without interactive, the script's stdin is empty, so
+// a prompt in it gets end of input instead of waiting.
+func executeScript(scriptFile string, args []string, interactive bool) error {
 
 	bashPath, err := exec.LookPath("bash")
 	if err != nil {
@@ -45,7 +44,14 @@ func executeScript(scriptFile string, args []string) error {
 
 	combinedArgs := append([]string{scriptFile}, args...)
 
-	err = sh.RunV(bashPath, combinedArgs...)
+	cmd := exec.Command(bashPath, combinedArgs...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if interactive {
+		cmd.Stdin = os.Stdin
+	}
+
+	err = cmd.Run()
 	if err != nil {
 		return fmt.Errorf("executing script: %v", err)
 	}
@@ -53,17 +59,12 @@ func executeScript(scriptFile string, args []string) error {
 	return nil
 }
 
-func RunScript(scriptName string, args []string) {
+func RunScript(scriptName string, args []string, interactive bool) error {
 	scriptFile, err := createTempScriptFile(scriptName)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	defer os.Remove(scriptFile)
 
-	err = executeScript(scriptFile, args)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	return executeScript(scriptFile, args, interactive)
 }

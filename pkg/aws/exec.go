@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/magefile/mage/sh"
+	"github.com/oslokommune/ok/pkg/prompt"
 	"strings"
 )
 
@@ -127,17 +128,18 @@ func Exec() (string, error) {
 		clusterOptions = append(clusterOptions, huh.NewOption(c, c))
 	}
 
+	clusterTitle := "Select cluster"
 	clusterSelect := huh.NewSelect[string]().
 		Options(clusterOptions...).
-		Title("Select cluster").
+		Title(clusterTitle).
 		Value(&cluster)
 
-	err = huh.NewForm(huh.NewGroup(clusterSelect)).Run()
+	err = prompt.Run(huh.NewForm(huh.NewGroup(clusterSelect)), clusterTitle, "")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
 		} else {
-			return "", fmt.Errorf("running cluster select form: %w", err)
+			return "", fmt.Errorf("selecting cluster: %w", err)
 		}
 	}
 
@@ -151,18 +153,19 @@ func Exec() (string, error) {
 		serviceOptions = append(serviceOptions, huh.NewOption(s, s))
 	}
 
+	serviceTitle := "Select service"
 	serviceSelect := huh.NewSelect[string]().
 		Options(serviceOptions...).
-		Title("Select service").
+		Title(serviceTitle).
 		Value(&service)
 
-	err = huh.NewForm(huh.NewGroup(serviceSelect)).Run()
+	err = prompt.Run(huh.NewForm(huh.NewGroup(serviceSelect)), serviceTitle, "")
 
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
 		} else {
-			return "", fmt.Errorf("running service select form: %w", err)
+			return "", fmt.Errorf("selecting service: %w", err)
 		}
 	}
 
@@ -176,17 +179,18 @@ func Exec() (string, error) {
 		taskOptions = append(taskOptions, huh.NewOption(t, t))
 	}
 
+	taskTitle := "Select running task"
 	taskSelect := huh.NewSelect[string]().
 		Options(taskOptions...).
-		Title("Select running task").
+		Title(taskTitle).
 		Value(&task)
 
-	err = huh.NewForm(huh.NewGroup(taskSelect)).Run()
+	err = prompt.Run(huh.NewForm(huh.NewGroup(taskSelect)), taskTitle, "")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
 		} else {
-			return "", fmt.Errorf("running task select form: %w", err)
+			return "", fmt.Errorf("selecting task: %w", err)
 		}
 	}
 
@@ -200,17 +204,18 @@ func Exec() (string, error) {
 		containerOptions = append(containerOptions, huh.NewOption(*c.Name, *c.Name))
 	}
 
+	containerTitle := "Select container"
 	containerSelect := huh.NewSelect[string]().
 		Options(containerOptions...).
-		Title("Select container").
+		Title(containerTitle).
 		Value(&container)
 
-	err = huh.NewForm(huh.NewGroup(containerSelect)).Run()
+	err = prompt.Run(huh.NewForm(huh.NewGroup(containerSelect)), containerTitle, "")
 	if err != nil {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return "", nil
 		} else {
-			return "", fmt.Errorf("running container select form: %w", err)
+			return "", fmt.Errorf("selecting container: %w", err)
 		}
 	}
 

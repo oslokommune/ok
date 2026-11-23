@@ -11,6 +11,7 @@ on:
       - 'go.mod'
       - 'go.sum'
       - '**/*.sh'
+      - '.goreleaser.yml'
       # NOTE: Formula/ is written by GoReleaser during a release. It is left out
       # so that commit does not start another run.
       # NOTE: We need to trigger a release when a PR from release-please has been merged

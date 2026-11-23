@@ -32,3 +32,5 @@ main
 /packages.yml
 
 docs
+
+/version.json

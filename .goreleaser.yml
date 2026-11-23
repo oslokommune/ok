@@ -17,6 +17,7 @@ release:
 before:
   hooks:
     - ./scripts/completions.sh
+    - ./scripts/release-metadata.sh "{{ .Version }}" "{{ .FullCommit }}" "{{ .Date }}"
 
 builds:
   - binary: ok
@@ -27,8 +28,15 @@ builds:
       - amd64
       - arm64
 archives:
-  - files:
+  - id: versioned
+    files:
       - completions/*
+      - version.json
+  - id: stable
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - completions/*
+      - version.json
 
 nfpms:
   - package_name: ok
@@ -40,6 +48,7 @@ nfpms:
 
 brews:
   - name: ok
+    ids: [versioned]
     description: A CLI called ok
     homepage: https://github.com/oslokommune/ok
     goarm: 6
